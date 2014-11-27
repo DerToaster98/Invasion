@@ -10,6 +10,8 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.packet.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
@@ -150,4 +152,7 @@ public class BlockNexus extends BlockContainer
             world.spawnParticle("portal", x1, y1, z1, x2, y2, z2);
         }
     }
+
+    
+ 
 }

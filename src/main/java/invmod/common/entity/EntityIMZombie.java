@@ -192,10 +192,6 @@ public class EntityIMZombie extends EntityIMMob implements ICanDig
                 {
                     setTexture(5);
                 }
-                else if (this.flavour == 3)
-                {
-                    setTexture(3);
-                }
                 else
                 {
                     int r = this.rand.nextInt(2);
@@ -475,32 +471,32 @@ public class EntityIMZombie extends EntityIMMob implements ICanDig
         }
     }
 
-    protected void updateAnimation()
-    {
-        if ((!this.worldObj.isRemote) && (this.terrainModifier.isBusy()))
-        {
-            setSwinging(true);
-        }
-
-        int swingSpeed = getSwingSpeed();
-
-        if (isSwinging())
-        {
-            this.swingTimer += 1;
-
-            if (this.swingTimer >= swingSpeed)
-            {
-                this.swingTimer = 0;
-                setSwinging(false);
-            }
-        }
-        else
-        {
-            this.swingTimer = 0;
-        }
-
-        this.swingProgress = (this.swingTimer / swingSpeed);
-    }
+	protected void updateAnimation() 
+	{
+		updateAnimation(false);
+	}
+	
+	public void updateAnimation(boolean override){
+	if ((!this.worldObj.isRemote) && ((this.terrainModifier.isBusy())||override) )
+	{
+		setSwinging(true);
+	}
+	int swingSpeed = getSwingSpeed();
+	if (isSwinging())
+	{
+		this.swingTimer += 1;
+		if (this.swingTimer >= swingSpeed) 
+		{
+			this.swingTimer = 0;
+			setSwinging(false);
+		}
+	}
+	else 
+	{
+		this.swingTimer = 0;
+	}
+	this.swingProgress =(float)((float)this.swingTimer / (float)swingSpeed);
+}
 
     protected boolean isSwinging()
     {
@@ -671,18 +667,6 @@ public class EntityIMZombie extends EntityIMMob implements ICanDig
                 this.maxDestructiveness = 2;
                 this.flammability = 30;
                 this.floatsInWater = false;
-                setDestructiveness(2);
-                setMaxHealthAndHealth(mod_Invasion.getMobHealth(this));
-            }
-            else if (flavour == 3)
-            {
-                setName("Zombie Pigman");
-                setGender(1);
-                setBaseMoveSpeedStat(0.25F);
-                this.attackStrength = 8;
-                this.maxDestructiveness = 2;
-                this.isImmuneToFire = true;
-                this.defaultHeldItem = new ItemStack(Item.swordGold, 1);
                 setDestructiveness(2);
                 setMaxHealthAndHealth(mod_Invasion.getMobHealth(this));
             }

@@ -18,7 +18,6 @@ public class RenderIMZombie extends RenderLiving
 {
     private static final ResourceLocation t_old = new ResourceLocation("invmod:textures/zombie_old.png");
     private static final ResourceLocation t_T1a = new ResourceLocation("invmod:textures/zombieT1a.png");
-    private static final ResourceLocation t_pig = new ResourceLocation("invmod:textures/pigzombie64x32.png");
     private static final ResourceLocation t_T2 = new ResourceLocation("invmod:textures/zombieT2.png");
     private static final ResourceLocation t_T2a = new ResourceLocation("invmod:textures/zombieT2a.png");
     private static final ResourceLocation t_T3 = new ResourceLocation("invmod:textures/zombieT3.png");
@@ -144,9 +143,6 @@ public class RenderIMZombie extends RenderLiving
 
             case 2:
                 return t_T2;
-
-            case 3:
-                return t_pig;
 
             case 4:
                 return t_T2a;

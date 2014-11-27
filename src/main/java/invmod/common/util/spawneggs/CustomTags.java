@@ -82,7 +82,29 @@ public class CustomTags
         tag.setInteger("tier", 2);
         return tag;
     }
-
+    
+	public static NBTTagCompound IMZombiePigman_T1() {
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setInteger("flavour", 1);
+		tag.setInteger("tier", 1);
+		return tag;
+	}
+	
+	public static NBTTagCompound IMZombiePigman_T2() {
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setInteger("flavour", 1);
+		tag.setInteger("tier", 2);
+		return tag;
+	}
+	
+	public static NBTTagCompound IMZombiePigman_T3() {
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setInteger("flavour", 1);
+		tag.setInteger("tier", 3);
+		return tag;
+	}
+	
+    
     public static NBTTagCompound witherSkeleton()
     {
         NBTTagCompound tag = new NBTTagCompound();

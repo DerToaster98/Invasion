@@ -26,6 +26,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -175,11 +176,7 @@ public class EntityIMCreeper extends EntityIMMob
             if (this.timeSinceIgnited >= 30)
             {
                 this.timeSinceIgnited = 30;
-
-                if (!this.worldObj.isRemote)
-                {
-                    this.explosionDeath = true;
-                }
+                this.explosionDeath = true;
             }
         }
 
@@ -259,12 +256,15 @@ public class EntityIMCreeper extends EntityIMMob
 
     protected void doExplosion()
     {
+    	
         boolean mobgriefing = this.worldObj.getGameRules().getGameRuleBooleanValue("mobGriefing");
-        Explosion explosion = new Explosion(this.worldObj, this, this.posX, this.posY + 1.0D, this.posZ, 1.3F);
+        Explosion explosion = new Explosion(this.worldObj, this, this.posX, this.posY + 1.0D, this.posZ, 2.1F);
         explosion.isFlaming = false;
         explosion.isSmoking = mobgriefing;
+        if(!worldObj.isRemote){
         explosion.doExplosionA();
-        ExplosionUtil.doExplosionB(this.worldObj, explosion, false);
+        }
+        ExplosionUtil.doExplosionB(this.worldObj, explosion, true);
     }
 
     public int getCreeperState()

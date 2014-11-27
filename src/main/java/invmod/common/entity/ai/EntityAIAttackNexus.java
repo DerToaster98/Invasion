@@ -4,6 +4,7 @@ package invmod.common.entity.ai;
 
 import invmod.common.mod_Invasion;
 import invmod.common.entity.EntityIMLiving;
+import invmod.common.entity.EntityIMZombie;
 import invmod.common.entity.Goal;
 import invmod.common.nexus.INexusAccess;
 import invmod.common.nexus.TileEntityNexus;
@@ -44,15 +45,18 @@ public class EntityAIAttackNexus extends EntityAIBase
 
     public void updateTask()
     {
-        if (this.theEntity.attackTime == 0)
+      if (this.theEntity.attackTime == 0)
+      {
+        if (isNexusInRange())
         {
-            if (isNexusInRange())
-            {
-                this.theEntity.getNexus().attackNexus(2);
-            }
-
-            this.attacked = true;
+      	if(this.theEntity instanceof EntityIMZombie)
+      	{
+      		((EntityIMZombie)this.theEntity).updateAnimation(true);
+      	}
+          this.theEntity.getNexus().attackNexus(2);
         }
+        this.attacked = true;
+      }
     }
 
     public void resetTask()

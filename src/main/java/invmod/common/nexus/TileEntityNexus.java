@@ -19,6 +19,9 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.network.INetworkManager;
+import net.minecraft.network.packet.Packet;
+import net.minecraft.network.packet.Packet132TileEntityData;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
@@ -65,7 +68,7 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
     private boolean mobsSorted;
     private boolean resumedFromNBT;
     private AttackerAI attackerAI;
-
+    private boolean activated;
     public TileEntityNexus()
     {
         this(null);
@@ -108,6 +111,7 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
         this.continuousAttack = false;
         this.mobsSorted = false;
         this.resumedFromNBT = false;
+        this.activated=false;
     }
 
     public void updateEntity()
@@ -207,6 +211,7 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
     {
         mod_Invasion.tryGetInvasionPermission(this);
         startInvasion(startWave);
+		this.activated=true;
     }
 
     public void createBolt(int x, int y, int z, int t)
@@ -501,6 +506,7 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
         this.daysToAttack = nbttagcompound.getInteger("daysToAttack");
         this.continuousAttack = nbttagcompound.getBoolean("continuousAttack");
         this.boundingBoxToRadius.setBounds(this.xCoord - (this.spawnRadius + 10), this.yCoord - (this.spawnRadius + 40), this.zCoord - (this.spawnRadius + 10), this.xCoord + (this.spawnRadius + 10), this.yCoord + (this.spawnRadius + 40), this.zCoord + (this.spawnRadius + 10));
+        this.activated= nbttagcompound.getBoolean("activated");
         mod_Invasion.log("activationTimer = " + this.activationTimer);
         mod_Invasion.log("mode = " + this.mode);
         mod_Invasion.log("currentWave = " + this.currentWave);
@@ -546,7 +552,9 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
         nbttagcompound.setInteger("nextAttackTime", this.nextAttackTime);
         nbttagcompound.setInteger("daysToAttack", this.daysToAttack);
         nbttagcompound.setBoolean("continuousAttack", this.continuousAttack);
+        nbttagcompound.setBoolean("activated", this.activated);
         NBTTagList nbttaglist = new NBTTagList();
+        
 
         for (int i = 0; i < this.nexusItemStacks.length; i++)
         {
@@ -655,7 +663,7 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
                     this.waveDelayTimer = -1L;
                     this.timer = System.currentTimeMillis();
                     mod_Invasion.sendMessageToPlayers(this.getBoundPlayers(), "The first wave is coming soon!");
-                    mod_Invasion.playGlobalSFX("invmod:rumble");
+                    mod_Invasion.playGlobalSFX("invmod:rumble1");
                 }
                 catch (WaveSpawnerException e)
                 {
@@ -967,7 +975,7 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
                     {
                         this.nexusItemStacks[0] = null;
                     }
-
+                    this.activated=true;
                     startInvasion(1);
                     int blockId = this.worldObj.getBlockId(this.xCoord, this.yCoord, this.zCoord);
                     Block.blocksList[blockId].setBlockUnbreakable();
@@ -980,7 +988,7 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
                     {
                         this.nexusItemStacks[0] = null;
                     }
-
+                    this.activated=true;
                     startInvasion(10);
                     int blockId = this.worldObj.getBlockId(this.xCoord, this.yCoord, this.zCoord);
                     Block.blocksList[blockId].setBlockUnbreakable();
@@ -993,7 +1001,7 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
                     {
                         this.nexusItemStacks[0] = null;
                     }
-
+                    this.activated=true;
                     startContinuousPlay();
                     int blockId = this.worldObj.getBlockId(this.xCoord, this.yCoord, this.zCoord);
                     Block.blocksList[blockId].setBlockUnbreakable();
@@ -1074,6 +1082,7 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
         this.activationTimer = 0;
         this.currentWave = 0;
         this.errorState = 0;
+        this.activated=false;
     }
 
     private void bindPlayers()
@@ -1288,4 +1297,51 @@ public class TileEntityNexus extends TileEntity implements INexusAccess, IInvent
     {
         return this.boundPlayers;
     }
+    
+	public boolean isActive()
+	{
+		return this.activated;
+	}
+	
+	@Override
+	public void onDataPacket(INetworkManager net, Packet132TileEntityData packet){
+		NBTTagCompound tagCompound = packet.data;
+		this.readFromNBT(tagCompound);
+	}
+	
+	@Override
+	public Packet getDescriptionPacket(){
+		NBTTagCompound tagCompound = new NBTTagCompound();
+		this.writeToNBT(tagCompound);
+		return new Packet132TileEntityData(this.xCoord, this.yCoord, this.zCoord, 4, tagCompound);
+	}
+	
+//	@Override
+//	public IBaseClass getHandler() {
+//			if(baseHandler == null) baseHandler = HydraulicBaseClassSupplier.getBaseClass(this);
+//        return baseHandler;
+//	}
+//	
+//	@Override
+//	public void onDataPacket(INetworkManager net, Packet132TileEntityData packet) {
+//		getHandler().onDataPacket(net, packet);
+//	}
+//
+//	@Override
+//	public Packet getDescriptionPacket() {
+//		return getHandler().getDescriptionPacket();
+//	}
+//	
+//	@Override
+//	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity packet) {
+//		NBTTagCompound tagCompound = packet.func_148857_g();
+//		this.readFromNBT(tagCompound);
+//	}
+//	
+//	@Override
+//	public Packet getDescriptionPacket(){
+//		NBTTagCompound tagCompound = new NBTTagCompound();
+//		this.writeToNBT(tagCompound);
+//		return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 4, tagCompound);
+//	}
 }

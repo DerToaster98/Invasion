@@ -9,5 +9,6 @@ public class ItemEngyHammer extends ItemIM
         super(id);
         this.setMaxStackSize(1);
         this.setCreativeTab(null);
+        this.setFull3D();
     }
 }

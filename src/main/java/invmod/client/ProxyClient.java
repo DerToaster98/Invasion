@@ -13,7 +13,9 @@ import invmod.client.render.RenderEgg;
 import invmod.client.render.RenderGiantBird;
 import invmod.client.render.RenderIMCreeper;
 import invmod.client.render.RenderIMSkeleton;
+import invmod.client.render.RenderIMWolf;
 import invmod.client.render.RenderIMZombie;
+import invmod.client.render.RenderIMZombiePigman;
 import invmod.client.render.RenderImp;
 import invmod.client.render.RenderInvis;
 import invmod.client.render.RenderPenArrow;
@@ -46,7 +48,9 @@ import invmod.common.entity.EntityIMSpawnProxy;
 import invmod.common.entity.EntityIMSpider;
 import invmod.common.entity.EntityIMThrower;
 import invmod.common.entity.EntityIMTrap;
+import invmod.common.entity.EntityIMWolf;
 import invmod.common.entity.EntityIMZombie;
+import invmod.common.entity.EntityIMZombiePigman;
 import invmod.common.entity.EntitySFX;
 
 import java.io.File;
@@ -87,11 +91,13 @@ public class ProxyClient extends ProxyCommon
     public void registerEntityRenderers()
     {
         RenderingRegistry.registerEntityRenderingHandler(EntityIMZombie.class, new RenderIMZombie(new ModelZombie(0.0F, true), 0.5F));
+		RenderingRegistry.registerEntityRenderingHandler(EntityIMZombiePigman.class, new RenderIMZombiePigman(new ModelZombie(0.0F, true), 0.5F));
         RenderingRegistry.registerEntityRenderingHandler(EntityIMSkeleton.class, new RenderIMSkeleton(new ModelIMSkeleton(), 0.5F));
         RenderingRegistry.registerEntityRenderingHandler(EntityIMSpider.class, new RenderSpiderIM());
         RenderingRegistry.registerEntityRenderingHandler(EntityIMPigEngy.class, new RenderPigEngy(new ModelBiped(), 0.5F));
         RenderingRegistry.registerEntityRenderingHandler(EntityIMImp.class, new RenderImp(new ModelImp(), 0.3F));
         RenderingRegistry.registerEntityRenderingHandler(EntityIMThrower.class, new RenderThrower(new ModelThrower(), 1.5F));
+		RenderingRegistry.registerEntityRenderingHandler(EntityIMWolf.class, new RenderIMWolf());
         RenderingRegistry.registerEntityRenderingHandler(EntityIMBurrower.class, new RenderBurrower());
         RenderingRegistry.registerEntityRenderingHandler(EntityIMBoulder.class, new RenderBoulder());
         RenderingRegistry.registerEntityRenderingHandler(EntityIMTrap.class, new RenderTrap(new ModelTrap()));

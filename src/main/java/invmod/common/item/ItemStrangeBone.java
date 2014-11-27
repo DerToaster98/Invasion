@@ -61,6 +61,8 @@ public class ItemStrangeBone extends ItemIM
                     wolf.worldObj.spawnEntityInWorld(newWolf);
                     wolf.setDead();
                     itemStack.stackSize -= 1;
+                }else{
+              	  player.addChatMessage("The wolf doesn't like this strange bone.");
                 }
             }
 
@@ -70,47 +72,4 @@ public class ItemStrangeBone extends ItemIM
         return false;
     }
 
-//    @Override
-//    public boolean hitEntity(ItemStack itemstack, EntityLivingBase targetEntity, EntityLivingBase player)
-//    {
-//        if ((!targetEntity.worldObj.isRemote) && ((targetEntity instanceof EntityWolf)) && (!(targetEntity instanceof EntityIMWolf)))
-//        {
-//            EntityWolf wolf = (EntityWolf)targetEntity;
-//
-//            if (wolf.isTamed())
-//            {
-//                TileEntityNexus nexus = null;
-//                int x = MathHelper.floor_double(wolf.posX);
-//                int y = MathHelper.floor_double(wolf.posY);
-//                int z = MathHelper.floor_double(wolf.posZ);
-//
-//                for (int i = -7; i < 8; i++)
-//                {
-//                    for (int j = -4; j < 5; j++)
-//                    {
-//                        for (int k = -7; k < 8; k++)
-//                        {
-//                            if (wolf.worldObj.getBlockId(x + i, y + j, z + k) == mod_Invasion.blockNexus.blockID)
-//                            {
-//                                nexus = (TileEntityNexus)wolf.worldObj.getBlockTileEntity(x + i, y + j, z + k);
-//                                break;
-//                            }
-//                        }
-//                    }
-//                }
-//
-//                if (nexus != null)
-//                {
-//                    EntityIMWolf newWolf = new EntityIMWolf(wolf, nexus);
-//                    wolf.worldObj.spawnEntityInWorld(newWolf);
-//                    wolf.setDead();
-//                    itemstack.stackSize -= 1;
-//                }
-//            }
-//
-//            return true;
-//        }
-//
-//        return false;
-//    }
 }
