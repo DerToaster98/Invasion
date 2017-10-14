@@ -1,20 +1,22 @@
-/gradle
-/eclipse
-/build
-/.settings
-/.gradle
-
-README.txt
-MinecraftForge-License.txt
-MinecraftForge-Credits.txt
-LICENSE-fml.txt
-gradlew.bat
-gradlew
-forge-1.6.4-9.11.1.964-changelog.txt
-CREDITS-fml.txt
-build.gradle
-
-.project
-.gitattributes
+# eclipse
+bin
+*.launch
+.settings
+.metadata
 .classpath
-/bin/
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
