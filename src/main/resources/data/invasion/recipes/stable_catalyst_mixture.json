@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "#C#",
+        " B "
+    ],
+    "key": {
+        "#": {
+            "item": "minecraft:bone"
+        },
+        "C": {
+            "item": "minecraft:coal"
+        },
+        "B": {
+            "item": "minecraft:bowl"
+        }
+    },
+    "result": {
+        "item": "minecraft:stable_catalyst_mixture",
+        "count": 1
+    }
+}

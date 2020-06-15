@@ -1,0 +1,27 @@
+ {
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "F#O",
+        "O#F",
+        " B "
+    ],
+    "key": {
+        "B": {
+            "item": "minecraft:bowl"
+        },
+        "#": {
+            "item": "minecraft:redstone"
+        },
+        "O": {
+            "item": "minecraft:bone"
+        },
+        "F": {
+            "item": "minecraft:rotten_flesh"
+        }
+        
+    },
+    "result": {
+        "item": "minecraft:catalyst_mixture",
+        "count": 1
+    }
+}  

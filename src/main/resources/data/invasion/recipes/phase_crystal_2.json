@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        " # ",
+        "XDX",
+        " # "
+    ],
+    "key": {
+        "X": {
+            "item": "minecraft:lapis_lazuli"
+        },
+        "D": {
+            "item": "minecraft:diamond"
+        },
+        "#": {
+            "item": "minecraft:redstone"
+        }
+    },
+    "result": {
+        "item": "invasion:phase_crystal",
+        "count": 1
+    }
+} 
+ 
+ 
