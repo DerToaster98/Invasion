@@ -41,6 +41,10 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toCollection;
 
 //TODO refactor this class into individual classes for each invasion mode, but this is a story for another time
+
+/**
+ * The Nexus class is responsible for spawning enemies and managing hp and stuff. However, some logic is located in 'NexusTileEntity'
+ */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class Nexus extends WorldSavedData {
@@ -121,6 +125,11 @@ public class Nexus extends WorldSavedData {
 
     }
 
+    /**
+     * Retrieves a Nexus instance from a world. if an instance is already loaded, it will be returned.
+     * @param worldIn The world from which the Nexus is retrieved. It must not be remote.
+     * @return A Nexus instance. It either is loaded from worldIn directly or cached from previous calls.
+     */
     public static Nexus get(World worldIn) {
         if (worldIn.isRemote) throw new IllegalStateException("Tried to retrieve WorldSavedData remotely");
         if (instance ==null) {
@@ -136,6 +145,10 @@ public class Nexus extends WorldSavedData {
 
      */
 
+    /**
+     * Called every tick and handles spawning and various checks
+     * @param event The event data
+     */
     @SubscribeEvent
     public void update(TickEvent.WorldTickEvent event) {
         if (world.isRemote) return;
@@ -201,12 +214,18 @@ public class Nexus extends WorldSavedData {
         attackerAI.onResume();
     }
 
+    /**
+     * Force-stop any ongoing invasion
+     */
     public void emergencyStop() {
         Invasion.logger.info("Nexus manually stopped by command");
         stop();
         killAllMobs();
     }
 
+    /**
+     * Prints debug messages to player chats
+     */
     public void debugStatus() {
         sendMessageToBoundPlayers(new StringTextComponent("Current Time: " + world.getGameTime()));
         sendMessageToBoundPlayers(new StringTextComponent("Time to next: " + nextAttackTime));
@@ -215,29 +234,42 @@ public class Nexus extends WorldSavedData {
         sendMessageToBoundPlayers(new StringTextComponent("Mode: " + mode));
     }
 
+    /**
+     * Used to start a wave invasion via commands
+     * @param startWave the wave number to start at
+     * @param tileEntity the NexusTileEntity to bind to
+     */
     public void debugStartInvasion(int startWave, NexusTileEntity tileEntity) {
         startInvasion(startWave, tileEntity);
         happening = true;
     }
 
+    /**
+     * Used to start a continuous invasion via commands
+     * @param tileEntity the NexusTileEntity to bind to
+     */
     public void debugStartContinuous(NexusTileEntity tileEntity) {
         startContinuousPlay(tileEntity);
         happening = true;
     }
 
-    public boolean setSpawnRadius(int radius) {
+    /**
+     * Sets the spawn radius. Only works if the Nexus is active.
+     * @param radius the new radius (must be greater than 8)
+     */
+    public void setSpawnRadius(int radius) {
         if ((!waveSpawner.isActive()) && (radius > 8)) {
             spawnRadius = radius;
             waveSpawner.setRadius(radius);
             boundingBoxToRadius = new AxisAlignedBB(pos.getX() - (spawnRadius + 10), 0.0D, pos.getZ() - (spawnRadius + 10),
                     pos.getX() + (spawnRadius + 10), 127.0D, pos.getZ() + (spawnRadius + 10));
-            return true;
         }
 
-        return false;
     }
 
-
+    /**
+     * Called to signalize the death of an enemy
+     */
     public void registerMobDied() {
         kills += 1;
         mobsLeftInWave -= 1;
@@ -293,9 +325,13 @@ public class Nexus extends WorldSavedData {
         return currentWave;
     }
 
+    /**
+     * Reads data from NBT
+     * @param nbt the data as NBT
+     */
     @Override
     public void read(@Nonnull CompoundNBT nbt) {
-        Invasion.logger.debug("Restoring invasion from NBT...");
+        Invasion.logger.debug("Restoring nexus from NBT...");
         //super.read(nbt);
 
         happening = nbt.getBoolean("happening");
@@ -329,6 +365,11 @@ public class Nexus extends WorldSavedData {
         attackerAI.read(nbt);
     }
 
+    /**
+     * Writes the data of a Nexus to NBT
+     * @param nbt the original NBT Compound
+     * @return the written NBT Compound
+     */
     @Override
     @Nonnull
     public CompoundNBT write(@Nonnull CompoundNBT nbt) {
