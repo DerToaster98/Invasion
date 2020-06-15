@@ -33,7 +33,7 @@ public class TerrainDataLayer implements IBlockAccessExtended {
         return 0;
     }
 
-    public void setAllData(Map<Integer,Integer> data) {
+    public void setAllData(Map<Integer, Integer> data) {
         this.dataLayer = data;
     }
 

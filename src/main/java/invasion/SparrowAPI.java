@@ -3,49 +3,48 @@ package invasion;
 import net.minecraft.entity.Entity;
 
 
-public interface SparrowAPI
-{
+public interface SparrowAPI {
 
-	public boolean isStupidToAttack();
+    boolean isStupidToAttack();
 
-	public boolean doNotVaporize();
+    boolean doNotVaporize();
 
-	public boolean isPredator();
+    boolean isPredator();
 
-	public boolean isHostile();
+    boolean isHostile();
 
-	public boolean isPeaceful();
+    boolean isPeaceful();
 
-	public boolean isPrey();
+    boolean isPrey();
 
-	public boolean isNeutral();
+    boolean isNeutral();
 
-	public boolean isUnkillable();
+    boolean isUnkillable();
 
-	public boolean isThreatTo(Entity paramEntity);
+    boolean isThreatTo(Entity paramEntity);
 
-	public boolean isFriendOf(Entity paramEntity);
+    boolean isFriendOf(Entity paramEntity);
 
-	public boolean isNPC();
+    boolean isNPC();
 
-	public int isPet();
+    int isPet();
 
-	public Entity getPetOwner();
+    Entity getPetOwner();
 
-	public String getName();
+    String getName();
 
-	public Entity getAttackingTarget();
+    Entity getAttackingTarget();
 
-	public float getSize();
+    float getSize();
 
-	public String getSpecies();
+    String getSpecies();
 
-	public int getTier();
+    int getTier();
 
-	public int getGender();
+    int getGender();
 
-	public String customStringAndResponse(String paramString);
+    String customStringAndResponse(String paramString);
 
-	public String getSimplyID();
+    String getSimplyID();
 
 }

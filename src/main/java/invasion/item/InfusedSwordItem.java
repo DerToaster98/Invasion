@@ -1,6 +1,5 @@
 package invasion.item;
 
-import invasion.init.ModItemGroups;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -38,7 +37,7 @@ public class InfusedSwordItem extends SwordItem {
 
     @Override
     public boolean hitEntity(ItemStack itemstack,
-							 LivingEntity entity1, LivingEntity entity2) {
+                             LivingEntity entity1, LivingEntity entity2) {
         if (this.isDamaged(itemstack)) {
             this.setDamage(itemstack, this.getDamage(itemstack) - 1);
 
@@ -78,10 +77,9 @@ public class InfusedSwordItem extends SwordItem {
 	 */
 
 
-
-	@Override
+    @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-		ItemStack itemstack = player.getHeldItem(hand);
+        ItemStack itemstack = player.getHeldItem(hand);
         if (!world.isRemote && itemstack.getDamage() == 0) {
             // if player isSneaking then refill hunger else refill health
             if (player.isSneaking()) {
@@ -91,7 +89,7 @@ public class InfusedSwordItem extends SwordItem {
             } else {
                 player.heal(6.0F);
                 // spawn heart particles around the player
-				//TODO fix coordinates
+                //TODO fix coordinates
                 world.addParticle(ParticleTypes.HEART,
                         player.getPosX() + 1.5D, player.getPosY(),
                         player.getPosZ(), 0.0D, 0.0D, 0.0D);

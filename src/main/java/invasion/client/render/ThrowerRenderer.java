@@ -2,7 +2,6 @@ package invasion.client.render;
 
 
 import invasion.Invasion;
-import invasion.Reference;
 import invasion.client.render.model.ThrowerModel;
 import invasion.entity.monster.EntityIMThrower;
 import net.minecraft.client.renderer.entity.EntityRendererManager;

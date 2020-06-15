@@ -1,6 +1,5 @@
 package invasion.entity.ally;
 
-import java.util.List;
 import invasion.entity.EntityIMLiving;
 import invasion.entity.ai.navigator.PathNode;
 import invasion.entity.ai.navigator.PathfinderIM;
@@ -15,79 +14,68 @@ import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerProfessio
 import net.minecraftforge.registries.IForgeRegistry;
 import scala.actors.threadpool.Arrays;
 
+import java.util.List;
 
-public class EntityIMVillager extends EntityIMLiving
-{
 
-	private boolean nexusBound = false;
+public class EntityIMVillager extends EntityIMLiving {
 
-	private VillagerProfession originalProfession;
+    private boolean nexusBound = false;
 
-	public EntityIMVillager(World worldIn)
-	{
-		this(worldIn, null);
-	}
+    private final VillagerProfession originalProfession;
 
-	public EntityIMVillager(World worldIn, EntityVillager villager)
-	{
-		super(worldIn);
-		if (villager != null)
-		{
-			this.originalProfession = villager.getProfessionForge();
-		}
-		else
-		{
-			List<VillagerProfession> professions = VillagerRegistry.instance().getRegistry().getValues();
-			this.originalProfession = professions.get(this.rand.nextInt(professions.size()));
-		}
-	}
+    public EntityIMVillager(World worldIn) {
+        this(worldIn, null);
+    }
 
-	@Override
-	protected void initEntityAI()
-	{
-		this.tasks.addTask(0, new EntityAISwimming(this));
-	}
+    public EntityIMVillager(World worldIn, EntityVillager villager) {
+        super(worldIn);
+        if (villager != null) {
+            this.originalProfession = villager.getProfessionForge();
+        } else {
+            List<VillagerProfession> professions = VillagerRegistry.instance().getRegistry().getValues();
+            this.originalProfession = professions.get(this.rand.nextInt(professions.size()));
+        }
+    }
 
-	@Override
-	public void acquiredByNexus(Nexus nexus)
-	{
-		if (this.targetNexus == null)
-		{
-			this.targetNexus = nexus;
-			this.nexusBound = true;
-		}
-	}
+    @Override
+    protected void initEntityAI() {
+        this.tasks.addTask(0, new EntityAISwimming(this));
+    }
 
-	@Override
-	public float getBlockPathCost(PathNode prevNode, PathNode node, IBlockAccess terrainMap)
-	{
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    @Override
+    public void acquiredByNexus(Nexus nexus) {
+        if (this.targetNexus == null) {
+            this.targetNexus = nexus;
+            this.nexusBound = true;
+        }
+    }
 
-	@Override
-	public void getPathOptionsFromNode(IBlockAccess paramIBlockAccess, PathNode paramPathNode, PathfinderIM paramPathfinderIM)
-	{
-		// TODO Auto-generated method stub
-	}
+    @Override
+    public float getBlockPathCost(PathNode prevNode, PathNode node, IBlockAccess terrainMap) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 
-	public static class IMVillageAssignment
-	{
+    @Override
+    public void getPathOptionsFromNode(IBlockAccess paramIBlockAccess, PathNode paramPathNode, PathfinderIM paramPathfinderIM) {
+        // TODO Auto-generated method stub
+    }
 
-		public static final IForgeRegistry<VillagerProfession> REGISTRY = VillagerRegistry.instance();//.getRegistry();
+    public static class IMVillageAssignment {
 
-		public static final IMVillageAssignment WARRIOR = new IMVillageAssignment("warrior",
-			REGISTRY.getValue(new ResourceLocation("minecraft:butcher")));
+        public static final IForgeRegistry<VillagerProfession> REGISTRY = VillagerRegistry.instance();//.getRegistry();
 
-		public final String name;
-		public final List<VillagerProfession> compatibleProfessions;
+        public static final IMVillageAssignment WARRIOR = new IMVillageAssignment("warrior",
+                REGISTRY.getValue(new ResourceLocation("minecraft:butcher")));
 
-		public IMVillageAssignment(String name, VillagerProfession... compatibleProfessions)
-		{
-			this.name = name.toLowerCase();
-			this.compatibleProfessions = Arrays.asList(compatibleProfessions);
-		}
+        public final String name;
+        public final List<VillagerProfession> compatibleProfessions;
 
-	}
+        public IMVillageAssignment(String name, VillagerProfession... compatibleProfessions) {
+            this.name = name.toLowerCase();
+            this.compatibleProfessions = Arrays.asList(compatibleProfessions);
+        }
+
+    }
 
 }

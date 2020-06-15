@@ -35,7 +35,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
@@ -60,16 +63,9 @@ public class Nexus extends WorldSavedData {
     //private static final long BIND_EXPIRE_TIME = 300000L;
     private final WaveSpawner waveSpawner;
     private final WaveBuilder waveBuilder = new WaveBuilder();
-
-
-    private List<EntityIMLiving> mobList = new ArrayList<>();
     private final AttackerAI attackerAI;
-
-
     private final World world;
-
-
-
+    private List<EntityIMLiving> mobList = new ArrayList<>();
     // The following fields are null when no invasion is happening (and may be set when starting an invasion or reading from NBT)
     private NexusTileEntity nexusTE = null;
     private BlockPos pos = null;
@@ -86,7 +82,6 @@ public class Nexus extends WorldSavedData {
     private int spawnRadius = 52;
     private int kills; //Maybe move to nexus TE
     private int mobsLeftInWave;
-
 
 
     private int powerLevel;
@@ -106,7 +101,7 @@ public class Nexus extends WorldSavedData {
     private int cleanupTimer;
     //private long spawnerElapsedRestore;
     private long timer;
-    private long waveDelayTimer= -1L;
+    private long waveDelayTimer = -1L;
     private long waveDelay;
     private boolean continuousAttack;
     private boolean mobsSorted;
@@ -127,12 +122,13 @@ public class Nexus extends WorldSavedData {
 
     /**
      * Retrieves a Nexus instance from a world. if an instance is already loaded, it will be returned.
+     *
      * @param worldIn The world from which the Nexus is retrieved. It must not be remote.
      * @return A Nexus instance. It either is loaded from worldIn directly or cached from previous calls.
      */
     public static Nexus get(World worldIn) {
         if (worldIn.isRemote) throw new IllegalStateException("Tried to retrieve WorldSavedData remotely");
-        if (instance ==null) {
+        if (instance == null) {
             instance = ((ServerWorld) worldIn).getSavedData().getOrCreate(() -> new Nexus(worldIn), DATA_NAME);
         }
         return instance;
@@ -147,6 +143,7 @@ public class Nexus extends WorldSavedData {
 
     /**
      * Called every tick and handles spawning and various checks
+     *
      * @param event The event data
      */
     @SubscribeEvent
@@ -236,7 +233,8 @@ public class Nexus extends WorldSavedData {
 
     /**
      * Used to start a wave invasion via commands
-     * @param startWave the wave number to start at
+     *
+     * @param startWave  the wave number to start at
      * @param tileEntity the NexusTileEntity to bind to
      */
     public void debugStartInvasion(int startWave, NexusTileEntity tileEntity) {
@@ -246,25 +244,12 @@ public class Nexus extends WorldSavedData {
 
     /**
      * Used to start a continuous invasion via commands
+     *
      * @param tileEntity the NexusTileEntity to bind to
      */
     public void debugStartContinuous(NexusTileEntity tileEntity) {
         startContinuousPlay(tileEntity);
         happening = true;
-    }
-
-    /**
-     * Sets the spawn radius. Only works if the Nexus is active.
-     * @param radius the new radius (must be greater than 8)
-     */
-    public void setSpawnRadius(int radius) {
-        if ((!waveSpawner.isActive()) && (radius > 8)) {
-            spawnRadius = radius;
-            waveSpawner.setRadius(radius);
-            boundingBoxToRadius = new AxisAlignedBB(pos.getX() - (spawnRadius + 10), 0.0D, pos.getZ() - (spawnRadius + 10),
-                    pos.getX() + (spawnRadius + 10), 127.0D, pos.getZ() + (spawnRadius + 10));
-        }
-
     }
 
     /**
@@ -287,14 +272,31 @@ public class Nexus extends WorldSavedData {
         }
     }
 
-
-
     public NexusMode getMode() {
         return mode;
     }
 
+    public void setMode(NexusMode mode) {
+        this.mode = mode;
+    }
+
     public int getSpawnRadius() {
         return spawnRadius;
+    }
+
+    /**
+     * Sets the spawn radius. Only works if the Nexus is active.
+     *
+     * @param radius the new radius (must be greater than 8)
+     */
+    public void setSpawnRadius(int radius) {
+        if ((!waveSpawner.isActive()) && (radius > 8)) {
+            spawnRadius = radius;
+            waveSpawner.setRadius(radius);
+            boundingBoxToRadius = new AxisAlignedBB(pos.getX() - (spawnRadius + 10), 0.0D, pos.getZ() - (spawnRadius + 10),
+                    pos.getX() + (spawnRadius + 10), 127.0D, pos.getZ() + (spawnRadius + 10));
+        }
+
     }
 
     public int getPowerLevel() {
@@ -321,84 +323,12 @@ public class Nexus extends WorldSavedData {
         return powerLevel;
     }
 
+    public void setNexusPowerLevel(int i) {
+        powerLevel = i;
+    }
+
     public int getCurrentWave() {
         return currentWave;
-    }
-
-    /**
-     * Reads data from NBT
-     * @param nbt the data as NBT
-     */
-    @Override
-    public void read(@Nonnull CompoundNBT nbt) {
-        Invasion.logger.debug("Restoring nexus from NBT...");
-        //super.read(nbt);
-
-        happening = nbt.getBoolean("happening");
-        if (happening) {
-            pos = new BlockPos(nbt.getInt("x"), nbt.getInt("x"), nbt.getInt("x"));
-            nexusTE = (NexusTileEntity) world.getTileEntity(pos);
-            Invasion.logger.debug("An invasion is happening and restored Tile entity from NBT: {}, {}, {}", pos.getX(), pos.getY(), pos.getZ());
-        }
-        hp = nbt.getInt("hp");
-        level = nbt.getInt("level");
-        powerLevel = nbt.getInt("powerLevel");
-        currentWave = nbt.getInt("currentWave");
-        spawnRadius = nbt.getInt("spawnRadius");
-        waveSpawner.setRadius(spawnRadius);
-        boundingBoxToRadius = new AxisAlignedBB(
-                pos.getX() - (spawnRadius + 10),
-                pos.getY() - (spawnRadius + 40),
-                pos.getZ() - (spawnRadius + 10),
-                pos.getX() + (spawnRadius + 10),
-                pos.getY() + (spawnRadius + 40),
-                pos.getZ() + (spawnRadius + 10));
-
-        boundPlayers = nbt.getList("boundPlayers", Constants.NBT.TAG_COMPOUND).stream().map((compound) -> new UUID(
-                ((CompoundNBT) compound).getLong("UUIDMost"),
-                ((CompoundNBT) compound).getLong("UUIDLeast")
-        )).collect(Collectors.toList());
-
-        Invasion.logger.debug("Restored invasion from NBT with with currentWave: {}, spawnRadius: {}, powerLevel: {}, boundPlayers: {} entries",
-                currentWave, currentWave, powerLevel, boundPlayers.size());
-
-        attackerAI.read(nbt);
-    }
-
-    /**
-     * Writes the data of a Nexus to NBT
-     * @param nbt the original NBT Compound
-     * @return the written NBT Compound
-     */
-    @Override
-    @Nonnull
-    public CompoundNBT write(@Nonnull CompoundNBT nbt) {
-        //TODO maybe return a new NBT tag
-        Invasion.logger.debug("Writing invasion to NBT...");
-
-        nbt.putBoolean("happening", happening);
-        if (happening) {
-            nbt.putInt("x", pos.getX());
-            nbt.putInt("y", pos.getY());
-            nbt.putInt("z", pos.getZ());
-        }
-        nbt.putInt("hp", hp);
-        nbt.putInt("level", level);
-        nbt.putInt("powerLevel", powerLevel);
-        nbt.putInt("currentWave", currentWave);
-        nbt.putInt("spawnRadius", spawnRadius);
-
-        ListNBT uuids = new ListNBT();
-        boundPlayers.forEach((uuid) -> {
-            CompoundNBT compound = new CompoundNBT();
-            compound.putLong("UUIDMost", uuid.getMostSignificantBits());
-            compound.putLong("UUIDLeast", uuid.getLeastSignificantBits());
-            uuids.add(compound);
-        });
-        nbt.put("boundPlayers", uuids);
-
-
-        return nbt;
     }
 
     /*
@@ -508,6 +438,84 @@ public class Nexus extends WorldSavedData {
 
      */
 
+    /**
+     * Reads data from NBT
+     *
+     * @param nbt the data as NBT
+     */
+    @Override
+    public void read(@Nonnull CompoundNBT nbt) {
+        Invasion.logger.debug("Restoring nexus from NBT...");
+        //super.read(nbt);
+
+        happening = nbt.getBoolean("happening");
+        if (happening) {
+            pos = new BlockPos(nbt.getInt("x"), nbt.getInt("x"), nbt.getInt("x"));
+            nexusTE = (NexusTileEntity) world.getTileEntity(pos);
+            Invasion.logger.debug("An invasion is happening and restored Tile entity from NBT: {}, {}, {}", pos.getX(), pos.getY(), pos.getZ());
+        }
+        hp = nbt.getInt("hp");
+        level = nbt.getInt("level");
+        powerLevel = nbt.getInt("powerLevel");
+        currentWave = nbt.getInt("currentWave");
+        spawnRadius = nbt.getInt("spawnRadius");
+        waveSpawner.setRadius(spawnRadius);
+        boundingBoxToRadius = new AxisAlignedBB(
+                pos.getX() - (spawnRadius + 10),
+                pos.getY() - (spawnRadius + 40),
+                pos.getZ() - (spawnRadius + 10),
+                pos.getX() + (spawnRadius + 10),
+                pos.getY() + (spawnRadius + 40),
+                pos.getZ() + (spawnRadius + 10));
+
+        boundPlayers = nbt.getList("boundPlayers", Constants.NBT.TAG_COMPOUND).stream().map((compound) -> new UUID(
+                ((CompoundNBT) compound).getLong("UUIDMost"),
+                ((CompoundNBT) compound).getLong("UUIDLeast")
+        )).collect(Collectors.toList());
+
+        Invasion.logger.debug("Restored invasion from NBT with with currentWave: {}, spawnRadius: {}, powerLevel: {}, boundPlayers: {} entries",
+                currentWave, currentWave, powerLevel, boundPlayers.size());
+
+        attackerAI.read(nbt);
+    }
+
+    /**
+     * Writes the data of a Nexus to NBT
+     *
+     * @param nbt the original NBT Compound
+     * @return the written NBT Compound
+     */
+    @Override
+    @Nonnull
+    public CompoundNBT write(@Nonnull CompoundNBT nbt) {
+        //TODO maybe return a new NBT tag
+        Invasion.logger.debug("Writing invasion to NBT...");
+
+        nbt.putBoolean("happening", happening);
+        if (happening) {
+            nbt.putInt("x", pos.getX());
+            nbt.putInt("y", pos.getY());
+            nbt.putInt("z", pos.getZ());
+        }
+        nbt.putInt("hp", hp);
+        nbt.putInt("level", level);
+        nbt.putInt("powerLevel", powerLevel);
+        nbt.putInt("currentWave", currentWave);
+        nbt.putInt("spawnRadius", spawnRadius);
+
+        ListNBT uuids = new ListNBT();
+        boundPlayers.forEach((uuid) -> {
+            CompoundNBT compound = new CompoundNBT();
+            compound.putLong("UUIDMost", uuid.getMostSignificantBits());
+            compound.putLong("UUIDLeast", uuid.getLeastSignificantBits());
+            uuids.add(compound);
+        });
+        nbt.put("boundPlayers", uuids);
+
+
+        return nbt;
+    }
+
     public void askForRespawn(EntityIMLiving entity) {
         Invasion.logger.warn("Stuck entity asking for respawn: {} ({}, {}, {}) ", entity.toString(), entity.getPosX(), entity.getPosY(), entity.getPosZ());
         waveSpawner.askForRespawn(entity);
@@ -515,10 +523,6 @@ public class Nexus extends WorldSavedData {
 
     public AttackerAI getAttackerAI() {
         return attackerAI;
-    }
-
-    public void setNexusPowerLevel(int i) {
-        powerLevel = i;
     }
 
     public void setWave(int wave) {
@@ -627,7 +631,7 @@ public class Nexus extends WorldSavedData {
                         waveSpawner.beginNextWave(currentWave);
                         waveDelayTimer = -1L;
                         world.playSound(null, pos, ModSounds.RUMBLE.get(), SoundCategory.AMBIENT, 1.0F, 1.0F);
-                        level=Math.max(level,currentWave);
+                        level = Math.max(level, currentWave);
                     }
                 }
             } else {
@@ -635,7 +639,6 @@ public class Nexus extends WorldSavedData {
             }
         }
     }
-
 
     private void playSoundForBoundPlayers(SoundEvent sound) {
         /* TODO if (getBoundPlayers() != null) {
@@ -694,7 +697,7 @@ public class Nexus extends WorldSavedData {
                             + Config.MAX_DAYS_BETWEEN_ATTACKS_CONTINIOUS_MODE
                             - Config.MIN_DAYS_BETWEEN_ATTACKS_CONTINIOUS_MODE);
                     nextAttackTime = ((int) (currentTime / 24000L * 24000L) + 14000 + days * 24000);
-                    hp=MAX_HP;
+                    hp = MAX_HP;
                     zapTimer = 0;
                     waveDelayTimer = -1L;
                     sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus_destabilized"));
@@ -723,7 +726,7 @@ public class Nexus extends WorldSavedData {
                     waveDelayTimer = -1L;
                     continuousAttack = false;
                     waveSpawner.stop();
-                    hp=MAX_HP;
+                    hp = MAX_HP;
                     lastPowerLevel = powerLevel;
                 }
             }
@@ -776,8 +779,7 @@ public class Nexus extends WorldSavedData {
 
  */
 
-}
-
+    }
 
     private void stop() {
         if (mode == NexusMode.MODE_3) {
@@ -819,23 +821,6 @@ public class Nexus extends WorldSavedData {
     private void updateMobList() {
         mobList = world.getEntitiesWithinAABB(EntityIMLiving.class, boundingBoxToRadius);
         mobsSorted = false;
-    }
-
-    private void setActive(boolean flag) {
-// TODO: Fix this
-//		if (world != null) {
-//			int meta = world.getBlockMetadata(pos.getX(), pos.getY(),
-//					pos.getZ());
-//			if (flag) {
-//				world.setBlockMetadataWithNotify(pos.getX(),
-//						pos.getY(), pos.getZ(), (meta & 0x4) == 0 ? meta + 4
-//								: meta, 3);
-//			} else {
-//				world.setBlockMetadataWithNotify(pos.getX(),
-//						pos.getY(), pos.getZ(), (meta & 0x4) == 4 ? meta - 4
-//								: meta, 3);
-//			}
-//		}
     }
 
     private int acquireEntities() {
@@ -962,6 +947,23 @@ public class Nexus extends WorldSavedData {
         return happening;
     }
 
+    private void setActive(boolean flag) {
+// TODO: Fix this
+//		if (world != null) {
+//			int meta = world.getBlockMetadata(pos.getX(), pos.getY(),
+//					pos.getZ());
+//			if (flag) {
+//				world.setBlockMetadataWithNotify(pos.getX(),
+//						pos.getY(), pos.getZ(), (meta & 0x4) == 0 ? meta + 4
+//								: meta, 3);
+//			} else {
+//				world.setBlockMetadataWithNotify(pos.getX(),
+//						pos.getY(), pos.getZ(), (meta & 0x4) == 4 ? meta - 4
+//								: meta, 3);
+//			}
+//		}
+    }
+
     public NexusTileEntity getNexusTE() {
         return nexusTE;
     }
@@ -980,9 +982,5 @@ public class Nexus extends WorldSavedData {
 
     public int getHp() {
         return hp;
-    }
-
-    public void setMode(NexusMode mode) {
-        this.mode = mode;
     }
 }

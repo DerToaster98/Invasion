@@ -16,17 +16,17 @@ public class WaveSpawner implements ISpawnerAccess {
     private final int MIN_SPAWN_POINTS_TO_KEEP_BELOW_HEIGHT_CUTOFF = 20;
     private final int HEIGHT_CUTOFF = 35;
     private final float SPAWN_POINT_CULL_RATE = 0.3F;
-    private SpawnPointContainer spawnPointContainer;
     private final Nexus nexus;
     private final MobBuilder mobBuilder;
-    private Random rand;
+    private SpawnPointContainer spawnPointContainer;
+    private final Random rand;
     private Wave currentWave;
     private boolean active;
     private boolean waveComplete;
     private boolean spawnMode;
     private boolean debugMode;
     private int spawnRadius;
-    private int currentWaveNumber;
+    private final int currentWaveNumber;
     private int successfulSpawns;
     private long elapsed;
 
@@ -205,7 +205,7 @@ public class WaveSpawner implements ISpawnerAccess {
             return false;
         }
 
-        int spawnTries = Math.min(getNumberOfPointsInRange(minAngle, maxAngle, SpawnType.HUMANOID),20);
+        int spawnTries = Math.min(getNumberOfPointsInRange(minAngle, maxAngle, SpawnType.HUMANOID), 20);
 
         for (int j = 0; j < spawnTries; j++) {
             SpawnPoint spawnPoint;

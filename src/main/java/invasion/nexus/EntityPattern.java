@@ -4,14 +4,14 @@ import invasion.util.RandomSelectionPool;
 
 
 public class EntityPattern implements IEntityIMPattern {
-    private final IMEntityType entityType;
-    private final RandomSelectionPool<Integer> tierPool;
-    private final RandomSelectionPool<Integer> texturePool;
-    private final RandomSelectionPool<Integer> flavourPool;
     private static final int DEFAULT_TIER = 1;
     private static final int DEFAULT_FLAVOUR = 0;
     private static final int OPEN_TEXTURE = 0;
     private static final int OPEN_SCALING = 0;
+    private final IMEntityType entityType;
+    private final RandomSelectionPool<Integer> tierPool;
+    private final RandomSelectionPool<Integer> texturePool;
+    private final RandomSelectionPool<Integer> flavourPool;
 
     public EntityPattern(IMEntityType entityType) {
         this.entityType = entityType;

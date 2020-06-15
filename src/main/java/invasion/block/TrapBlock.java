@@ -41,7 +41,8 @@ public class TrapBlock extends Block {
             return this.name;
         }
 
-        @Override @Nonnull
+        @Override
+        @Nonnull
         public String getName() {
             return this.name;
         }

@@ -41,10 +41,10 @@ public class MoulderingCreeperEntity extends InvadingEntity {
     private boolean commitToExplode;
     private int explodeDirection;
 
-	private short fuseTime = 30;
-	private int explosionRadius = 3;
+    private short fuseTime = 30;
+    private final int explosionRadius = 3;
 
-	// TODO rework constructors
+    // TODO rework constructors
 
     public MoulderingCreeperEntity(World world) {
         this(world, null);
@@ -63,7 +63,7 @@ public class MoulderingCreeperEntity extends InvadingEntity {
     @Override
     protected void registerGoals() {
 
-    tasksIM = new EntityAITasks(world.profiler);
+        tasksIM = new EntityAITasks(world.profiler);
         tasksIM.addTask(0, new EntityAISwimming(this));
         tasksIM.addTask(1, new EntityAICreeperIMSwell(this));
         tasksIM.addTask(2, new EntityAIAvoidEntity(this, EntityOcelot.class, (Predicate) entity -> entity instanceof EntityOcelot, 6.0F, 0.25D, 0.300000011920929D));
@@ -87,42 +87,42 @@ public class MoulderingCreeperEntity extends InvadingEntity {
         }
         targetTasksIM.addTask(3, new EntityAIHurtByTarget(this, false));
     }
-    
-    @Override
-	protected void registerAttributes() {
-		super.registerAttributes();
-		getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
-	}
 
-	@Override
-	protected void registerData() {
-		super.registerData();
-		dataManager.register(CREEPER_STATE,-1);
-	}
+    @Override
+    protected void registerAttributes() {
+        super.registerAttributes();
+        getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.25D);
+    }
+
+    @Override
+    protected void registerData() {
+        super.registerData();
+        dataManager.register(CREEPER_STATE, -1);
+    }
 
     @Override
     public void updateAITick() {
         super.updateAITick();
     }
 
-	@Override
-	public void writeAdditional(CompoundNBT nbt) {
-		super.writeAdditional(nbt);
-		nbt.putShort("Fuse",fuseTime);
-	}
+    @Override
+    public void writeAdditional(CompoundNBT nbt) {
+        super.writeAdditional(nbt);
+        nbt.putShort("Fuse", fuseTime);
+    }
 
-	@Override
-	public void readAdditional(CompoundNBT nbt) {
-		super.readAdditional(nbt);
-		if(nbt.contains("Fuse", Constants.NBT.TAG_ANY_NUMERIC)) {
-			fuseTime = nbt.getShort("Fuse");
-		}
-	}
+    @Override
+    public void readAdditional(CompoundNBT nbt) {
+        super.readAdditional(nbt);
+        if (nbt.contains("Fuse", Constants.NBT.TAG_ANY_NUMERIC)) {
+            fuseTime = nbt.getShort("Fuse");
+        }
+    }
 
-	@OnlyIn(Dist.CLIENT)
-	public float getCreeperFlashIntensity(float f) {
-		return MathHelper.lerp(f, (float)lastActiveTime, (float)timeSinceIgnited) / (float)(fuseTime - 2);
-	}
+    @OnlyIn(Dist.CLIENT)
+    public float getCreeperFlashIntensity(float f) {
+        return MathHelper.lerp(f, (float) lastActiveTime, (float) timeSinceIgnited) / (float) (fuseTime - 2);
+    }
 
     @Override
     public boolean onPathBlocked(Path path, INotifyTask notifee) {
@@ -231,17 +231,17 @@ public class MoulderingCreeperEntity extends InvadingEntity {
      */
 
     protected void explode() {
-     //   Explosion explosion = new Explosion(world, this, posX, posY, posZ, 2.1F, false, true);
+        //   Explosion explosion = new Explosion(world, this, posX, posY, posZ, 2.1F, false, true);
 
-		Explosion.Mode explosionMode = Explosion.Mode.DESTROY;
+        Explosion.Mode explosionMode = Explosion.Mode.DESTROY;
        /* if (!world.isRemote) explosion.doExplosionA();
         explosion.doExplosionB(true);
         //ExplosionUtil.doExplosionB(world,explosion,true);
 */
 
-		dead = true;
-		world.createExplosion(this, getPosX(), getPosY(), getPosZ(), (float)explosionRadius, explosionMode);
-		remove();
+        dead = true;
+        world.createExplosion(this, getPosX(), getPosY(), getPosZ(), (float) explosionRadius, explosionMode);
+        remove();
     }
 
     public int getCreeperState() {

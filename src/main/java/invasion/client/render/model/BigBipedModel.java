@@ -11,7 +11,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class BigBipedModel<E extends LivingEntity> extends BipedModel<E> {
 
     public BigBipedModel() {
-        super(1.0f,0.0f,64,32);
+        super(1.0f, 0.0f, 64, 32);
 
         bipedHead = new ModelRenderer(this, 0, 0);
         bipedHead.addBox(-3.533333F, -7.0F, -3.5F, 7, 7, 7);
@@ -44,7 +44,7 @@ public class BigBipedModel<E extends LivingEntity> extends BipedModel<E> {
     }
 
     public void setSneaking(boolean flag) {
-    	//TODO
+        //TODO
     }
 
 /*

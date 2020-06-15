@@ -47,14 +47,14 @@ public class ImpEntity extends InvadingEntity {
 
     }
 
-	@Override
-	protected void registerAttributes() {
-		super.registerAttributes();
-		getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3f);
-		getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0f);
-	}
+    @Override
+    protected void registerAttributes() {
+        super.registerAttributes();
+        getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.3f);
+        getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(3.0f);
+    }
 
-	@Override
+    @Override
     public boolean attackEntityAsMob(Entity entity) {
         entity.setFire(3);
         return super.attackEntityAsMob(entity);

@@ -5,11 +5,11 @@ import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 
-public class ModifyBlockEntry  {
+public class ModifyBlockEntry {
     private final BlockPos pos;
-    private BlockState oldBlock;
     private final BlockState newBlock;
     private final int cost;
+    private BlockState oldBlock;
 
     public ModifyBlockEntry(BlockPos pos, Block newBlock) {
         this(pos, newBlock.getDefaultState(), 0, null);

@@ -32,7 +32,7 @@ public class PigEngyEntity extends InvadingEntity implements ICanDig, ICanBuild 
     private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
 
     private final NavigatorEngy navigatorEngy;
-	private int swingTimer;
+    private int swingTimer;
     private int planks;
     private int askForScaffoldTimer;
     private float supportThisTick;
@@ -47,7 +47,7 @@ public class PigEngyEntity extends InvadingEntity implements ICanDig, ICanBuild 
         pathSource.setSearchDepth(1500);
         pathSource.setQuickFailDepth(1500);
         navigatorEngy = new NavigatorEngy(this, pathSource);
-		PathNavigateAdapter oldNavAdapter = new PathNavigateAdapter(navigatorEngy);
+        PathNavigateAdapter oldNavAdapter = new PathNavigateAdapter(navigatorEngy);
         pathSource.setSearchDepth(1200);
 
         if (terrainBuilder == null) {

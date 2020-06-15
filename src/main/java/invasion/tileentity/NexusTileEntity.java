@@ -5,9 +5,9 @@ import invasion.container.NexusContainer;
 import invasion.init.ModBlocks;
 import invasion.init.ModItems;
 import invasion.init.ModTileEntityTypes;
+import invasion.nexus.INexusAccess;
 import invasion.nexus.Nexus;
 import invasion.nexus.NexusMode;
-import invasion.nexus.INexusAccess;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
@@ -48,7 +48,6 @@ public class NexusTileEntity extends LockableTileEntity implements INexusAccess,
     private final LazyOptional<IItemHandlerModifiable> itemHandler = LazyOptional.of(() -> items);
     private final IIntArray syncData;
     private int numPlayersUsing;
-
 
 
     private NexusMode mode; // it seems like: { 0: inactive, 1: wave invasion ,2:continuous invasion, 3: strong wave invasion 4:? }?
@@ -105,6 +104,17 @@ public class NexusTileEntity extends LockableTileEntity implements INexusAccess,
         this(ModTileEntityTypes.NEXUS.get());
     }
 
+    public static int getNumPlayersUsing(IBlockReader reader, BlockPos pos) {
+        BlockState blockstate = reader.getBlockState(pos);
+        if (blockstate.hasTileEntity()) {
+            TileEntity tileEntity = reader.getTileEntity(pos);
+            if (tileEntity instanceof NexusTileEntity) {
+                return ((NexusTileEntity) tileEntity).numPlayersUsing;
+            }
+        }
+        return 0;
+    }
+
     @Override
     public void tick() {
 
@@ -112,7 +122,7 @@ public class NexusTileEntity extends LockableTileEntity implements INexusAccess,
 
         if (contents.get(0).isEmpty()) {
             cookTime = 0;
-            activationTimer=0;
+            activationTimer = 0;
         } else {
             if (isInInputSlot(Items.BRICK)) {
                 if (cookTime < MAX_COOK_TIME) {
@@ -137,23 +147,19 @@ public class NexusTileEntity extends LockableTileEntity implements INexusAccess,
                 */
             }
         }
-        if(activationTimer>=MAX_ACTIVATION_TIME) {
-            activationTimer=0;
+        if (activationTimer >= MAX_ACTIVATION_TIME) {
+            activationTimer = 0;
 
-            if(isInInputSlot(ModItems.CATALYST.get()))  {
-                Nexus.get(world).startInvasion(1,this);
-            } else if(isInInputSlot(ModItems.STRONG_CATALYST.get())) {
-                Nexus.get(world).startInvasion(10,this);
-            } else if(isInInputSlot(ModItems.STABLE_CATALYST.get())) {
+            if (isInInputSlot(ModItems.CATALYST.get())) {
+                Nexus.get(world).startInvasion(1, this);
+            } else if (isInInputSlot(ModItems.STRONG_CATALYST.get())) {
+                Nexus.get(world).startInvasion(10, this);
+            } else if (isInInputSlot(ModItems.STABLE_CATALYST.get())) {
                 Nexus.get(world).debugStartContinuous(this);
             }
 
             contents.get(0).shrink(1);
         }
-
-
-
-
 
 
     }
@@ -275,17 +281,6 @@ public class NexusTileEntity extends LockableTileEntity implements INexusAccess,
     public void updateContainingBlockInfo() {
         super.updateContainingBlockInfo();
         //TODO
-    }
-
-    public static int getNumPlayersUsing(IBlockReader reader, BlockPos pos) {
-        BlockState blockstate = reader.getBlockState(pos);
-        if (blockstate.hasTileEntity()) {
-            TileEntity tileEntity = reader.getTileEntity(pos);
-            if (tileEntity instanceof NexusTileEntity) {
-                return ((NexusTileEntity) tileEntity).numPlayersUsing;
-            }
-        }
-        return 0;
     }
 
     private IItemHandlerModifiable createHandler() {

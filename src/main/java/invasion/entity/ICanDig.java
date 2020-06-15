@@ -5,17 +5,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 
-public interface ICanDig
-{
+public interface ICanDig {
 
-	public BlockPos[] getBlockRemovalOrder(BlockPos pos);
+    BlockPos[] getBlockRemovalOrder(BlockPos pos);
 
-	public float getBlockRemovalCost(BlockPos pos);
+    float getBlockRemovalCost(BlockPos pos);
 
-	public boolean canClearBlock(BlockPos pos);
+    boolean canClearBlock(BlockPos pos);
 
-	public void onBlockRemoved(BlockPos pos, IBlockState state);
+    void onBlockRemoved(BlockPos pos, IBlockState state);
 
-	public IBlockAccess getTerrain();
+    IBlockAccess getTerrain();
 
 }

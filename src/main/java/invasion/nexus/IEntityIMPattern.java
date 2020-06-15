@@ -1,8 +1,7 @@
 package invasion.nexus;
 
-public interface IEntityIMPattern
-{
-	EntityConstruct generateEntityConstruct();
+public interface IEntityIMPattern {
+    EntityConstruct generateEntityConstruct();
 
-	EntityConstruct generateEntityConstruct(int paramInt1, int paramInt2);
+    EntityConstruct generateEntityConstruct(int paramInt1, int paramInt2);
 }

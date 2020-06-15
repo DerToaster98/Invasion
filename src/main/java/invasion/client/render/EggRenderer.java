@@ -20,8 +20,8 @@ public class EggRenderer extends EntityRenderer<EggEntity> {
     private final EggModel model = new EggModel();
 
     protected EggRenderer(EntityRendererManager rendererManager) {
-      super(rendererManager);
-      shadowSize = 0.5f;
+        super(rendererManager);
+        shadowSize = 0.5f;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class EggRenderer extends EntityRenderer<EggEntity> {
         super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 
         IVertexBuilder vertexBuilder = bufferIn.getBuffer(model.getRenderType(getEntityTexture(entityIn)));
-        model.render(matrixStackIn,vertexBuilder,packedLightIn, OverlayTexture.NO_OVERLAY,1.0f,1.0f,1.0f,1.0f);
+        model.render(matrixStackIn, vertexBuilder, packedLightIn, OverlayTexture.NO_OVERLAY, 1.0f, 1.0f, 1.0f, 1.0f);
 
     }
 

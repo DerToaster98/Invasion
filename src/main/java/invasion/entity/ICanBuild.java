@@ -6,21 +6,20 @@ import net.minecraft.util.math.BlockPos;
 
 /**
  * In order for an entity to use {@link TerrainBuilder}, implement this interface.
- * @author DarthXenon
+ *
  * @param <T> Must extend {@link EntityIMLiving}.
+ * @author DarthXenon
  * @since IM 1.2.6
  */
-public interface ICanBuild<T extends EntityIMLiving>
-{
+public interface ICanBuild<T extends EntityIMLiving> {
 
-	/**
-	 * Returns the entity, which must extend {@link Entity}.
-	 */
-	public default T getEntity()
-	{
-		return (this instanceof EntityIMLiving) ? (T)this : null;
-	}
+    /**
+     * Returns the entity, which must extend {@link Entity}.
+     */
+    default T getEntity() {
+        return (this instanceof EntityIMLiving) ? (T) this : null;
+    }
 
-	public boolean canPlaceLadderAt(BlockPos pos);
+    boolean canPlaceLadderAt(BlockPos pos);
 
 }

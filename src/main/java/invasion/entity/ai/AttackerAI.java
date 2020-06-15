@@ -32,7 +32,7 @@ import java.util.Map;
 public class AttackerAI {
     private final Nexus nexus;
     private final IPathSource pathSource;
-    private final Map<Integer,Integer> entityDensityData = new HashMap<>();
+    private final Map<Integer, Integer> entityDensityData = new HashMap<>();
     private final List<Scaffold> scaffolds = new ArrayList<>();
     private int scaffoldLimit;
     private int minDistanceBetweenScaffolds;
@@ -122,7 +122,7 @@ public class AttackerAI {
             List costDif = new ArrayList(scaffoldPositions.size());
             for (int i = 0; i < scaffoldPositions.size(); i++) {
                 TerrainDataLayer terrainMap = new TerrainDataLayer(getChunkCache(pos.getX(), pos.getY(), pos.getZ(), nexus.getPos().getX(), nexus.getPos().getY(), nexus.getPos().getZ(), 12.0F));
-                Scaffold s = (Scaffold) scaffoldPositions.get(i);
+                Scaffold s = scaffoldPositions.get(i);
                 for (int j = 0; j < scaffoldPositions.size(); j++) {
                     if (j != i) {
                         terrainMap.setData(s.getPos().x, s.getPos().y, s.getPos().z, Integer.valueOf(200000));

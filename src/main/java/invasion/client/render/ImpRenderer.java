@@ -11,11 +11,11 @@ import net.minecraft.util.ResourceLocation;
 public class ImpRenderer extends LivingRenderer<ImpEntity, ImpModel> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID + "textures/entity/imp.png");
 
-	public ImpRenderer(EntityRendererManager rendererManager) {
-		super(rendererManager, new ImpModel(), 0.3f);
-	}
+    public ImpRenderer(EntityRendererManager rendererManager) {
+        super(rendererManager, new ImpModel(), 0.3f);
+    }
 
-	@Override
+    @Override
     public ResourceLocation getEntityTexture(ImpEntity entity) {
         return TEXTURE;
     }

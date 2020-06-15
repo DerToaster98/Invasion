@@ -30,10 +30,13 @@ public abstract class EntityIMLiving extends Entity implements IHasNexus, IPathf
     private static final DataParameter<Integer> MOVE_STATE = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.VARINT); //23
     private static final DataParameter<Integer> TIER = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.VARINT); //30
     private static final DataParameter<Integer> TEXTURE = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.VARINT); //31
-
-    private PathCreator pathSource = new PathCreator(700, 50);
-    private final NavigatorIM imNavigator = new NavigatorIM(this, this.pathSource);
+    protected static List<Block> unDestructableBlocks = Arrays.asList(
+            Blocks.BEDROCK, Blocks.COMMAND_BLOCK, Blocks.END_PORTAL_FRAME,
+            Blocks.LADDER, Blocks.CHEST);
     private final PathNavigateAdapter oldNavAdapter = new PathNavigateAdapter(this.imNavigator);
+    protected Nexus targetNexus;
+    private final PathCreator pathSource = new PathCreator(700, 50);
+    private final NavigatorIM imNavigator = new NavigatorIM(this, this.pathSource);
     private BlockPos collideSize;
     private BlockPos currentTargetPos = BlockPos.ORIGIN;
     private int rallyCooldown;
@@ -41,11 +44,7 @@ public abstract class EntityIMLiving extends Entity implements IHasNexus, IPathf
     private float moveSpeedBase = 0.2f;
     private float moveSpeed = 0.2f;
     private MoveState moveState;
-    private IMMoveHelper moveHelperIM = new IMMoveHelper(this);
-    protected Nexus targetNexus;
-    protected static List<Block> unDestructableBlocks = Arrays.asList(
-            Blocks.BEDROCK, Blocks.COMMAND_BLOCK, Blocks.END_PORTAL_FRAME,
-            Blocks.LADDER, Blocks.CHEST);
+    private final IMMoveHelper moveHelperIM = new IMMoveHelper(this);
 
     public EntityIMLiving(World worldIn) {
         this(worldIn, null);
@@ -126,14 +125,14 @@ public abstract class EntityIMLiving extends Entity implements IHasNexus, IPathf
         return this.rallyCooldown == 0;
     }
 
+    public int getTier() {
+        return this.getDataManager().get(TIER);
+    }
+
     public void setTier(int tier) {
         this.getDataManager().set(TIER, tier);
         this.initEntityAI();
         this.setTexture(tier);
-    }
-
-    public int getTier() {
-        return this.getDataManager().get(TIER);
     }
 
     public void setTexture(int textureId) {
@@ -164,10 +163,6 @@ public abstract class EntityIMLiving extends Entity implements IHasNexus, IPathf
         if (this.rallyCooldown > 0) {
             this.rallyCooldown--;
         }
-    }
-
-    public void setCurrentTargetPos(BlockPos pos) {
-        this.currentTargetPos = pos;
     }
 
     public boolean canStandAt(IBlockAccess terrainMap, BlockPos pos) {
@@ -284,29 +279,9 @@ public abstract class EntityIMLiving extends Entity implements IHasNexus, IPathf
         return false;
     }
 
-    protected void setBaseMoveSpeedStat(float speed) {
-        this.moveSpeedBase = speed;
-        this.moveSpeed = speed;
-    }
-
-    public void setMoveSpeedStat(float speed) {
-        this.moveSpeed = speed;
-        this.getNavigatorNew().setSpeed(speed);
-        //this.getMoveHelper().setMoveSpeed(speed);
-    }
-
     public void resetMoveSpeed() {
         this.setMoveSpeedStat(this.moveSpeedBase);
         this.getNavigatorNew().setSpeed(this.moveSpeedBase);
-    }
-
-    public void setMoveState(MoveState moveState) {
-        this.moveState = moveState;
-        if (!this.world.isRemote) this.getDataManager().set(MOVE_STATE, Integer.valueOf(moveState.ordinal()));
-    }
-
-    public void setTurnRate(float rate) {
-        this.turnRate = rate;
     }
 
     public boolean isHoldingOntoLadder() {
@@ -346,8 +321,19 @@ public abstract class EntityIMLiving extends Entity implements IHasNexus, IPathf
         return this.moveSpeed;
     }
 
+    public void setMoveSpeedStat(float speed) {
+        this.moveSpeed = speed;
+        this.getNavigatorNew().setSpeed(speed);
+        //this.getMoveHelper().setMoveSpeed(speed);
+    }
+
     public float getBaseMoveSpeedStat() {
         return this.moveSpeedBase;
+    }
+
+    protected void setBaseMoveSpeedStat(float speed) {
+        this.moveSpeedBase = speed;
+        this.moveSpeed = speed;
     }
 
     @Override
@@ -359,12 +345,25 @@ public abstract class EntityIMLiving extends Entity implements IHasNexus, IPathf
         return this.moveState;
     }
 
+    public void setMoveState(MoveState moveState) {
+        this.moveState = moveState;
+        if (!this.world.isRemote) this.getDataManager().set(MOVE_STATE, Integer.valueOf(moveState.ordinal()));
+    }
+
     public BlockPos getCurrentTargetPos() {
         return this.currentTargetPos;
     }
 
+    public void setCurrentTargetPos(BlockPos pos) {
+        this.currentTargetPos = pos;
+    }
+
     public float getTurnRate() {
         return this.turnRate;
+    }
+
+    public void setTurnRate(float rate) {
+        this.turnRate = rate;
     }
 
     @Override

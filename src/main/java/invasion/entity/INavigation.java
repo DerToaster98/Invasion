@@ -6,49 +6,48 @@ import invasion.entity.ai.navigator.PathAction;
 import net.minecraft.entity.Entity;
 
 
-public interface INavigation extends INotifyTask
-{
+public interface INavigation extends INotifyTask {
 
-	public PathAction getCurrentWorkingAction();
+    PathAction getCurrentWorkingAction();
 
-	public void setSpeed(float paramFloat);
+    void setSpeed(float paramFloat);
 
-	public Path getPathToXYZ(double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat);
+    Path getPathToXYZ(double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat);
 
-	public boolean tryMoveToXYZ(double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2);
+    boolean tryMoveToXYZ(double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2);
 
-	public Path getPathTowardsXZ(double paramDouble1, double paramDouble2, int paramInt1, int paramInt2, int paramInt3);
+    Path getPathTowardsXZ(double paramDouble1, double paramDouble2, int paramInt1, int paramInt2, int paramInt3);
 
-	public boolean tryMoveTowardsXZ(double paramDouble1, double paramDouble2, int paramInt1, int paramInt2, int paramInt3, float paramFloat);
+    boolean tryMoveTowardsXZ(double paramDouble1, double paramDouble2, int paramInt1, int paramInt2, int paramInt3, float paramFloat);
 
-	public Path getPathToEntity(Entity paramEntity, float paramFloat);
+    Path getPathToEntity(Entity paramEntity, float paramFloat);
 
-	public boolean tryMoveToEntity(Entity paramEntity, float paramFloat1, float paramFloat2);
+    boolean tryMoveToEntity(Entity paramEntity, float paramFloat1, float paramFloat2);
 
-	public void autoPathToEntity(Entity paramEntity);
+    void autoPathToEntity(Entity paramEntity);
 
-	public boolean setPath(Path paramPath, float paramFloat);
+    boolean setPath(Path paramPath, float paramFloat);
 
-	public boolean isWaitingForTask();
+    boolean isWaitingForTask();
 
-	public Path getPath();
+    Path getPath();
 
-	public void onUpdateNavigation();
+    void onUpdateNavigation();
 
-	public int getLastActionResult();
+    int getLastActionResult();
 
-	public boolean noPath();
+    boolean noPath();
 
-	public int getStuckTime();
+    int getStuckTime();
 
-	public float getLastPathDistanceToTarget();
+    float getLastPathDistanceToTarget();
 
-	public void clearPath();
+    void clearPath();
 
-	public void haltForTick();
+    void haltForTick();
 
-	public Entity getTargetEntity();
+    Entity getTargetEntity();
 
-	public String getStatus();
+    String getStatus();
 
 }

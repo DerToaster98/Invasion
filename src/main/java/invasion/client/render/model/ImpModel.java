@@ -2,7 +2,6 @@ package invasion.client.render.model;
 
 import com.google.common.collect.ImmutableList;
 import invasion.entity.monster.ImpEntity;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.entity.model.SegmentedModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.Entity;
@@ -33,8 +32,7 @@ public class ImpModel extends SegmentedModel<ImpEntity> {
     }
 
 
-
-	public ImpModel(float f) {
+    public ImpModel(float f) {
         this(f, 0.0F);
     }
 
@@ -161,20 +159,19 @@ public class ImpModel extends SegmentedModel<ImpEntity> {
     }
 
 
-	@Override
-	public void setRotationAngles(ImpEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		head.rotateAngleY = (netHeadYaw / 57.29578F);
-		head.rotateAngleX = (headPitch / 57.29578F);
-	}
+    @Override
+    public void setRotationAngles(ImpEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        head.rotateAngleY = (netHeadYaw / 57.29578F);
+        head.rotateAngleX = (headPitch / 57.29578F);
+    }
 
-	@Override
-	public Iterable<ModelRenderer> getParts() {
-		return ImmutableList.of();
-	}
+    @Override
+    public Iterable<ModelRenderer> getParts() {
+        return ImmutableList.of();
+    }
 
     @Override
     public void l(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
-
 
 
         rightArm.rotateAngleX = (MathHelper.cos(f * 0.6662F + 3.141593F) * 2.0F * f1 * 0.5F);

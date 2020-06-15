@@ -22,19 +22,18 @@ import java.util.Objects;
 
 
 public class NexusContainer extends Container {
+    public static final int INDEX_HP = 0, INDEX_ACTIVATION_TYPE = 1, INDEX_GENERATION_PROGRESS = 2, INDEX_ACTIVATION_PROGRESS = 3, INDEX_COOKING_PROGRESS = 4, INDEX_LEVEL = 5, INDEX_RADIUS = 6, INDEX_KILLS = 7;
+    public static final int SYNC_DATA_SIZE = 8;
     public final NexusTileEntity tileEntity;
     private final IWorldPosCallable canInteractWithCallable;
     private final IIntArray syncData;
-
-    public static final int INDEX_HP=0, INDEX_ACTIVATION_TYPE =1,INDEX_GENERATION_PROGRESS=2, INDEX_ACTIVATION_PROGRESS=3, INDEX_COOKING_PROGRESS=4, INDEX_LEVEL=5, INDEX_RADIUS=6, INDEX_KILLS=7;
-    public static final int SYNC_DATA_SIZE=8;
 
     public NexusContainer(final int windowId, final PlayerInventory playerInventory, final NexusTileEntity tileEntity, final IIntArray syncData) {
         super(ModContainerTypes.NEXUS.get(), windowId);
         this.tileEntity = tileEntity;
         this.canInteractWithCallable = IWorldPosCallable.of(tileEntity.getWorld(), tileEntity.getPos());
         this.syncData = syncData;
-        assertIntArraySize(syncData,SYNC_DATA_SIZE);
+        assertIntArraySize(syncData, SYNC_DATA_SIZE);
 
         //Input
         this.addSlot(new Slot(tileEntity, 0, 32, 33));
@@ -77,17 +76,6 @@ public class NexusContainer extends Container {
 
     //TODO maybe transferItem?
 
-    private static class OutputSlot extends Slot {
-        public OutputSlot(IInventory iinventory, int i, int j, int k) {
-            super(iinventory, i, j, k);
-        }
-
-        @Override
-        public boolean isItemValid(ItemStack itemstack) {
-            return false;
-        }
-    }
-
     @OnlyIn(Dist.CLIENT)
     public int getHp() {
         return syncData.get(INDEX_HP);
@@ -126,5 +114,16 @@ public class NexusContainer extends Container {
     @OnlyIn(Dist.CLIENT)
     public int getLevel() {
         return syncData.get(INDEX_LEVEL);
+    }
+
+    private static class OutputSlot extends Slot {
+        public OutputSlot(IInventory iinventory, int i, int j, int k) {
+            super(iinventory, i, j, k);
+        }
+
+        @Override
+        public boolean isItemValid(ItemStack itemstack) {
+            return false;
+        }
     }
 }

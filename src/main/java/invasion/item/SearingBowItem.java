@@ -1,7 +1,6 @@
 package invasion.item;
 
 import invasion.entity.projectile.EntityIMArrow;
-import invasion.init.ModItemGroups;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
@@ -13,7 +12,6 @@ import net.minecraft.item.Items;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.ArrowLooseEvent;
-
 
 
 public class SearingBowItem extends BowItem {

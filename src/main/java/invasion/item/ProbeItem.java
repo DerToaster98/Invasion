@@ -2,7 +2,6 @@ package invasion.item;
 
 import invasion.entity.monster.InvadingEntity;
 import invasion.init.ModBlocks;
-import invasion.init.ModItemGroups;
 import invasion.nexus.Nexus;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;

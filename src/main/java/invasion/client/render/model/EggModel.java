@@ -4,15 +4,12 @@ package invasion.client.render.model;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.SegmentedModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.EggEntity;
-
-import java.util.Arrays;
 
 
 public class EggModel extends EntityModel<EggEntity> /*SegmentedModel<EggEntity>*/ {
+    public ModelRenderer egg;
     ModelRenderer base;
     ModelRenderer l3s4;
     ModelRenderer l3s2;
@@ -32,15 +29,13 @@ public class EggModel extends EntityModel<EggEntity> /*SegmentedModel<EggEntity>
     ModelRenderer l1s2;
     ModelRenderer l1s3;
 
-    public ModelRenderer egg;
-
     public EggModel() {
         textureWidth = 64;
         textureHeight = 32;
         egg = new ModelRenderer(this, 0, 8);
         egg.mirror = true;
-       // egg.addBox()
-        egg.setRotationPoint(0f,0f,0f);
+        // egg.addBox()
+        egg.setRotationPoint(0f, 0f, 0f);
 
 
 /*
@@ -158,7 +153,7 @@ public class EggModel extends EntityModel<EggEntity> /*SegmentedModel<EggEntity>
 
     @Override
     public void render(MatrixStack matrixStackIn, IVertexBuilder bufferIn, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha) {
-        egg.render(matrixStackIn,bufferIn,packedLightIn,packedOverlayIn,red,green,blue,alpha);
+        egg.render(matrixStackIn, bufferIn, packedLightIn, packedOverlayIn, red, green, blue, alpha);
     }
 
     @Override

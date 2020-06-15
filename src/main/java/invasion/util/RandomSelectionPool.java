@@ -5,79 +5,66 @@ import java.util.List;
 import java.util.Random;
 
 
-public class RandomSelectionPool<EntityIMLiving> implements ISelect<EntityIMLiving>
-{
-	private List<Pair<ISelect<EntityIMLiving>, Float>> pool;
-	private float totalWeight;
-	private Random rand;
+public class RandomSelectionPool<EntityIMLiving> implements ISelect<EntityIMLiving> {
+    private final List<Pair<ISelect<EntityIMLiving>, Float>> pool;
+    private float totalWeight;
+    private final Random rand;
 
-	public RandomSelectionPool()
-	{
-		this.pool = new ArrayList();
-		this.totalWeight = 0.0F;
-		this.rand = new Random();
-	}
+    public RandomSelectionPool() {
+        this.pool = new ArrayList();
+        this.totalWeight = 0.0F;
+        this.rand = new Random();
+    }
 
-	public void addEntry(EntityIMLiving entry, float weight)
-	{
-		SingleSelection selection = new SingleSelection(entry);
-		this.addEntry(selection, weight);
-	}
+    public void addEntry(EntityIMLiving entry, float weight) {
+        SingleSelection selection = new SingleSelection(entry);
+        this.addEntry(selection, weight);
+    }
 
-	public void addEntry(ISelect<EntityIMLiving> entry, float weight)
-	{
-		this.pool.add(new Pair(entry, Float.valueOf(weight)));
-		this.totalWeight += weight;
-	}
+    public void addEntry(ISelect<EntityIMLiving> entry, float weight) {
+        this.pool.add(new Pair(entry, Float.valueOf(weight)));
+        this.totalWeight += weight;
+    }
 
-	@Override
-	public EntityIMLiving selectNext()
-	{
-		float r = this.rand.nextFloat() * this.totalWeight;
-		for (Pair entry : this.pool)
-		{
-			if (r < ((Float)entry.getVal2()).floatValue())
-			{
-				return (EntityIMLiving)((ISelect)entry.getVal1()).selectNext();
-			}
+    @Override
+    public EntityIMLiving selectNext() {
+        float r = this.rand.nextFloat() * this.totalWeight;
+        for (Pair entry : this.pool) {
+            if (r < ((Float) entry.getVal2()).floatValue()) {
+                return (EntityIMLiving) ((ISelect) entry.getVal1()).selectNext();
+            }
 
-			r -= ((Float)entry.getVal2()).floatValue();
-		}
+            r -= ((Float) entry.getVal2()).floatValue();
+        }
 
-		if (this.pool.size() > 0)
-		{
-			ModLogger.logFatal("RandomSelectionPool invalid setup or rounding error. Failing safe.");
-			return (EntityIMLiving)((ISelect)((Pair)this.pool.get(0)).getVal1()).selectNext();
-		}
-		return null;
-	}
+        if (this.pool.size() > 0) {
+            ModLogger.logFatal("RandomSelectionPool invalid setup or rounding error. Failing safe.");
+            return (EntityIMLiving) ((ISelect) ((Pair) this.pool.get(0)).getVal1()).selectNext();
+        }
+        return null;
+    }
 
-	@Override
-	public RandomSelectionPool<EntityIMLiving> clone()
-	{
-		RandomSelectionPool clone = new RandomSelectionPool();
-		for (Pair entry : this.pool)
-		{
-			clone.addEntry((ISelect)entry.getVal1(), ((Float)entry.getVal2()).floatValue());
-		}
+    @Override
+    public RandomSelectionPool<EntityIMLiving> clone() {
+        RandomSelectionPool clone = new RandomSelectionPool();
+        for (Pair entry : this.pool) {
+            clone.addEntry((ISelect) entry.getVal1(), ((Float) entry.getVal2()).floatValue());
+        }
 
-		return clone;
-	}
+        return clone;
+    }
 
-	@Override
-	public void reset()
-	{
-	}
+    @Override
+    public void reset() {
+    }
 
-	@Override
-	public String toString()
-	{
-		String s = "RandomSelectionPool@" + Integer.toHexString(this.hashCode()) + "#Size=" + this.pool.size();
-		for (int i = 0; i < this.pool.size(); i++)
-		{
-			s = s + "\n\tEntry " + i + "   Weight: " + ((Pair)this.pool.get(i)).getVal2();
-			s = s + "\n\t" + ((ISelect)((Pair)this.pool.get(i)).getVal1()).toString();
-		}
-		return s;
-	}
+    @Override
+    public String toString() {
+        String s = "RandomSelectionPool@" + Integer.toHexString(this.hashCode()) + "#Size=" + this.pool.size();
+        for (int i = 0; i < this.pool.size(); i++) {
+            s = s + "\n\tEntry " + i + "   Weight: " + ((Pair) this.pool.get(i)).getVal2();
+            s = s + "\n\t" + ((Pair) this.pool.get(i)).getVal1().toString();
+        }
+        return s;
+    }
 }

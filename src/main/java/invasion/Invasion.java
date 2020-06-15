@@ -3,8 +3,8 @@ package invasion;
 import invasion.entity.monster.InvadingEntity;
 import invasion.init.*;
 import invasion.nexus.IEntityIMPattern;
-import invasion.nexus.WaveBuilder;
 import invasion.nexus.MobBuilder;
+import invasion.nexus.WaveBuilder;
 import invasion.util.ISelect;
 import invasion.util.RandomSelectionPool;
 import invasion.util.config.Config;
@@ -41,7 +41,7 @@ public class Invasion {
 
     public static Invasion instance;
 
-    private static MobBuilder defaultMobBuilder = new MobBuilder();
+    private static final MobBuilder defaultMobBuilder = new MobBuilder();
     private static ISelect<IEntityIMPattern> nightSpawnPool1;
 
     public Invasion() {
@@ -60,14 +60,28 @@ public class Invasion {
         //  guiHandler = new GuiHandler();
     }
 
-    private void setup(FMLCommonSetupEvent event) {
+    public static void addToDeathList(String username, long timeStamp) {
+        deathList.put(username, Long.valueOf(timeStamp));
     }
 
-    private void clientSetup(FMLClientSetupEvent event) {
+    public static Entity[] getNightMobSpawns1(World world) {
+        ISelect mobPool = getMobSpawnPool();
+        int numberOfMobs = world.rand.nextInt(Config.NIGHTSPAWNS_MOB_MAX_GROUPSIZE) + 1;
+        Entity[] entities = new Entity[numberOfMobs];
+        for (int i = 0; i < numberOfMobs; i++) {
+            InvadingEntity mob = getMobBuilder().createMobFromConstruct(((IEntityIMPattern) mobPool.selectNext()).generateEntityConstruct(), world, null);
+            mob.setEntityIndependent();
+            //also set in entityLiving constructor, is needed for ai to function properly, I believe
+            mob.setAggroRange(Config.NIGHTSPAWNS_MOB_SIGHTRANGE);
+            mob.setSenseRange(Config.NIGHTSPAWNS_MOB_SENSERANGE);
+            mob.setBurnsInDay(Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY);
+            // TODO   entities[i] = mob;
+        }
+        return entities;
     }
 
-    private void serverSetup(FMLDedicatedServerSetupEvent event) {
-
+    public static MobBuilder getMobBuilder() {
+        return defaultMobBuilder;
     }
 
     /*
@@ -155,46 +169,8 @@ public class Invasion {
 
      */
 
-    //load mobhealth config
-    private void loadHealthConfig() {
-        //Main spawns
-        mobHealthInvasion.put("IMCreeper-T1-invasionSpawn-health", 20);
-        mobHealthInvasion.put("IMVulture-T1-invasionSpawn-health", 20);
-        mobHealthInvasion.put("IMImp-T1-invasionSpawn-health", 20);
-        mobHealthInvasion.put("IMPigManEngineer-T1-invasionSpawn-health", 20);
-        mobHealthInvasion.put("IMSkeleton-T1-invasionSpawn-health", 20);
-        mobHealthInvasion.put("IMSpider-T1-Spider-invasionSpawn-health", 18);
-        mobHealthInvasion.put("IMSpider-T1-Baby-Spider-invasionSpawn-health", 3);
-        mobHealthInvasion.put("IMSpider-T2-Jumping-Spider-invasionSpawn-health", 18);
-        mobHealthInvasion.put("IMSpider-T2-Mother-Spider-invasionSpawn-health", 23);
-        mobHealthInvasion.put("IMThrower-T1-invasionSpawn-health", 50);
-        mobHealthInvasion.put("IMThrower-T2-invasionSpawn-health", 70);
-        mobHealthInvasion.put("IMZombie-T1-invasionSpawn-health", 20);
-        mobHealthInvasion.put("IMZombie-T2-invasionSpawn-health", 30);
-        mobHealthInvasion.put("IMZombie-T3-invasionSpawn-health", 65);
-        mobHealthInvasion.put("IMZombiePigman-T1-invasionSpawn-health", 20);
-        mobHealthInvasion.put("IMZombiePigman-T2-invasionSpawn-health", 30);
-        mobHealthInvasion.put("IMZombiePigman-T3-invasionSpawn-health", 65);
-
-        //Nightspawns
-        mobHealthNightspawn.put("IMCreeper-T1-nightSpawn-health", 20);
-        mobHealthNightspawn.put("IMVulture-T1-nightSpawn-health", 20);
-        mobHealthNightspawn.put("IMImp-T1-nightSpawn-health", 20);
-        mobHealthNightspawn.put("IMPigManEngineer-T1-nightSpawn-health", 20);
-        mobHealthNightspawn.put("IMSkeleton-T1-nightSpawn-health", 20);
-        mobHealthNightspawn.put("IMSpider-T1-Spider-nightSpawn-health", 18);
-        mobHealthNightspawn.put("IMSpider-T1-Baby-Spider-nightSpawn-health", 3);
-        mobHealthNightspawn.put("IMSpider-T2-Jumping-Spider-nightSpawn-health", 18);
-        mobHealthNightspawn.put("IMSpider-T2-Mother-Spider-nightSpawn-health", 23);
-        mobHealthNightspawn.put("IMThrower-T1-nightSpawn-health", 50);
-        mobHealthNightspawn.put("IMThrower-T2-nightSpawn-health", 70);
-        mobHealthNightspawn.put("IMZombie-T1-nightSpawn-health", 20);
-        mobHealthNightspawn.put("IMZombie-T2-nightSpawn-health", 30);
-        mobHealthNightspawn.put("IMZombie-T3-nightSpawn-health", 65);
-        mobHealthNightspawn.put("IMZombiePigman-T1-nightSpawn-health", 20);
-        mobHealthNightspawn.put("IMZombiePigman-T2-nightSpawn-health", 30);
-        mobHealthNightspawn.put("IMZombiePigman-T3-nightSpawn-health", 65);
-
+    public static ISelect<IEntityIMPattern> getMobSpawnPool() {
+        return nightSpawnPool1;
     }
 
     /*
@@ -264,6 +240,83 @@ public class Invasion {
 
     // }
 
+    public static ItemStack getRenderHammerItem() {
+        return new ItemStack(ModItems.CATALYST.get(), 1);
+    }
+
+    public static Invasion instance() {
+        return instance;
+    }
+
+    public static int getMobHealth(InvadingEntity mob) {
+        int health = 0;
+        if (mob.isNexusBound()) {
+            if (mobHealthInvasion.get(mob.toString() + "-invasionSpawn-health") != null) {
+                health = mobHealthInvasion.get(mob.toString() + "-invasionSpawn-health");
+            } else {
+                return 20;
+            }
+        } else {
+            if (mobHealthNightspawn.get(mob.toString() + "-nightSpawn-health") != null) {
+                health = mobHealthNightspawn.get(mob.toString() + "-nightSpawn-health");
+            } else {
+                return 20;
+            }
+        }
+        return health;
+    }
+
+    private void setup(FMLCommonSetupEvent event) {
+    }
+
+    private void clientSetup(FMLClientSetupEvent event) {
+    }
+
+    private void serverSetup(FMLDedicatedServerSetupEvent event) {
+
+    }
+
+    //load mobhealth config
+    private void loadHealthConfig() {
+        //Main spawns
+        mobHealthInvasion.put("IMCreeper-T1-invasionSpawn-health", 20);
+        mobHealthInvasion.put("IMVulture-T1-invasionSpawn-health", 20);
+        mobHealthInvasion.put("IMImp-T1-invasionSpawn-health", 20);
+        mobHealthInvasion.put("IMPigManEngineer-T1-invasionSpawn-health", 20);
+        mobHealthInvasion.put("IMSkeleton-T1-invasionSpawn-health", 20);
+        mobHealthInvasion.put("IMSpider-T1-Spider-invasionSpawn-health", 18);
+        mobHealthInvasion.put("IMSpider-T1-Baby-Spider-invasionSpawn-health", 3);
+        mobHealthInvasion.put("IMSpider-T2-Jumping-Spider-invasionSpawn-health", 18);
+        mobHealthInvasion.put("IMSpider-T2-Mother-Spider-invasionSpawn-health", 23);
+        mobHealthInvasion.put("IMThrower-T1-invasionSpawn-health", 50);
+        mobHealthInvasion.put("IMThrower-T2-invasionSpawn-health", 70);
+        mobHealthInvasion.put("IMZombie-T1-invasionSpawn-health", 20);
+        mobHealthInvasion.put("IMZombie-T2-invasionSpawn-health", 30);
+        mobHealthInvasion.put("IMZombie-T3-invasionSpawn-health", 65);
+        mobHealthInvasion.put("IMZombiePigman-T1-invasionSpawn-health", 20);
+        mobHealthInvasion.put("IMZombiePigman-T2-invasionSpawn-health", 30);
+        mobHealthInvasion.put("IMZombiePigman-T3-invasionSpawn-health", 65);
+
+        //Nightspawns
+        mobHealthNightspawn.put("IMCreeper-T1-nightSpawn-health", 20);
+        mobHealthNightspawn.put("IMVulture-T1-nightSpawn-health", 20);
+        mobHealthNightspawn.put("IMImp-T1-nightSpawn-health", 20);
+        mobHealthNightspawn.put("IMPigManEngineer-T1-nightSpawn-health", 20);
+        mobHealthNightspawn.put("IMSkeleton-T1-nightSpawn-health", 20);
+        mobHealthNightspawn.put("IMSpider-T1-Spider-nightSpawn-health", 18);
+        mobHealthNightspawn.put("IMSpider-T1-Baby-Spider-nightSpawn-health", 3);
+        mobHealthNightspawn.put("IMSpider-T2-Jumping-Spider-nightSpawn-health", 18);
+        mobHealthNightspawn.put("IMSpider-T2-Mother-Spider-nightSpawn-health", 23);
+        mobHealthNightspawn.put("IMThrower-T1-nightSpawn-health", 50);
+        mobHealthNightspawn.put("IMThrower-T2-nightSpawn-health", 70);
+        mobHealthNightspawn.put("IMZombie-T1-nightSpawn-health", 20);
+        mobHealthNightspawn.put("IMZombie-T2-nightSpawn-health", 30);
+        mobHealthNightspawn.put("IMZombie-T3-nightSpawn-health", 65);
+        mobHealthNightspawn.put("IMZombiePigman-T1-nightSpawn-health", 20);
+        mobHealthNightspawn.put("IMZombiePigman-T2-nightSpawn-health", 30);
+        mobHealthNightspawn.put("IMZombiePigman-T3-nightSpawn-health", 65);
+
+    }
 
     protected void nightSpawnConfig() {
         String[] pool1Patterns = new String[DEFAULT_NIGHT_MOB_PATTERN_1_SLOTS.length];
@@ -274,57 +327,15 @@ public class Invasion {
             for (int i = 0; i < DEFAULT_NIGHT_MOB_PATTERN_1_SLOTS.length; i++) {
 
                 if (WaveBuilder.isPatternNameValid(pool1Patterns[i])) {
-                    logger.debug("Added entry for pattern 1 slot {}" , i + 1);
+                    logger.debug("Added entry for pattern 1 slot {}", i + 1);
                     mobPool.addEntry(WaveBuilder.getPattern(pool1Patterns[i]), pool1Weights[i]);
                 } else {
-                    logger.warn("Pattern 1 slot {} in config not recognised. Proceeding as blank.", (i + 1) );
+                    logger.warn("Pattern 1 slot {} in config not recognised. Proceeding as blank.", (i + 1));
                 }
             }
         } else {
             logger.fatal("Mob pattern table element mismatch. Ensure each slot has a probability weight");
         }
-    }
-
-    public static void addToDeathList(String username, long timeStamp) {
-        deathList.put(username, Long.valueOf(timeStamp));
-    }
-
-    @Override
-    public String toString() {
-        return "Main";
-    }
-
-    public static Entity[] getNightMobSpawns1(World world) {
-        ISelect mobPool = getMobSpawnPool();
-        int numberOfMobs = world.rand.nextInt(Config.NIGHTSPAWNS_MOB_MAX_GROUPSIZE) + 1;
-        Entity[] entities = new Entity[numberOfMobs];
-        for (int i = 0; i < numberOfMobs; i++) {
-            InvadingEntity mob = getMobBuilder().createMobFromConstruct(((IEntityIMPattern) mobPool.selectNext()).generateEntityConstruct(), world, null);
-            mob.setEntityIndependent();
-            //also set in entityLiving constructor, is needed for ai to function properly, I believe
-            mob.setAggroRange(Config.NIGHTSPAWNS_MOB_SIGHTRANGE);
-            mob.setSenseRange(Config.NIGHTSPAWNS_MOB_SENSERANGE);
-            mob.setBurnsInDay(Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY);
-            // TODO   entities[i] = mob;
-        }
-        return entities;
-    }
-
-    public static MobBuilder getMobBuilder() {
-        return defaultMobBuilder;
-    }
-
-    public static ISelect<IEntityIMPattern> getMobSpawnPool() {
-        return nightSpawnPool1;
-    }
-
-
-    public static ItemStack getRenderHammerItem() {
-        return new ItemStack(ModItems.CATALYST.get(), 1);
-    }
-
-    public static Invasion instance() {
-        return instance;
     }
 
     /*
@@ -387,22 +398,9 @@ public class Invasion {
 
      */
 
-    public static int getMobHealth(InvadingEntity mob) {
-        int health = 0;
-        if (mob.isNexusBound()) {
-            if (mobHealthInvasion.get(mob.toString() + "-invasionSpawn-health") != null) {
-                health = mobHealthInvasion.get(mob.toString() + "-invasionSpawn-health");
-            } else {
-                return 20;
-            }
-        } else {
-            if (mobHealthNightspawn.get(mob.toString() + "-nightSpawn-health") != null) {
-                health = mobHealthNightspawn.get(mob.toString() + "-nightSpawn-health");
-            } else {
-                return 20;
-            }
-        }
-        return health;
+    @Override
+    public String toString() {
+        return "Main";
     }
 
 

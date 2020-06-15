@@ -2,9 +2,7 @@ package invasion.entity.projectile;
 
 import invasion.init.ModBlocks;
 import invasion.init.ModEntityTypes;
-import invasion.nexus.Nexus;
 import invasion.tileentity.NexusTileEntity;
-import invasion.util.MathUtil;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -21,19 +19,19 @@ import java.util.List;
 
 
 public class BoulderEntity extends ThrowableEntity {
-   // private int xTile;
-   // private int yTile;
-   // private int zTile;
-   // private Block inTile;
-   // private int inData;
-   // private boolean inGround;
-    private int life = 60;
-   // public boolean doesArrowBelongToPlayer;
-  //  public int arrowShake;
-  //  public EntityLivingBase shootingEntity;
-  //  private int ticksInGround;
-    private int ticksInAir;
     public boolean arrowCritical;
+    // private int xTile;
+    // private int yTile;
+    // private int zTile;
+    // private Block inTile;
+    // private int inData;
+    // private boolean inGround;
+    private int life = 60;
+    // public boolean doesArrowBelongToPlayer;
+    //  public int arrowShake;
+    //  public EntityLivingBase shootingEntity;
+    //  private int ticksInGround;
+    private int ticksInAir;
 
     public BoulderEntity(World worldIn) {
         super(ModEntityTypes.BOULDER, worldIn);
@@ -75,7 +73,8 @@ public class BoulderEntity extends ThrowableEntity {
      */
 
     @Override
-    protected void registerData() {}
+    protected void registerData() {
+    }
 
    /* @Override
     public void setVelocity(double dx, double dy, double dz) {
@@ -272,7 +271,7 @@ public class BoulderEntity extends ThrowableEntity {
     @Override
     protected void onImpact(RayTraceResult result) {
         if (result.getType() == RayTraceResult.Type.ENTITY) {
-            float damage = MathHelper.clamp(ticksInAir * 0.3f,6.0f,14.0f);
+            float damage = MathHelper.clamp(ticksInAir * 0.3f, 6.0f, 14.0f);
 
             if (rtr0.entityHit.attackEntityFrom(
                     DamageSource.causeMobDamage(this.shootingEntity), damage)) {
@@ -286,7 +285,7 @@ public class BoulderEntity extends ThrowableEntity {
 
             }
             remove();
-        } else if (result.getType()== RayTraceResult.Type.BLOCK) {
+        } else if (result.getType() == RayTraceResult.Type.BLOCK) {
 
             BlockPos hitPos = null;
             this.xTile = rtr0.getBlockPos().getX();
@@ -306,7 +305,7 @@ public class BoulderEntity extends ThrowableEntity {
 
             Block blockHit = this.world.getBlockState(hitPos).getBlock();
             if (blockHit == ModBlocks.NEXUS.get()) {
-                TileEntity nexusTileEntity = (NexusTileEntity) this.world.getTileEntity(hitPos);
+                TileEntity nexusTileEntity = this.world.getTileEntity(hitPos);
                 if (nexusTileEntity != null) {
                     // TODO damage nexus with 2
                 }

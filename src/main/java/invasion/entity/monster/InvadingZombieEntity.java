@@ -41,8 +41,8 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
     private static final DataParameter<Boolean> IS_SWINGING = EntityDataManager.createKey(InvadingZombieEntity.class, DataSerializers.BOOLEAN); //27
     private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
 
-    private TerrainModifier terrainModifier;
-    private TerrainDigger terrainDigger;
+    private final TerrainModifier terrainModifier;
+    private final TerrainDigger terrainDigger;
     private boolean metaChanged;
     //private int tier;
     private int flavour;
@@ -175,9 +175,7 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
             }
             PathNode node = path.getPathPointFromIndex(path.getCurrentPathIndex());
 
-            if (terrainDigger.askClearPosition(new BlockPos(node.pos), notifee, 1.0F)) {
-                return true;
-            }
+            return terrainDigger.askClearPosition(new BlockPos(node.pos), notifee, 1.0F);
         }
         return false;
     }

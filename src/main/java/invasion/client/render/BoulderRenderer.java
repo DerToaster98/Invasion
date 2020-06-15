@@ -5,14 +5,12 @@ import invasion.client.render.model.BoulderModel;
 import invasion.entity.projectile.BoulderEntity;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
 
 public class BoulderRenderer extends EntityRenderer<BoulderEntity> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID,"textures/entity/boulder.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID, "textures/entity/boulder.png");
     private final BoulderModel MODEL = new BoulderModel();
 
     public BoulderRenderer(EntityRendererManager renderManager) {

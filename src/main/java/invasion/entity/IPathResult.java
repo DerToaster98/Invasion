@@ -3,7 +3,6 @@ package invasion.entity;
 import invasion.entity.ai.navigator.Path;
 
 
-public abstract interface IPathResult
-{
-	public abstract void pathCompleted(Path paramPath);
+public interface IPathResult {
+    void pathCompleted(Path paramPath);
 }

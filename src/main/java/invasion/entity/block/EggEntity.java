@@ -13,7 +13,7 @@ import net.minecraft.world.World;
 
 public class EggEntity extends InvadingEntity {
     //private static int META_HATCHED = 30;
-    private static final DataParameter<Byte> META_HATCHED = EntityDataManager.<Byte>createKey(EggEntity.class, DataSerializers.BYTE);
+    private static final DataParameter<Byte> META_HATCHED = EntityDataManager.createKey(EggEntity.class, DataSerializers.BYTE);
     private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
     private int hatchTime;
     private int ticks;

@@ -12,7 +12,6 @@ import invasion.entity.ai.navigator.*;
 import invasion.nexus.Nexus;
 import invasion.util.Coords;
 import invasion.util.Distance;
-import invasion.util.MathUtil;
 import invasion.util.config.Config;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
@@ -45,6 +44,10 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public abstract class InvadingEntity extends MonsterEntity implements /*SparrowAPI,*/ IHasNexus, IPathfindable {
 
+    //TODO reasonable defaults
+    protected static final IAttribute JUMP_HEIGHT = new RangedAttribute(null, "invasion.jump_height", 1.0D, 0.0D, 3.0D).setDescription("Jump Height");
+    protected static final IAttribute AGGRO_RANGE = new RangedAttribute(null, "invasion.aggro_range", 12.0D, 0.0D, 20.0D).setDescription("Aggression Range");
+    protected static final IAttribute SENSE_RANGE = new RangedAttribute(null, "invasion.sense_range", 6.0D, 0.0D, 20.0D).setDescription("Sensory Range");
     private static final DataParameter<Boolean> IS_ADJACENT_CLIMB_BLOCK = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BOOLEAN); //21
     private static final DataParameter<Boolean> IS_JUMPING = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BOOLEAN); //22
     private static final DataParameter<Boolean> IS_HOLDING_ONTO_LADDER = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.BOOLEAN); //20
@@ -52,14 +55,6 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     private static final DataParameter<Byte> TIER = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.BYTE); //30
     private static final DataParameter<Integer> TEXTURE = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.VARINT); //31
     private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
-
-    //TODO reasonable defaults
-    protected static final IAttribute JUMP_HEIGHT= new RangedAttribute(null, "invasion.jump_height", 1.0D, 0.0D, 3.0D).setDescription("Jump Height");;
-    protected static final IAttribute AGGRO_RANGE= new RangedAttribute(null, "invasion.aggro_range", 12.0D, 0.0D, 20.0D).setDescription("Aggression Range");
-    protected static final IAttribute SENSE_RANGE= new RangedAttribute(null, "invasion.sense_range", 6.0D, 0.0D, 20.0D).setDescription("Sensory Range");
-
-
-
     protected static List<Block> unDestructableBlocks = Arrays.asList(
             Blocks.BEDROCK, Blocks.COMMAND_BLOCK, Blocks.END_PORTAL_FRAME,
             Blocks.LADDER, Blocks.CHEST);
@@ -86,13 +81,13 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     protected int flammability = 2;
     protected int destructiveness = 0;
     private BlockPos collideSize;
-    private BlockPos currentTargetPos = BlockPos.ZERO;
+    private final BlockPos currentTargetPos = BlockPos.ZERO;
     private int rallyCooldown;
     //private float turnRate = 30.0F;
     //private float moveSpeedBase = 0.2f;
     //private float moveSpeed = 0.2f;
     private MoveState moveState;
-    private IMMoveHelper moveHelperIM = new IMMoveHelper(this);
+    private final IMMoveHelper moveHelperIM = new IMMoveHelper(this);
     //private float rotationRoll = 0f;
 
     //DarthXenon: Not sure what these should be initialized as
@@ -102,14 +97,14 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     //private float prevRotationYawHeadIM = 0f;
     //private float prevRotationPitchHead = 0f;
     private int debugMode;
-    private float airResistance = 0.9995F;
+    private final float airResistance = 0.9995F;
     private float groundFriction = 0.546F;
     private float gravityAcel = 0.08F;
-    private float pitchRate = 2f;
+    private final float pitchRate = 2f;
     private BlockPos lastBreathExtendPos = BlockPos.ZERO;
     private float maxHealth;
     private boolean canClimb = false;
-    private boolean canDig = true;
+    private final boolean canDig = true;
     private boolean nexusBound;
     private boolean alwaysIndependent = false;
     private boolean burnsInDay;
@@ -122,8 +117,8 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
 
      */
 
-    public InvadingEntity(EntityType<? extends InvadingEntity> type , World world, Nexus nexus) {
-        super(type,world);
+    public InvadingEntity(EntityType<? extends InvadingEntity> type, World world, Nexus nexus) {
+        super(type, world);
 
         this.nexus = nexus;
         debugMode = Config.DEBUG ? 1 : 0;
@@ -131,9 +126,9 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         isImmuneToFire = false;
         experienceValue = 5;
         nexusBound = nexus != null;
-        burnsInDay = nexus != null ? false : Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY;
-     //   aggroRange = nexus != null ? 12 : Config.NIGHTSPAWNS_MOB_SIGHTRANGE;
-     //   senseRange = nexus != null ? 6 : Config.NIGHTSPAWNS_MOB_SENSERANGE;
+        burnsInDay = nexus == null && Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY;
+        //   aggroRange = nexus != null ? 12 : Config.NIGHTSPAWNS_MOB_SIGHTRANGE;
+        //   senseRange = nexus != null ? 6 : Config.NIGHTSPAWNS_MOB_SENSERANGE;
         // debugTest
     }
 
@@ -155,7 +150,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         super.registerData();
         getDataManager().register(IS_ADJACENT_CLIMB_BLOCK, false);
         getDataManager().register(IS_JUMPING, false);
-        getDataManager().register(TIER, (byte) 1 );
+        getDataManager().register(TIER, (byte) 1);
     }
 
     @Override
@@ -1057,7 +1052,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     }
 
     protected boolean getLightLevelBelow8() {
-        BlockPos blockPos = new BlockPos(getPosX() , getBoundingBox().minY, getPosZ());
+        BlockPos blockPos = new BlockPos(getPosX(), getBoundingBox().minY, getPosZ());
 
         if (world.getLightFor(EnumSkyBlock.SKY, blockPos) > rand.nextInt(32)) return false;
         int l = world.getBlockLightOpacity(blockPos);

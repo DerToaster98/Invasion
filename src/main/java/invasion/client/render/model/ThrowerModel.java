@@ -134,7 +134,7 @@ public class ThrowerModel extends SegmentedModel<EntityIMThrower> implements IHa
 
     @Override
     public void translateHand(HandSide handSide, MatrixStack matrixStack) {
-        if(handSide == HandSide.RIGHT) {
+        if (handSide == HandSide.RIGHT) {
             throwerRightArm.translateRotate(matrixStack);
         } else {
             throwerLeftArm.translateRotate(matrixStack);

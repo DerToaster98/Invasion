@@ -21,12 +21,12 @@ public class BoltRenderer extends EntityRenderer<BoltEntity> {
         super(renderManager);
     }
 
-	@Override
-	public void render(BoltEntity bolt, float p_225623_2_, float p_225623_3_, MatrixStack matrixStack, IRenderTypeBuffer buffer, int p_225623_6_) {
+    @Override
+    public void render(BoltEntity bolt, float p_225623_2_, float p_225623_3_, MatrixStack matrixStack, IRenderTypeBuffer buffer, int p_225623_6_) {
 
-	}
+    }
 
-	@Override
+    @Override
     public void render(BoltEntity entityBolt, double d, double d1, double d2, float f, float f1) {
         Tessellator tessellator = Tessellator.getInstance();
         GL11.glPushMatrix();

@@ -12,15 +12,15 @@ import java.util.List;
 public class TerrainModifier implements ITerrainModify {
 
     private static final float DEFAULT_REACH = 2.0F;
-    private EntityIMLiving theEntity;
+    private final EntityIMLiving theEntity;
     private INotifyTask taskSetter;
     private INotifyTask blockNotify;
-    private List<ModifyBlockEntry> modList;
+    private final List<ModifyBlockEntry> modList;
     private ModifyBlockEntry nextEntry;
     private ModifyBlockEntry lastEntry;
     private int entryIndex;
     private int timer;
-    private float reach;
+    private final float reach;
     private boolean outOfRangeFlag;
     private boolean terrainFailFlag;
 
@@ -52,7 +52,7 @@ public class TerrainModifier implements ITerrainModify {
     @Override
     public boolean requestTask(ModifyBlockEntry[] entries, INotifyTask onFinished, INotifyTask onBlockChange) {
         if (this.isReadyForTask(onFinished)) {
-			Collections.addAll(this.modList, entries);
+            Collections.addAll(this.modList, entries);
             this.taskSetter = onFinished;
             this.blockNotify = onBlockChange;
             return true;
@@ -142,11 +142,8 @@ public class TerrainModifier implements ITerrainModify {
     }
 
     private boolean isTerrainIdentical(ModifyBlockEntry entry) {
-        if ((this.theEntity.world.getBlockState(entry.getPos()).getBlock() == entry.getNewBlock().getBlock())
-                && (this.theEntity.world.getBlockState(entry.getPos()) == entry.getNewBlock())) {
-            return true;
-        }
-        return false;
+        return (this.theEntity.world.getBlockState(entry.getPos()).getBlock() == entry.getNewBlock().getBlock())
+                && (this.theEntity.world.getBlockState(entry.getPos()) == entry.getNewBlock());
     }
 
 }

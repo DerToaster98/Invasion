@@ -14,10 +14,10 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
 
 public class BoltEntity extends Entity implements IEntityAdditionalSpawnData {
-    private int age;
-    private short ticksToRender;
     private final long timeCreated;
     private final double[][] vertices = new double[3][0];
+    private int age;
+    private short ticksToRender;
     private long lastVertexUpdate;
     private float yaw;
     private float pitch;
@@ -29,7 +29,7 @@ public class BoltEntity extends Entity implements IEntityAdditionalSpawnData {
 
 
     public BoltEntity(World world) {
-        super(ModEntityTypes.BOLT,world);
+        super(ModEntityTypes.BOLT, world);
         timeCreated = (this.lastVertexUpdate = System.currentTimeMillis());
         ignoreFrustumCheck = true;
     }
@@ -50,22 +50,23 @@ public class BoltEntity extends Entity implements IEntityAdditionalSpawnData {
     }
 
     @Override
-    protected void registerData() {}
+    protected void registerData() {
+    }
 
-	@Override
-	public void writeSpawnData(PacketBuffer buffer) {
-		buffer.writeShort(ticksToRender);
-		buffer.writeFloat(vecX);
-		buffer.writeFloat(vecY);
-		buffer.writeFloat(vecZ);
-	}
+    @Override
+    public void writeSpawnData(PacketBuffer buffer) {
+        buffer.writeShort(ticksToRender);
+        buffer.writeFloat(vecX);
+        buffer.writeFloat(vecY);
+        buffer.writeFloat(vecZ);
+    }
 
-	@Override
-	public void readSpawnData(PacketBuffer buffer) {
-    	ticksToRender = buffer.readShort();
-    	setHeading(buffer.readFloat(),buffer.readFloat(),buffer.readFloat());
-    	doVertexUpdate();
-	}
+    @Override
+    public void readSpawnData(PacketBuffer buffer) {
+        ticksToRender = buffer.readShort();
+        setHeading(buffer.readFloat(), buffer.readFloat(), buffer.readFloat());
+        doVertexUpdate();
+    }
 
     @Override
     public void tick() {
@@ -100,18 +101,20 @@ public class BoltEntity extends Entity implements IEntityAdditionalSpawnData {
         return this.pitch;
     }
 
-	@Override
-	protected void readAdditional(CompoundNBT compound) {}
+    @Override
+    protected void readAdditional(CompoundNBT compound) {
+    }
 
-	@Override
-	protected void writeAdditional(CompoundNBT compound) {}
+    @Override
+    protected void writeAdditional(CompoundNBT compound) {
+    }
 
-	@Override
-	public IPacket<?> createSpawnPacket() {
-		return new SSpawnObjectPacket(this);
-	}
+    @Override
+    public IPacket<?> createSpawnPacket() {
+        return new SSpawnObjectPacket(this);
+    }
 
-	private void setHeading(float x, float y, float z) {
+    private void setHeading(float x, float y, float z) {
         float xzSq = x * x + z * z;
         yaw = ((float) (Math.atan2(x, z) * 180.0D / Math.PI) + 90.0F);
         pitch = ((float) (Math.atan2(MathHelper.sqrt(xzSq), y) * 180.0D / Math.PI));
@@ -139,10 +142,10 @@ public class BoltEntity extends Entity implements IEntityAdditionalSpawnData {
     private void createSegment(int begin, int end) {
         int points = end + 1 - begin;
         if (points <= 4) {
-			createVertex(begin, begin + 1, end);
-			if (points != 3) {
-				createVertex(begin, begin + 2, end);
-			}
+            createVertex(begin, begin + 1, end);
+            if (points != 3) {
+                createVertex(begin, begin + 2, end);
+            }
             return;
         }
         int midPoint = begin + points / 2;
@@ -162,7 +165,6 @@ public class BoltEntity extends Entity implements IEntityAdditionalSpawnData {
         vertices[2][mid] = (vertices[2][begin] + difference * yRatio + (world.rand
                 .nextFloat() - 0.5D) * yDiffToMid * widthVariance);
     }
-
 
 
 }
