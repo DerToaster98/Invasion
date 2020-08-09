@@ -22,18 +22,18 @@ public class CraftingAndSmelting
 	{
 
 		//Nexus block
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.blockNexus), new Object[] { " X ", "#D#", " # ", 'X', BlocksAndItems.itemPhaseCrystal, '#', Items.REDSTONE, 'D', Blocks.OBSIDIAN });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.blockNexus), new Object[] { " X ", "#D#", " # ", 'X', BlocksAndItems.itemPhaseCrystal, '#', Items.REDSTONE, 'D', Blocks.OBSIDIAN });
 
 		//Items
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemPhaseCrystal), new Object[] { " X ", "#D#", " X ", 'X', LAPIS_LAZULI, '#', Items.REDSTONE, 'D', Items.DIAMOND });
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemPhaseCrystal), new Object[] { " # ", "XDX", " # ", 'X', LAPIS_LAZULI, '#', Items.REDSTONE, 'D', Items.DIAMOND });
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemRiftFlux), new Object[] { "XXX", "XXX", "XXX", 'X', BlocksAndItems.itemSmallRemnants });
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemInfusedSword), new Object[] { "X ", "X#", "X ", 'X', BlocksAndItems.itemRiftFlux, '#', DIAMOND_SWORD });
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemCatalystMixture), new Object[] { "D#H", " X ", 'X', Items.BOWL, '#', Items.REDSTONE, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemCatalystMixture), new Object[] { "H#D", " X ", 'X', Items.BOWL, '#', Items.REDSTONE, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemStableCatalystMixture), new Object[] { "D#D", " X ", 'X', Items.BOWL, '#', Items.COAL, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemStrongCatalystMixture), new Object[] { "D#H", " X ", 'X', Items.BOWL, '#', Blocks.REDSTONE_BLOCK, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
-		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemStrongCatalystMixture), new Object[] { "H#D", " X ", 'X', Items.BOWL, '#', Blocks.REDSTONE_BLOCK, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemPhaseCrystal), new Object[] { " X ", "#D#", " X ", 'X', LAPIS_LAZULI, '#', Items.REDSTONE, 'D', Items.DIAMOND });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemPhaseCrystal), new Object[] { " # ", "XDX", " # ", 'X', LAPIS_LAZULI, '#', Items.REDSTONE, 'D', Items.DIAMOND });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemRiftFlux), new Object[] { "XXX", "XXX", "XXX", 'X', BlocksAndItems.itemSmallRemnants });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemInfusedSword), new Object[] { "X ", "X#", "X ", 'X', BlocksAndItems.itemRiftFlux, '#', DIAMOND_SWORD });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemCatalystMixture), new Object[] { "D#H", " X ", 'X', Items.BOWL, '#', Items.REDSTONE, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemCatalystMixture), new Object[] { "H#D", " X ", 'X', Items.BOWL, '#', Items.REDSTONE, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemStableCatalystMixture), new Object[] { "D#D", " X ", 'X', Items.BOWL, '#', Items.COAL, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemStrongCatalystMixture), new Object[] { "D#H", " X ", 'X', Items.BOWL, '#', Blocks.REDSTONE_BLOCK, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
+		-GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemStrongCatalystMixture), new Object[] { "H#D", " X ", 'X', Items.BOWL, '#', Blocks.REDSTONE_BLOCK, 'D', Items.BONE, 'H', Items.ROTTEN_FLESH });
 		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemDampingAgent), new Object[] { "#X#", 'X', BlocksAndItems.itemRiftFlux, '#', LAPIS_LAZULI });
 		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemStrongDampingAgent), new Object[] { "X", "X", "X", 'X', BlocksAndItems.itemDampingAgent });
 		GameRegistry.addRecipe(new ItemStack(BlocksAndItems.itemStrongDampingAgent), new Object[] { "XXX", 'X', BlocksAndItems.itemDampingAgent });

@@ -1,8 +1,7 @@
 {
   "parent": "block/cube_column",
   "textures": {
-    "end": "mod_invasion:blocks/nexus_top_on",
-    "side": "mod_invasion:blocks/nexus_side_on",
-    "front": "mod_invasion:blocks/nexus_side_on"
+    "end": "invasion:block/nexus_top_on",
+    "side": "invasion:block/nexus_side_on"
   }
 }

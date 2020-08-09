@@ -1,16 +1,12 @@
 package invasion.entity.ai.navigator;
 
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 
 
 public class PathNode {
 
-    //DarthXenon: Changed the following fields to double for added precision: xCoord, yCoord, zCoord, distanceToNext, ditanceToTarget
-    //public final double xCoord;
-    //public final double yCoord;
-    //public final double zCoord;
-    public final Vec3d pos;
+    public final BlockPos pos;
     public final PathAction action;
     private final int hash;
     public boolean isFirst;
@@ -25,7 +21,7 @@ public class PathNode {
     }
 
     public PathNode(int i, int j, int k, PathAction pathAction) {
-        this(i, j, k, pathAction);
+        this(new BlockPos(i, j, k), pathAction);
     }
 
     public PathNode(double i, double j, double k) {
@@ -33,15 +29,15 @@ public class PathNode {
     }
 
     public PathNode(double i, double j, double k, PathAction pathAction) {
-        this(new Vec3d(i, j, k), pathAction);
+        this(new BlockPos(i, j, k), pathAction);
     }
 
-    public PathNode(Vec3d pos, PathAction pathAction) {
-        this.index = -1;
-        this.isFirst = false;
+    public PathNode(BlockPos pos, PathAction pathAction) {
+        index = -1;
+        isFirst = false;
         this.pos = pos;
-        this.action = pathAction;
-        this.hash = makeHash(pos, this.action);
+        action = pathAction;
+        hash = makeHash(this.pos, action);
     }
 
 	/*public static int makeHash(int x, int y, int z, PathAction action) {
@@ -55,26 +51,26 @@ public class PathNode {
 	}*/
 
     //DarthXenon: I hope I'm doing this right.
-    public static int makeHash(Vec3d vec, PathAction action) {
+    public static int makeHash(BlockPos vec, PathAction action) {
         long j = Integer.toUnsignedLong(action.ordinal());
         return 31 * vec.hashCode() + (int) (j ^ j >>> 32);
     }
 
     public static int makeHash(double x, double y, double z, PathAction action) {
-        return makeHash(new Vec3d(x, y, z), action);
+        return makeHash(new BlockPos(x, y, z), action);
     }
 
     public float distanceTo(PathNode pathpoint) {
-        double d0 = pathpoint.pos.x - this.pos.x;
-        double d1 = pathpoint.pos.y - this.pos.y;
-        double d2 = pathpoint.pos.z - this.pos.z;
+        double d0 = pathpoint.pos.getX() - pos.getX();
+        double d1 = pathpoint.pos.getY() - pos.getY();
+        double d2 = pathpoint.pos.getZ() - pos.getZ();
         return MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
     }
 
     public float distanceTo(double x, double y, double z) {
-        double d0 = x - this.pos.x;
-        double d1 = y - this.pos.y;
-        double d2 = z - this.pos.z;
+        double d0 = x - pos.getX();
+        double d1 = y - pos.getY();
+        double d2 = z - pos.getZ();
         return MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
     }
 
@@ -82,36 +78,36 @@ public class PathNode {
     public boolean equals(Object obj) {
         if ((obj instanceof PathNode)) {
             PathNode node = (PathNode) obj;
-            return (this.hash == node.hash) && this.equals(node.pos) && (node.action == this.action);
+            return (hash == node.hash) && equals(node.pos) && (node.action == action);
         }
 
         return false;
     }
 
     public boolean equals(double x, double y, double z) {
-        return (this.pos.x == x) && (this.pos.y == y) && (this.pos.z == z);
+        return pos.getX() == x && pos.getY() == y && pos.getZ() == z;
     }
 
-    public boolean equals(Vec3d pos) {
-        return this.pos.equals(pos);
+    public boolean equals(BlockPos pos1) {
+        return pos.equals(pos1);
     }
 
     @Override
     public int hashCode() {
-        return this.hash;
+        return hash;
     }
 
     public boolean isAssigned() {
-        return this.index >= 0;
+        return index >= 0;
     }
 
     @Override
     public String toString() {
-        return this.pos.toString() + ", " + this.action.toString();
+        return pos.toString() + ", " + action.toString();
     }
 
     public PathNode getPrevious() {
-        return this.previous;
+        return previous;
     }
 
     public void setPrevious(PathNode previous) {

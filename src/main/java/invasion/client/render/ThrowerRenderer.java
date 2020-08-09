@@ -19,14 +19,6 @@ public class ThrowerRenderer extends LivingRenderer<EntityIMThrower, ThrowerMode
         super(rendererManager, new ThrowerModel(), 1.5f);
     }
 
-    /*
-    @Override
-    public void render(EntityIMThrower entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
-        super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
-    }
-
-     */
-
     @Override
     public ResourceLocation getEntityTexture(EntityIMThrower entity) {
         return TEXTURES[entity.getTier()];

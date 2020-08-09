@@ -13,9 +13,54 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
+////// remove this section after getting everything to work
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+            exclude '**/invasion/entity/monster/**'
+            exclude '**/invasion/entity/ai/**'
+            exclude '**/invasion/entity/**'
+            exclude '**/invasion/world/**'
+            exclude '**/invasion/village/**'
+            exclude '**/invasion/structure/**'
+            exclude '**/invasion/client/**'
+            exclude '**/invasion/TerrainDataLayer.java'
+            //exclude '**/invasion/nexus/**'
+            exclude '**/invasion/IPathfindable.java'
+            exclude '**/invasion/util/spawneggs/**'
+            exclude '**/invasion/util/**'
+            exclude '**/invasion/entity/**'
+            exclude '**/invasion/nexus/WaveSpawner.java'
+            exclude '**/invasion/nexus/EntityPattern.java'
+            exclude '**/invasion/nexus/WaveBuilder.java'
+            exclude '**/invasion/nexus/WaveEntry.java'
+            exclude '**/invasion/nexus/SpawnPointContainer.java'
+            exclude '**/invasion/nexus/SpawnPoint.java'
+            exclude '**/invasion/nexus/MobBuilder.java'
+            exclude '**/invasion/nexus/Invasion.java'
+            exclude '**/invasion/nexus/Wave.java'
+            exclude '**/invasion/nexus/EntityPattern.java'
+
+
+
+            exclude '**/invasion/item/trap/**'
+            exclude '**/invasion/item/DebugWandItem.java'
+            exclude '**/invasion/item/ProbeItem.java'
+            exclude '**/invasion/item/SearingBowItem.java'
+            exclude '**/invasion/item/StrangeBoneItem.java'
+
+
+
+
+        }
+    }
+}
+/////
+
 version = '1.0'
-group = 'com.yourname.modid' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'modid'
+group = 'invasion' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'invasion'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 

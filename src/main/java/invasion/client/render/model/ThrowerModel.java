@@ -77,21 +77,6 @@ public class ThrowerModel extends SegmentedModel<EntityIMThrower> implements IHa
         throwerBody2.mirror = false;
     }
 
-    /*
-    @Override
-    public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
-        setRotationAngles(f, f1, f2, f3, f4, f5, entity);
-        throwerHead.render(f5);
-        throwerBody.render(f5);
-        throwerBody2.render(f5);
-        throwerRightArm.render(f5);
-        throwerLeftArm.render(f5);
-        throwerRightLeg.render(f5);
-        throwerLeftLeg.render(f5);
-    }
-    
-     */
-
     @Override
     public void setRotationAngles(EntityIMThrower thrower, float t, float v1, float v2, float headPitch, float headYaw) {
         throwerHead.rotateAngleY = (headPitch / 57.29578F);

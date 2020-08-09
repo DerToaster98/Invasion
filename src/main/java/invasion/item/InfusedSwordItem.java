@@ -25,7 +25,7 @@ public class InfusedSwordItem extends SwordItem {
 
     public InfusedSwordItem(Item.Properties properties) {
         //TODO set Attack damage
-        super(ItemTier.DIAMOND, 1, 2, properties.maxDamage(40).maxStackSize(1));
+        super(ItemTier.DIAMOND, 1, 2, properties.maxDamage(40));
     }
 
     @Override
@@ -84,7 +84,6 @@ public class InfusedSwordItem extends SwordItem {
             // if player isSneaking then refill hunger else refill health
             if (player.isSneaking()) {
                 player.getFoodStats().addStats(6, 0.5f);
-                //world.playSoundAtEntity(entityplayer, "random.burp", 0.5F, world.rand.nextFloat() * 0.1F + 0.9F);
                 player.playSound(SoundEvents.ENTITY_PLAYER_BURP, 0.5f, world.rand.nextFloat() * 0.1f + 0.9f);
             } else {
                 player.heal(6.0F);

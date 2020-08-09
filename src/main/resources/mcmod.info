@@ -1,6 +1,6 @@
 [
 {
-  "modid": "mod_invasion",
+  "modid": "invasion",
   "name": "Invasion mod",
   "description": "So you think your base is tough do you?",
   "version": "${version}",

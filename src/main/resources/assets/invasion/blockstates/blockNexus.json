@@ -1,6 +1,0 @@
-{
-    "variants": {
-        "activated=false": { "model": "invasion:nexus_off" },
-        "activated=true": { "model": "invasion:nexus_on" }
-    }
-}

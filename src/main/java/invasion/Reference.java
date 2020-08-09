@@ -1,6 +1,6 @@
 package invasion;
 
-import invasion.util.Version;
+//RM import invasion.util.Version;
 
 
 public class Reference {
@@ -13,5 +13,5 @@ public class Reference {
     public static final String COMMONPROXY = "invmod.common.ProxyCommon";
     public static final String CLIENTPROXY = "invmod.client.ProxyClient";
     public static final String PREFIX = "invasion";
-    public static Version versionNumber = new Version(1, 2, 6);
+    //RM  public static Version versionNumber = new Version(1, 2, 6);
 }

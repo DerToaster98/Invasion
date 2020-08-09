@@ -13,7 +13,7 @@ public class PathCreator implements IPathSource {
 
     private int searchDepth;
     private int quickFailDepth;
-    private final int[] nanosUsed;
+    private final int[] nanosUsed = new int[6];
     private int index;
 
     public PathCreator() {
@@ -23,40 +23,38 @@ public class PathCreator implements IPathSource {
     public PathCreator(int searchDepth, int quickFailDepth) {
         this.searchDepth = searchDepth;
         this.quickFailDepth = quickFailDepth;
-        this.nanosUsed = new int[6];
-        this.index = 0;
     }
 
     @Override
     public int getSearchDepth() {
-        return this.searchDepth;
+        return searchDepth;
     }
 
     @Override
     public void setSearchDepth(int depth) {
-        this.searchDepth = depth;
+        searchDepth = depth;
     }
 
     @Override
     public int getQuickFailDepth() {
-        return this.quickFailDepth;
+        return quickFailDepth;
     }
 
     @Override
     public void setQuickFailDepth(int depth) {
-        this.quickFailDepth = depth;
+        quickFailDepth = depth;
     }
 
     @Override
     public Path createPath(IPathfindable entity, Vec3d pos0, Vec3d pos1, float targetRadius, float maxSearchRange, IBlockAccess terrainMap) {
         long time = System.nanoTime();
         Path path = PathfinderIM.createPath(entity, pos0, pos1,
-                targetRadius, maxSearchRange, terrainMap, this.searchDepth,
-                this.quickFailDepth);
+                targetRadius, maxSearchRange, terrainMap, searchDepth,
+                quickFailDepth);
         int elapsed = (int) (System.nanoTime() - time);
-        this.nanosUsed[this.index] = elapsed;
-        if (++this.index >= this.nanosUsed.length) {
-            this.index = 0;
+        nanosUsed[index] = elapsed;
+        if (++index >= nanosUsed.length) {
+            index = 0;
         }
         return path;
     }
@@ -64,7 +62,7 @@ public class PathCreator implements IPathSource {
     @Override
     public Path createPath(EntityIMLiving entity, Entity target, float targetRadius, float maxSearchRange, IBlockAccess terrainMap) {
         Vec3d vec = new Vec3d(target.posX + 0.5D - entity.width / 2.0F, target.posY, target.posZ + 0.5D - entity.width / 2.0F);
-        return this.createPath(entity, vec, targetRadius, maxSearchRange, terrainMap);
+        return createPath(entity, vec, targetRadius, maxSearchRange, terrainMap);
     }
 
     @Override
@@ -80,7 +78,7 @@ public class PathCreator implements IPathSource {
             startX = entity.getEntityBoundingBox().minX;
             startZ = entity.getEntityBoundingBox().minZ;
         }
-        return this.createPath(entity, new Vec3d(startX, startY, startZ),
+        return createPath(entity, new Vec3d(startX, startY, startZ),
                 vec.addVector(0.5d - entity.width / 2.0F, 0d, 0.5d - entity.width / 2d),
                 targetRadius, maxSearchRange, terrainMap);
     }

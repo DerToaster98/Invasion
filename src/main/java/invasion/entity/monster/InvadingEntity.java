@@ -55,7 +55,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     private static final DataParameter<Byte> TIER = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.BYTE); //30
     private static final DataParameter<Integer> TEXTURE = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.VARINT); //31
     private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
-    protected static List<Block> unDestructableBlocks = Arrays.asList(
+    protected static List<Block> unbreakableBlocks = Arrays.asList(
             Blocks.BEDROCK, Blocks.COMMAND_BLOCK, Blocks.END_PORTAL_FRAME,
             Blocks.LADDER, Blocks.CHEST);
 
@@ -179,6 +179,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
                 setAir(180);
             }
         }
+        
     }
 
     @Override
@@ -263,7 +264,9 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
             motionX *= 0.5D;
             motionY *= 0.5D;
             motionZ *= 0.5D;
-            motionY -= 0.02D;
+            motionY -= 0.02D;//"get paid pupper"
+
+
             if ((collidedHorizontally)
                     && (isOffsetPositionInLiquid(motionX, motionY + 0.6D - posY + y, motionZ)))
                 motionY = 0.3D;
@@ -282,6 +285,8 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
             }
 
             moveFlying(strafe, forward, landMoveSpeed);
+//"get paid pupper"
+
 
             if (isOnLadder()) {
                 float maxLadderXZSpeed = 0.15F;
@@ -1069,11 +1074,10 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     public void transitionAIGoal(Objective newObjective) {
         prevObjective = currentObjective;
         currentObjective = newObjective;
-        WorldSavedData
+
     }
 
-    protected void onDebugChange() {
-    }
+    abstract protected void onDebugChange();
 
     @Override
     public Nexus getNexus() {

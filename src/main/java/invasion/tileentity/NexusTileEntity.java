@@ -5,7 +5,6 @@ import invasion.container.NexusContainer;
 import invasion.init.ModBlocks;
 import invasion.init.ModItems;
 import invasion.init.ModTileEntityTypes;
-import invasion.nexus.INexusAccess;
 import invasion.nexus.Nexus;
 import invasion.nexus.NexusMode;
 import mcp.MethodsReturnNonnullByDefault;
@@ -38,7 +37,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 //Todo which superclass to use?
-public class NexusTileEntity extends LockableTileEntity implements INexusAccess, ITickableTileEntity {
+public class NexusTileEntity extends LockableTileEntity implements ITickableTileEntity {
 
     //TODO maybe use two separate fields
     public final int MAX_COOK_TIME = 1200, MAX_GENERATION_TIME = 3000, MAX_ACTIVATION_TIME = 400;

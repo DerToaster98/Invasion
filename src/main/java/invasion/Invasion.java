@@ -1,13 +1,7 @@
 package invasion;
 
-import invasion.entity.monster.InvadingEntity;
 import invasion.init.*;
-import invasion.nexus.IEntityIMPattern;
-import invasion.nexus.MobBuilder;
-import invasion.nexus.WaveBuilder;
-import invasion.util.ISelect;
-import invasion.util.RandomSelectionPool;
-import invasion.util.config.Config;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -41,8 +35,8 @@ public class Invasion {
 
     public static Invasion instance;
 
-    private static final MobBuilder defaultMobBuilder = new MobBuilder();
-    private static ISelect<IEntityIMPattern> nightSpawnPool1;
+   //RM private static final MobBuilder defaultMobBuilder = new MobBuilder();
+    // RM private static ISelect<IEntityIMPattern> nightSpawnPool1;
 
     public Invasion() {
         final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -57,13 +51,15 @@ public class Invasion {
 
 
         instance = this;
-        //  guiHandler = new GuiHandler();
+
     }
 
     public static void addToDeathList(String username, long timeStamp) {
         deathList.put(username, Long.valueOf(timeStamp));
     }
 
+    //RM
+     /*
     public static Entity[] getNightMobSpawns1(World world) {
         ISelect mobPool = getMobSpawnPool();
         int numberOfMobs = world.rand.nextInt(Config.NIGHTSPAWNS_MOB_MAX_GROUPSIZE) + 1;
@@ -72,8 +68,9 @@ public class Invasion {
             InvadingEntity mob = getMobBuilder().createMobFromConstruct(((IEntityIMPattern) mobPool.selectNext()).generateEntityConstruct(), world, null);
             mob.setEntityIndependent();
             //also set in entityLiving constructor, is needed for ai to function properly, I believe
-            mob.setAggroRange(Config.NIGHTSPAWNS_MOB_SIGHTRANGE);
-            mob.setSenseRange(Config.NIGHTSPAWNS_MOB_SENSERANGE);
+            // TODO
+            //mob.setAggroRange(Config.NIGHTSPAWNS_MOB_SIGHTRANGE);
+            //mob.setSenseRange(Config.NIGHTSPAWNS_MOB_SENSERANGE);
             mob.setBurnsInDay(Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY);
             // TODO   entities[i] = mob;
         }
@@ -83,7 +80,7 @@ public class Invasion {
     public static MobBuilder getMobBuilder() {
         return defaultMobBuilder;
     }
-
+*/
     /*
 
     @EventHandler
@@ -169,9 +166,9 @@ public class Invasion {
 
      */
 
-    public static ISelect<IEntityIMPattern> getMobSpawnPool() {
-        return nightSpawnPool1;
-    }
+    //RM public static ISelect<IEntityIMPattern> getMobSpawnPool() {
+    //RM    return nightSpawnPool1;
+    //RM }
 
     /*
     //load Creativetab
@@ -248,6 +245,8 @@ public class Invasion {
         return instance;
     }
 
+    //RM
+    /*
     public static int getMobHealth(InvadingEntity mob) {
         int health = 0;
         if (mob.isNexusBound()) {
@@ -266,10 +265,13 @@ public class Invasion {
         return health;
     }
 
+     */
+
     private void setup(FMLCommonSetupEvent event) {
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
+        event.getMinecraftSupplier().get().getBlockColors().register((IBlockColor) ModBlocks.TRAP.get());
     }
 
     private void serverSetup(FMLDedicatedServerSetupEvent event) {
@@ -318,6 +320,8 @@ public class Invasion {
 
     }
 
+    //RM
+    /*
     protected void nightSpawnConfig() {
         String[] pool1Patterns = new String[DEFAULT_NIGHT_MOB_PATTERN_1_SLOTS.length];
         float[] pool1Weights = new float[DEFAULT_NIGHT_MOB_PATTERN_1_SLOT_WEIGHTS.length];
@@ -337,6 +341,8 @@ public class Invasion {
             logger.fatal("Mob pattern table element mismatch. Ensure each slot has a probability weight");
         }
     }
+
+     */
 
     /*
     public static void broadcastToAll(String message) {

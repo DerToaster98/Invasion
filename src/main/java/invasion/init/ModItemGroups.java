@@ -4,7 +4,7 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 
 public class ModItemGroups {
-    public static final ItemGroup INVASION = new InvasionItemGroup("Main");
+    public static final ItemGroup INVASION = new InvasionItemGroup("invasion");
 
     public static class InvasionItemGroup extends ItemGroup {
 

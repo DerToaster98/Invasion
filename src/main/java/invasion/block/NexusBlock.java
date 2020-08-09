@@ -3,7 +3,6 @@ package invasion.block;
 import invasion.init.ModItems;
 import invasion.init.ModTileEntityTypes;
 import invasion.tileentity.NexusTileEntity;
-import invasion.util.config.Config;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.*;
 import net.minecraft.entity.player.PlayerEntity;
@@ -35,17 +34,10 @@ public class NexusBlock extends ContainerBlock {
 
     public NexusBlock() {
         super(Block.Properties.from(Blocks.OBSIDIAN).hardnessAndResistance(3.0F, 6000000.0F).sound(SoundType.GLASS));
-        /*
-        this.setUnlocalizedName(this.name);
-        this.setRegistryName(this.name);
-        this.setResistance(6000000.0F);
-        this.setHardness(3.0F);
-        //this.setStepSound(Blocks.glass.stepSound);
-        this.setSoundType(Blocks.GLASS.getSoundType());
-        this.itemBlock = new ItemBlock(this);
-        this.itemBlock.setRegistryName(this.name);
-*/
+        setDefaultState(getDefaultState().with(ACTIVATED,false));
     }
+
+
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
@@ -58,7 +50,8 @@ public class NexusBlock extends ContainerBlock {
         if (world.isRemote) return ActionResultType.FAIL;
 
         Item item = player.getHeldItem(hand).getItem();
-        if ((item != ModItems.PROBE.get()) && ((!Config.DEBUG) || (item != ModItems.DEBUG_WAND.get()))) {
+        //RM
+        if ((item != ModItems.PROBE.get()) && ((/*!Config.DEBUG*/false) || (item != ModItems.DEBUG_WAND.get()))) {
             NexusTileEntity tileEntity = (NexusTileEntity) world.getTileEntity(pos);
             if (tileEntity != null) {
                 //TODO which one of these two methods?
