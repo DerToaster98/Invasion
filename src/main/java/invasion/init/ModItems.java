@@ -1,6 +1,7 @@
 package invasion.init;
 
 import invasion.Invasion;
+import invasion.item.BlackArrowItem;
 import invasion.item.InfusedSwordItem;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
@@ -15,6 +16,7 @@ public class ModItems {
 
     public static final RegistryObject<Item> SEARING_BOW = null;//RM ITEMS.register("searing_bow", () -> new SearingBowItem(new Item.Properties().group(ModItemGroups.INVASION)));
     public static final RegistryObject<Item> INFUSED_SWORD = ITEMS.register("infused_sword", () -> new InfusedSwordItem(new Item.Properties().group(ModItemGroups.INVASION)));
+    public static final RegistryObject<Item> BLACK_ARROW = ITEMS.register("black_arrow", () -> new BlackArrowItem(new Item.Properties().group(ModItemGroups.INVASION)));
 
     public static final RegistryObject<Item> NEXUS = ITEMS.register("nexus", () -> new BlockItem(ModBlocks.NEXUS.get(), new Item.Properties().group(ModItemGroups.INVASION)));
 
@@ -32,7 +34,7 @@ public class ModItems {
     public static final RegistryObject<Item> PHASE_CRYSTAL = ITEMS.register("phase_crystal", () -> new SimpleFoiledItem(new Item.Properties().group(ModItemGroups.INVASION).maxStackSize(1)));
     public static final RegistryObject<Item> RIFT_FLUX = ITEMS.register("rift_flux", () -> new Item(new Item.Properties().group(ModItemGroups.INVASION)));
     public static final RegistryObject<Item> SMALL_REMNANTS = ITEMS.register("small_remnants", () -> new Item(new Item.Properties().group(ModItemGroups.INVASION)));
-    public static final RegistryObject<Item> PROBE =  null;//RM ITEMS.register("probe", () -> new ProbeItem(new Item.Properties().group(ModItemGroups.INVASION)));
+    public static final RegistryObject<Item> PROBE = null;//RM ITEMS.register("probe", () -> new ProbeItem(new Item.Properties().group(ModItemGroups.INVASION)));
     public static final RegistryObject<Item> DEBUG_WAND = null;//RM  ITEMS.register("debug_wand", DebugWandItem::new);
     public static final RegistryObject<Item> ENGY_HAMMER = ITEMS.register("engy_hammer", () -> new Item(new Item.Properties()));
 }
