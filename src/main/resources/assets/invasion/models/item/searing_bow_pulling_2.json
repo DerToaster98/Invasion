@@ -1,0 +1,6 @@
+{
+    "parent": "invasion:item/searing_bow",
+    "textures": {
+        "layer0": "invasion:item/searing_bow_pulling_2"
+    }
+}

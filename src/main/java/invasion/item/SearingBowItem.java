@@ -1,18 +1,8 @@
 package invasion.item;
 
-import invasion.entity.projectile.EntityIMArrow;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+
 import net.minecraft.item.BowItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.ArrowLooseEvent;
-
 
 public class SearingBowItem extends BowItem {
 
@@ -21,6 +11,7 @@ public class SearingBowItem extends BowItem {
     }
 
 
+    /*
     @Override
     public void onPlayerStoppedUsing(ItemStack stackIn, World worldIn, LivingEntity wielder, int timeLeft) {
         int var6 = this.getMaxItemUseDuration(stackIn) - timeLeft;
@@ -102,16 +93,7 @@ public class SearingBowItem extends BowItem {
         return stackIn;
     }
 
-    @Override
-    public int getMaxItemUseDuration(ItemStack itemstack) {
-        return 72000;
-    }
-
-    @Override
-    public EnumAction getItemUseAction(ItemStack itemstack) {
-        return EnumAction.BOW;
-    }
-
+     */
 
     //DarthXenon: Too similar to super.onItemRightClick() to necessitate overriding.
 	/*@Override
@@ -142,6 +124,7 @@ public class SearingBowItem extends BowItem {
         return this.name;
     }
 */
+    /* instead use ammuntition finding from ShootableItem
     protected ItemStack findAmmo(PlayerEntity player) {
         if (this.isArrow(player.getHeldItem(EnumHand.OFF_HAND))) {
             return player.getHeldItem(EnumHand.OFF_HAND);
@@ -156,5 +139,7 @@ public class SearingBowItem extends BowItem {
             return null;
         }
     }
+
+     */
 
 }
