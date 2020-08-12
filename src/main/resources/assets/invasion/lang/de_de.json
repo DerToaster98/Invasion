@@ -1,0 +1,51 @@
+{
+    "itemGroup.invasion": "Invasion",
+  
+    "block.invasion.nexus": "Nexus",
+  
+    "item.invasion.searing_bow": "Brennbow",
+    "item.invasion.infused_sword": "Infusiertes Sword",
+    "item.invasion.black_arrow": "Schwarzer Bogen",
+    "item.invasion.catalyst_mixture": "Catalyst Mixture",
+    "item.invasion.stable_catalyst_mixture": "Stabiler Catalyst Mixture",
+    "item.invasion.strong_catalyst_mixture": "Strong Catalyst Mixture",
+    "item.invasion.catalyst": "Nexuskatalysator",
+    "item.invasion.strong_catalyst": "Starker Nexuskatalysator",
+    "item.invasion.stable_catalyst": "Stabiler Nexuskatalysator",
+    "item.invasion.damping_agent": "Dampfender Agent",
+    "item.invasion.strong_damping_agent": "Stark dampfender Agent",
+    "item.invasion.phase_crystal": "Phasenkristall",
+    "item.invasion.rift_flux": "Riftflux",
+    "item.invasion.small_remnants": "Kleine Überreste",
+    "item.invasion.probe.material_probe": "Materialsonde",
+    "item.invasion.probe.nexus_adjuster": "Nexusanpasser",
+    "item.invasion.probe": "Materialsonde",
+    "item.invasion.debug_wand": "Debugstab",
+    "item.invasion.engy_hammer": "Ingenieurshammer",
+    "item.invasion.strange_bone": "Komischer Knochen",
+    "item.invasion.empty_trap": "Leere Falle",
+    "item.invasion.rift_trap": "Riftfalle (Folded)",
+    "item.invasion.flame_trap": "Flammenfalle (Zugeklappt)",
+    "item.invasion.poison_trap": "Giftfalle (Zugeklappt)",
+  
+  
+  
+    "container.nexus": "Nexus",
+  
+    "message.nexus.at_hp": "Nexus bei %s %!",
+    "message.nexus.destabilized": "Feindliche Streitkräfte are destabillieseren den Nexus!",
+    "message.nexus.stable": "Nexusrift wieder stabil!",
+    "message.nexus.energy_blast": "Die gespeicherte Energie wird entfesselt...",
+    "message.nexus.stabilized_to": "Nexusrift auf %s %%",
+    "message.nexus.activated": "Nexus aktiviert und stabil",
+    "message.nexus.activation_failed": "Nexus konnte nicht aktiviert werden",
+    "message.nexus.destroyed": "Der Nexus ist zerstört!",
+    "message.nexus.damaged": "Der Nexus ist schwer beschädigt!",
+    "message.nexus.dusk": "Die Nacht bricht um den Nexus ein...",
+    "message.wave.complete": "Welle %s ist fast vorbei!",
+    "message.wave.begin": "Welle %s fängt gleich an",
+    "message.wave.first": "Die erste Welle kommt bald!",
+    "message.invasion.end": "Hauptwelle vorbei",
+    "message.invasion.bind_player": "%s Leben ist an den Nexus gebunden",
+    "message.invasion.bind_you": "Dein Leben ist an den Nexus gebunden!"
+  }
