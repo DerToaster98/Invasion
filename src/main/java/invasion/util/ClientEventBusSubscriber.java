@@ -11,9 +11,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber(modid = Invasion.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientEventBusSubscriber {
-
+ //TODO remove this file if not needed otherwise
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event) {
-        ScreenManager.registerFactory(ModContainerTypes.NEXUS.get(), NexusScreen::new);
+
     }
 }

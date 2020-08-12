@@ -15,7 +15,7 @@ public class ImpEntity extends InvadingEntity {
     private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
 
     public ImpEntity(World world, Nexus nexus) {
-        super(world, nexus);
+        super(  ,world, nexus);
         setCanClimb(true);
     }
 

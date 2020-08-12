@@ -28,15 +28,14 @@ import java.util.Random;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class NexusBlock extends ContainerBlock {
+public class NexusBlock extends Block {
 
     public static final BooleanProperty ACTIVATED = BooleanProperty.create("activated");
 
     public NexusBlock() {
         super(Block.Properties.from(Blocks.OBSIDIAN).hardnessAndResistance(3.0F, 6000000.0F).sound(SoundType.GLASS));
-        setDefaultState(getDefaultState().with(ACTIVATED,false));
+        setDefaultState(getDefaultState().with(ACTIVATED, false));
     }
-
 
 
     @Override
@@ -47,16 +46,16 @@ public class NexusBlock extends ContainerBlock {
     //TODO work out the correct ActionResultTypes
     @Override
     public ActionResultType onBlockActivated(BlockState blockstate, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        if (world.isRemote) return ActionResultType.FAIL;
+        if (world.isRemote) return ActionResultType.SUCCESS;
 
         Item item = player.getHeldItem(hand).getItem();
         //RM
-        if ((item != ModItems.PROBE.get()) && ((/*!Config.DEBUG*/false) || (item != ModItems.DEBUG_WAND.get()))) {
+        if (true || (item != ModItems.PROBE.get()) && ((/*!Config.DEBUG*/false) || (item != ModItems.DEBUG_WAND.get()))) {
             NexusTileEntity tileEntity = (NexusTileEntity) world.getTileEntity(pos);
             if (tileEntity != null) {
                 //TODO which one of these two methods?
                 NetworkHooks.openGui((ServerPlayerEntity) player, tileEntity, pos);
-                // player.openContainer(invasion);
+                //player.openContainer(tileEntity);
             }
             return ActionResultType.SUCCESS;
         }
@@ -83,52 +82,6 @@ public class NexusBlock extends ContainerBlock {
 
     }
 
-    /*
-    @OnlyIn(Dist.CLIENT)
-    public void randomTick(BlockState blockState, World worldIn, BlockPos pos, Random rand) {
-
-        int numberOfParticles = blockState.get(NexusBlock.ACTIVATED) ? 6 : 0;
-
-        for (int i = 0; i < numberOfParticles; i++) {
-
-            //Copied from BlockEnderChest
-            int j = rand.nextInt(2) * 2 - 1;
-            int k = rand.nextInt(2) * 2 - 1;
-            double d0 = (double) pos.getX() + 0.5D + 0.25D * (double) j;
-            double d1 = (float) pos.getY() + rand.nextFloat();
-            double d2 = (double) pos.getZ() + 0.5D + 0.25D * (double) k;
-            double d3 = rand.nextFloat() * (float) j;
-            double d4 = ((double) rand.nextFloat() - 0.5D) * 0.125D;
-            double d5 = rand.nextFloat() * (float) k;
-
-            worldIn.addOptionalParticle(ParticleTypes.PORTAL,true, d0, d1, d2, d3, d4, d5);
-
-			double y1 = blockPos.getY() + random.nextFloat();
-			double y2 = (random.nextFloat() - 0.5D) * 0.5D;
-
-			int direction = random.nextInt(2) * 2 - 1;
-			double x2;
-			double x1;
-			double z1;
-			double z2;
-			if (random.nextInt(2) == 0) {
-				z1 = blockPos.getZ() + 0.5D + 0.25D * direction;
-				z2 = random.nextFloat() * 2.0F * direction;
-
-				x1 = blockPos.getX() + random.nextFloat();
-				x2 = (random.nextFloat() - 0.5D) * 0.5D;
-			} else {
-				x1 = blockPos.getX() + 0.5D + 0.25D * direction;
-				x2 = random.nextFloat() * 2.0F * direction;
-				z1 = blockPos.getZ() + random.nextFloat();
-				z2 = (random.nextFloat() - 0.5D) * 0.5D;
-			}
-
-			world.spawnParticle(EnumParticleTypes.PORTAL, x1, y1, z1, x2, y2, z2);*
-        }
-    }*/
-
-
 //TODO onReplaced
 
     @Override
@@ -139,12 +92,6 @@ public class NexusBlock extends ContainerBlock {
     @Nullable
     @Override
     public TileEntity createTileEntity(BlockState state, IBlockReader world) {
-        return ModTileEntityTypes.NEXUS.get().create();
-    }
-
-    @Nullable
-    @Override
-    public TileEntity createNewTileEntity(IBlockReader iBlockReader) {
         return ModTileEntityTypes.NEXUS.get().create();
     }
 

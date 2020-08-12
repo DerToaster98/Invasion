@@ -18,8 +18,8 @@ public class ComparatorEntityDistance implements Comparator<Entity> {
 
     @Override
     public int compare(Entity entity1, Entity entity2) {
-        double d1 = (this.x - entity1.posX) * (this.x - entity1.posX) + (this.y - entity1.posY) * (this.y - entity1.posY) + (this.z - entity1.posZ) * (this.z - entity1.posZ);
-        double d2 = (this.x - entity2.posX) * (this.x - entity2.posX) + (this.y - entity2.posY) * (this.y - entity2.posY) + (this.z - entity2.posZ) * (this.z - entity2.posZ);
+        double d1 = (this.x - entity1.getPosX()) * (this.x - entity1.getPosX()) + (this.y - entity1.getPosY()) * (this.y - entity1.getPosY()) + (this.z - entity1.getPosZ()) * (this.z - entity1.getPosZ());
+        double d2 = (this.x - entity2.getPosX()) * (this.x - entity2.getPosX()) + (this.y - entity2.getPosY()) * (this.y - entity2.getPosY()) + (this.z - entity2.getPosZ()) * (this.z - entity2.getPosZ());
         return Double.compare(d2, d1);
     }
 }

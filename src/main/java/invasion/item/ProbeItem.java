@@ -22,9 +22,10 @@ public class ProbeItem extends Item {
     public ActionResultType onItemUseFirst(ItemStack stack, ItemUseContext context) {
 
         World world = context.getWorld();
-        if (world.isRemote) return ActionResultType.FAIL;
-        Block block = world.getBlockState(context.getPos()).getBlock();
         PlayerEntity player = context.getPlayer();
+        if (world.isRemote || player == null) return ActionResultType.FAIL;
+        Block block = world.getBlockState(context.getPos()).getBlock();
+
 
         //Change Nexus spawn range
         if (block == ModBlocks.NEXUS.get()) {

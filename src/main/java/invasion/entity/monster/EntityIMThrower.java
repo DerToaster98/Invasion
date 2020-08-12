@@ -13,6 +13,7 @@ import invasion.util.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
@@ -32,12 +33,10 @@ public class EntityIMThrower extends InvadingEntity {
     private BlockPos pointToClear;
     private INotifyTask clearPointNotifee;
 
-    public EntityIMThrower(World world) {
-        this(world, null);
-    }
 
-    public EntityIMThrower(World world, Nexus nexus) {
-        super(world, nexus);
+    public EntityIMThrower(EntityType<? extends EntityIMThrower> type, World world
+            , Nexus nexus) {
+        super(type,world, nexus);
         this.setBaseMoveSpeedStat(0.13F);
         this.attackStrength = 10;
         this.selfDamage = 0;

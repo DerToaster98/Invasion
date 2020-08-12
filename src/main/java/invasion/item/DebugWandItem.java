@@ -117,8 +117,4 @@ public class DebugWandItem extends Item {
 		}
 		return false;
 	}*/
-
-    public String getName() {
-        return this.name;
-    }
 }

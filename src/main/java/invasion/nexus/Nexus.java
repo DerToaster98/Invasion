@@ -952,6 +952,10 @@ public class Nexus extends WorldSavedData {
         boundPlayers.stream().map(world::getPlayerByUuid).filter(Objects::nonNull).forEach(player -> player.sendMessage(message));
     }
 
+    public void sendStatusMessageToBoundPlayers(ITextComponent message) {
+        boundPlayers.stream().map(world::getPlayerByUuid).filter(Objects::nonNull).forEach(player -> player.sendStatusMessage(message,true));
+    }
+
     private void updateAI() {
         //RM attackerAI.update();
     }

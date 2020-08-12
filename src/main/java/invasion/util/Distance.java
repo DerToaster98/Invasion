@@ -35,9 +35,9 @@ public class Distance {
     }
 
     public static double distanceBetween(Entity entity, Vec3d pos2) {
-        double dX = pos2.x - entity.posX;
-        double dY = pos2.y - entity.posY;
-        double dZ = pos2.z - entity.posZ;
+        double dX = pos2.x - entity.getPosX();
+        double dY = pos2.y - entity.getPosY();
+        double dZ = pos2.z - entity.getPosZ();
         return Math.sqrt(dX * dX + dY * dY + dZ * dZ);
     }
 

@@ -40,7 +40,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class NexusTileEntity extends LockableTileEntity implements ITickableTileEntity {
 
     //TODO maybe use two separate fields
-    public final int MAX_COOK_TIME = 1200, MAX_GENERATION_TIME = 3000, MAX_ACTIVATION_TIME = 400;
+    public final static int MAX_COOK_TIME = 1200, MAX_GENERATION_TIME = 3000, MAX_ACTIVATION_TIME = 400;
 
     private final NonNullList<ItemStack> contents = NonNullList.withSize(2, ItemStack.EMPTY);
     private final IItemHandlerModifiable items = createHandler();
@@ -49,7 +49,7 @@ public class NexusTileEntity extends LockableTileEntity implements ITickableTile
     private int numPlayersUsing;
 
 
-    private NexusMode mode; // it seems like: { 0: inactive, 1: wave invasion ,2:continuous invasion, 3: strong wave invasion 4:? }?
+    private NexusMode mode = NexusMode.MODE_0; // it seems like: { 0: inactive, 1: wave invasion ,2:continuous invasion, 3: strong wave invasion 4:? }?
 
     //the following fields are stored in NBT
     private int fluxGeneration;
@@ -335,8 +335,8 @@ public class NexusTileEntity extends LockableTileEntity implements ITickableTile
     public void setActive(boolean flag) {
         world.setBlockState(this.pos, this.getBlockState().with(NexusBlock.ACTIVATED, flag));
     }
-
-    public boolean isActivating() {
-        return (activationTimer > 0) && (activationTimer < 400);
-    }
+ //TODO: remove
+    //public boolean isActivating() {
+   //     return (activationTimer > 0) && (activationTimer < 400);
+   // }
 }

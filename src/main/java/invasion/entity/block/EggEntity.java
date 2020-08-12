@@ -16,7 +16,6 @@ public class EggEntity extends InvadingEntity {
     private static final DataParameter<Byte> META_HATCHED = EntityDataManager.createKey(EggEntity.class, DataSerializers.BYTE);
     private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
     private int hatchTime;
-    private int ticks;
     private boolean hatched;
     private Entity parent;
     private Entity[] contents;
@@ -39,6 +38,20 @@ public class EggEntity extends InvadingEntity {
         this.getDataManager().register(META_HATCHED, Byte.valueOf((byte) 0));
 
         this.setMaxHealthAndHealth(Invasion.getMobHealth(this));
+
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if(world.isRemote) return;
+
+
+        if(this.ticksExisted> hatchTime *0.8) {
+            getDataManager().set(META_HATCHED,(byte)1);
+        }
+
+
 
     }
 

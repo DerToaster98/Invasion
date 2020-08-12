@@ -6,6 +6,7 @@ import invasion.tileentity.NexusTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ThrowableEntity;
 import net.minecraft.tileentity.TileEntity;
@@ -18,7 +19,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 
-public class BoulderEntity extends ThrowableEntity {
+public class BoulderEntity extends ThrowableEntity implements IProjectile {
     public boolean arrowCritical;
     // private int xTile;
     // private int yTile;

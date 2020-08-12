@@ -1,32 +1,35 @@
 package invasion.item;
 
-import invasion.BlocksAndItems;
-import invasion.entity.ally.EntityIMWolf;
-import invasion.nexus.Nexus;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntityWolf;
-import net.minecraft.entity.player.EntityPlayer;
+
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.WolfEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.Hand;
+import net.minecraft.util.text.StringTextComponent;
 
-
-public class StrangeBoneItem extends ModItem {
-
-    public StrangeBoneItem() {
-        super("strangeBone");
-        this.setMaxStackSize(1);
-    }
-
-    @Override
-    public int getDamage(ItemStack stack) {
-        return 0;
+public class StrangeBoneItem extends Item {
+    public StrangeBoneItem(Properties properties) {
+        super(properties);
     }
 
 
+//TODO tame wolves
+
     @Override
+    public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
+        if (target instanceof WolfEntity) {
+            if (playerIn.world.isRemote) return true;
+            playerIn.sendMessage(new StringTextComponent("Woof"));
+            stack.shrink(1);
+            return true;
+        }
+        return false;
+    }
+
+
+/*    @Override
     public boolean itemInteractionForEntity(ItemStack itemStack, EntityPlayer player, EntityLivingBase targetEntity, EnumHand hand) {
         if ((!targetEntity.world.isRemote) && ((targetEntity instanceof EntityWolf)) && (!(targetEntity instanceof EntityIMWolf))) {
             EntityWolf wolf = (EntityWolf) targetEntity;
@@ -64,5 +67,7 @@ public class StrangeBoneItem extends ModItem {
 
         return false;
     }
+
+ */
 
 }

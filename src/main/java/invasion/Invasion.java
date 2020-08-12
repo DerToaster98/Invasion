@@ -1,6 +1,8 @@
 package invasion;
 
+import invasion.client.gui.NexusScreen;
 import invasion.init.*;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -48,11 +50,13 @@ public class Invasion {
         ModBlocks.BLOCKS.register(modEventBus);
         ModTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
         ModContainerTypes.CONTAINER_TYPES.register(modEventBus);
+        ModEntityTypes.ENTITY_TYPES.register(modEventBus);
 
 
         instance = this;
 
     }
+    
 
     public static void addToDeathList(String username, long timeStamp) {
         deathList.put(username, Long.valueOf(timeStamp));
@@ -271,6 +275,7 @@ public class Invasion {
     }
 
     private void clientSetup(FMLClientSetupEvent event) {
+        ScreenManager.registerFactory(ModContainerTypes.NEXUS.get(), NexusScreen::new);
         event.getMinecraftSupplier().get().getBlockColors().register((IBlockColor) ModBlocks.TRAP.get());
     }
 

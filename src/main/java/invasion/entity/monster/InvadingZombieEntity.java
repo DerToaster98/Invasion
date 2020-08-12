@@ -16,6 +16,7 @@ import invasion.util.config.Config;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -51,12 +52,8 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
     private float dropChance;
     private int swingTimer;
 
-    public InvadingZombieEntity(World world) {
-        this(world, null);
-    }
-
-    public InvadingZombieEntity(World world, Nexus nexus) {
-        super(world, nexus);
+    public InvadingZombieEntity(EntityType<? extends InvadingZombieEntity> type, World world, Nexus nexus) {
+        super(type, world, nexus);
         terrainModifier = new TerrainModifier(this, 2.0F);
         terrainDigger = new TerrainDigger(this, terrainModifier, 1.0F);
         dropChance = 0.0F;

@@ -15,6 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.IWorldPosCallable;
 import net.minecraft.util.IntArray;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -88,17 +89,17 @@ public class NexusContainer extends Container {
 
     @OnlyIn(Dist.CLIENT)
     public int getGenerationProgressScaled(int width) {
-        return 0;
+        return MathHelper.clamp(width * syncData.get(INDEX_GENERATION_PROGRESS) / NexusTileEntity.MAX_GENERATION_TIME, 0, width);
     }
 
     @OnlyIn(Dist.CLIENT)
     public int getActivationProgressScaled(int width) {
-        return 0;
+        return MathHelper.clamp(width * syncData.get(INDEX_ACTIVATION_PROGRESS) / NexusTileEntity.MAX_ACTIVATION_TIME, 0, width);
     }
 
     @OnlyIn(Dist.CLIENT)
     public int getCookingProgressScaled(int width) {
-        return 0;
+        return MathHelper.clamp(width * syncData.get(INDEX_COOKING_PROGRESS) / NexusTileEntity.MAX_COOK_TIME, 0, width);
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -114,6 +115,12 @@ public class NexusContainer extends Container {
     @OnlyIn(Dist.CLIENT)
     public int getLevel() {
         return syncData.get(INDEX_LEVEL);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public boolean isActivating() {
+        int activationTimer = syncData.get(INDEX_ACTIVATION_PROGRESS);
+        return (activationTimer > 0) && (activationTimer < NexusTileEntity.MAX_ACTIVATION_TIME);
     }
 
     private static class OutputSlot extends Slot {

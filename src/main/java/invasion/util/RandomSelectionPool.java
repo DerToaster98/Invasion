@@ -1,5 +1,7 @@
 package invasion.util;
 
+import invasion.Invasion;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -38,7 +40,7 @@ public class RandomSelectionPool<EntityIMLiving> implements ISelect<EntityIMLivi
         }
 
         if (this.pool.size() > 0) {
-            ModLogger.logFatal("RandomSelectionPool invalid setup or rounding error. Failing safe.");
+            Invasion.logger.fatal("RandomSelectionPool invalid setup or rounding error. Failing safe.");
             return (EntityIMLiving) ((ISelect) ((Pair) this.pool.get(0)).getVal1()).selectNext();
         }
         return null;
