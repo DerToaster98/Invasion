@@ -17,8 +17,7 @@
   "item.invasion.phase_crystal": "Phase Crystal",
   "item.invasion.rift_flux": "Rift Flux",
   "item.invasion.small_remnants": "Small Remnants",
-  "item.invasion.probe.material_probe": "Material Probe",
-  "item.invasion.probe.nexus_adjuster": "Nexus Adjuster",
+  "item.invasion.nexus_adjuster": "Nexus Adjuster",
   "item.invasion.probe": "Material Probe",
   "item.invasion.debug_wand": "Debug Wand",
   "item.invasion.engy_hammer": "Engineers Hammer",
@@ -42,10 +41,12 @@
   "message.nexus.destroyed": "The nexus is destroyed!",
   "message.nexus.damaged": "Nexus severely damaged!",
   "message.nexus.dusk": "The night looms around the nexus...",
+  "message.nexus.range_changed": "Nexus spawn range changed to %s blocks",
   "message.wave.complete": "Wave %s almost complete!",
   "message.wave.begin": "Wave %s about to begin",
   "message.wave.first": "The first wave is coming soon!",
   "message.invasion.end": "Main ended",
   "message.invasion.bind_player": "%s life is now bound to the nexus",
-  "message.invasion.bind_you": "Your life is now bound to the nexus!"
+  "message.invasion.bind_you": "Your life is now bound to the nexus!",
+  "message.block_strength": "Block strength: %s"
 }

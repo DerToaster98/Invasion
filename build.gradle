@@ -47,7 +47,7 @@ sourceSets {
 
             exclude '**/invasion/item/trap/**'
             exclude '**/invasion/item/DebugWandItem.java'
-            exclude '**/invasion/item/ProbeItem.java'
+            //exclude '**/invasion/item/ProbeItem.java'
             //exclude '**/invasion/item/SearingBowItem.java'
             //exclude '**/invasion/item/StrangeBoneItem.java'
 
