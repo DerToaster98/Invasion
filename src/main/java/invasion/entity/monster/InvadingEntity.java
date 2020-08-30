@@ -1,8 +1,6 @@
 package invasion.entity.monster;
 
-import invasion.IBlockAccessExtended;
 import invasion.IPathfindable;
-import invasion.Invasion;
 import invasion.client.render.animation.util.IMMoveHelper;
 import invasion.entity.EntityIMLiving;
 import invasion.entity.IHasNexus;
@@ -10,13 +8,11 @@ import invasion.entity.MoveState;
 import invasion.entity.Objective;
 import invasion.entity.ai.navigator.*;
 import invasion.nexus.Nexus;
-import invasion.util.Coords;
 import invasion.util.Distance;
 import invasion.util.config.Config;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.LadderBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -24,25 +20,24 @@ import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.RangedAttribute;
 import net.minecraft.entity.monster.MonsterEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.WorldSavedData;
+import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
 import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class InvadingEntity extends MonsterEntity implements /*SparrowAPI,*/ IHasNexus, IPathfindable {
+public abstract class InvadingEntity extends MonsterEntity implements /*SparrowAPI,*/ IEntityAdditionalSpawnData, IHasNexus, IPathfindable {
 
     //TODO reasonable defaults
     protected static final IAttribute JUMP_HEIGHT = new RangedAttribute(null, "invasion.jump_height", 1.0D, 0.0D, 3.0D).setDescription("Jump Height");
@@ -59,9 +54,12 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
             Blocks.BEDROCK, Blocks.COMMAND_BLOCK, Blocks.END_PORTAL_FRAME,
             Blocks.LADDER, Blocks.CHEST);
 
+
+    @Nullable
     protected final Nexus nexus;
 
     //RM
+
     /*
     private final PathCreator pathSource = new PathCreator(700, 50);
     private final NavigatorIM imNavigator = new NavigatorIM(this, this.pathSource);
@@ -85,7 +83,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     protected int flammability = 2;
     protected int destructiveness = 0;
     protected boolean burnsInDay;
-    protected boolean isImmuneToFire;
+    //protected boolean isImmuneToFire;
     private BlockPos collideSize;
     private final BlockPos currentTargetPos = BlockPos.ZERO;
     private int rallyCooldown;
@@ -123,7 +121,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
 
      */
 
-    public InvadingEntity(EntityType<? extends InvadingEntity> type, World world, Nexus nexus) {
+    public InvadingEntity(EntityType<? extends InvadingEntity> type, World world, @Nullable Nexus nexus) {
         super(type, world);
 
         this.nexus = nexus;
@@ -136,6 +134,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         //   aggroRange = nexus != null ? 12 : Config.NIGHTSPAWNS_MOB_SIGHTRANGE;
         //   senseRange = nexus != null ? 6 : Config.NIGHTSPAWNS_MOB_SENSERANGE;
         // debugTest
+        this.targetSelector
     }
 
     public static float getBlockStrength(BlockPos pos, Block block, World world) {
@@ -156,7 +155,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         super.registerData();
         getDataManager().register(IS_ADJACENT_CLIMB_BLOCK, false);
         getDataManager().register(IS_JUMPING, false);
-        getDataManager().register(TIER, (byte) 1);
+        //getDataManager().register(TIER, (byte) 1);
     }
 
     @Override
@@ -165,6 +164,16 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         getAttributes().registerAttribute(JUMP_HEIGHT);
         getAttributes().registerAttribute(AGGRO_RANGE);
         getAttributes().registerAttribute(SENSE_RANGE);
+    }
+
+    @Override
+    public void writeSpawnData(PacketBuffer buffer) {
+        buffer.writeByte(tier);
+    }
+
+    @Override
+    public void readSpawnData(PacketBuffer additionalData) {
+        tier = additionalData.readByte();
     }
 
     @Override
@@ -195,7 +204,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
             if ((brightness > 0.5F) || (getPosY() < 55.0D)) {
                 ticksExisted += 2;
             }
-            if ((getBurnsInDay()) && (world.isDaytime()) && (!world.isRemote)) {
+            if ((burnsInDay) && (world.isDaytime()) && (!world.isRemote)) {
                 if ((brightness > 0.5F) && (world.canBlockSeeSky(getPosition()))
                         && (rand.nextFloat() * 30.0F < (brightness - 0.4F) * 2.0F)) {
                     sunlightDamageTick();
@@ -321,7 +330,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
             motionX *= groundFriction * airResistance;
             motionZ *= groundFriction * airResistance;
         }
-
+private boolean nexusBound;
         prevLimbSwingAmount = limbSwingAmount;
         double dX = posX - prevPosX;
         double dZ = posZ - prevPosZ;
@@ -421,7 +430,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     public void writeAdditional(CompoundNBT nbt) {
         super.writeAdditional(nbt);
         nbt.putBoolean("alwaysIndependent", alwaysIndependent);
-        nbt.putShort("tier", getTier());
+        nbt.putShort("tier", tier);
     }
 
     @Override
@@ -429,13 +438,14 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         super.readAdditional(nbt);
 
         if (nbt.contains("tier")) {
-            getDataManager().set(TIER, nbt.getByte("tier"));
+            //getDataManager().set(TIER, nbt.getByte("tier"));
+            tier =nbt.getByte("tier");
         }
         if (nbt.contains("alwaysIndependent")) {
             alwaysIndependent = nbt.getBoolean("alwaysIndependent");
         }
         if (alwaysIndependent) {
-            setBurnsInDay(Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY);
+            //setBurnsInDay(Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY);
             //(Config.NIGHTSPAWNS_MOB_SIGHTRANGE);
             //(Config.NIGHTSPAWNS_MOB_SENSERANGE);
         }
@@ -586,13 +596,6 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
 
      */
 
-    public boolean getBurnsInDay() {
-        return burnsInDay;
-    }
-
-    public void setBurnsInDay(boolean flag) {
-        burnsInDay = flag;
-    }
 /*
     @Override
     public boolean isHostile() {
@@ -867,8 +870,9 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         return nexusBound;
     }
 
+
     protected void sunlightDamageTick() {
-        if (isImmuneToFire) {
+        if (isImmuneToFire()) {
             damageEntity(DamageSource.GENERIC, 3.0F);
         } else {
             setFire(8);
@@ -1063,7 +1067,8 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     */
 
     public byte getTier() {
-        return getDataManager().get(TIER);
+        //return getDataManager().get(TIER);
+        return tier;
     }
 
 
@@ -1085,6 +1090,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     }
 
      */
+
 
     public void transitionAIGoal(Objective newObjective) {
         prevObjective = currentObjective;

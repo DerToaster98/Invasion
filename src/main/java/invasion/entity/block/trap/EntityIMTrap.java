@@ -236,6 +236,7 @@ public class EntityIMTrap extends Entity {
     protected void writeEntityToNBT(NBTTagCompound nbttagcompound) {
         nbttagcompound.setBoolean("isEmpty", this.isEmpty);
         nbttagcompound.setInteger("type", this.trapType);
+        
     }
 
     @Override

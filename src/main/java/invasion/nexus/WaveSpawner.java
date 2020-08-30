@@ -299,7 +299,7 @@ public class WaveSpawner implements ISpawnerAccess {
     private void addValidSpawn(EntityIMLiving entity, List<SpawnPoint> spawnPoints, int x, int y, int z) {
         entity.setLocationAndAngles(x, y, z, 0.0F, 0.0F);
         if (entity.getCanSpawnHere()) {
-            int angle = (int) (Math.atan2(nexus.getPos().getZ() - z, nexus.getPos().getX() - x) * 180.0D / Math.PI);
+            int angle = (int) (Math.atan2(nexus.getPos().getZ() - z, nexus.getPos().getX() - x));
             spawnPoints.add(new SpawnPoint(x, y, z, angle, SpawnType.HUMANOID));
         }
     }

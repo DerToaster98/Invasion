@@ -53,8 +53,8 @@ public class AttackerAI {
             updateScaffoldTimer = 40;
             updateScaffolds();
 
-            scaffoldLimit = (2 + nexus.getCurrentWave() / 2);
-            minDistanceBetweenScaffolds = (90 / (nexus.getCurrentWave() + 10));
+            scaffoldLimit = (2 + nexus.getWaveNumber() / 2);
+            minDistanceBetweenScaffolds = (90 / (nexus.getWaveNumber() + 10));
         }
 
         if (--nextEntityDensityUpdate <= 0) {

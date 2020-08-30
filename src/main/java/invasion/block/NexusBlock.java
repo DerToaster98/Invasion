@@ -4,7 +4,11 @@ import invasion.init.ModItems;
 import invasion.init.ModTileEntityTypes;
 import invasion.tileentity.NexusTileEntity;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.SoundType;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
@@ -40,22 +44,21 @@ public class NexusBlock extends Block {
 
     @Override
     protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
+        super.fillStateContainer(builder);
         builder.add(ACTIVATED);
     }
 
     //TODO work out the correct ActionResultTypes
     @Override
     public ActionResultType onBlockActivated(BlockState blockstate, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockRayTraceResult hit) {
-        if (world.isRemote) return ActionResultType.SUCCESS;
+        if (world == null || world.isRemote) return ActionResultType.SUCCESS;
 
         Item item = player.getHeldItem(hand).getItem();
         //RM
         if (true || (item != ModItems.PROBE.get()) && ((/*!Config.DEBUG*/false) || (item != ModItems.DEBUG_WAND.get()))) {
             NexusTileEntity tileEntity = (NexusTileEntity) world.getTileEntity(pos);
             if (tileEntity != null) {
-                //TODO which one of these two methods?
                 NetworkHooks.openGui((ServerPlayerEntity) player, tileEntity, pos);
-                //player.openContainer(tileEntity);
             }
             return ActionResultType.SUCCESS;
         }
@@ -82,7 +85,14 @@ public class NexusBlock extends Block {
 
     }
 
-//TODO onReplaced
+    @Override
+    public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
+        TileEntity tileEntity = worldIn.getTileEntity(pos);
+        if (tileEntity instanceof NexusTileEntity) {
+            ((NexusTileEntity.NexusItemHandler) ((NexusTileEntity) tileEntity).getInventory()).toNonNullList().forEach(itemStack -> worldIn.addEntity(new ItemEntity(worldIn, pos.getX(), pos.getY(), pos.getZ(), itemStack)));
+        }
+        super.onReplaced(state, worldIn, pos, newState, isMoving);
+    }
 
     @Override
     public boolean hasTileEntity(BlockState state) {

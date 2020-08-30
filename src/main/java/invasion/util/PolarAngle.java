@@ -2,14 +2,14 @@ package invasion.util;
 
 
 public class PolarAngle implements IPolarAngle {
-    private int angle;
+    private float angle;
 
     public PolarAngle(int angle) {
         this.angle = angle;
     }
 
     @Override
-    public int getAngle() {
+    public float getAngle() {
         return this.angle;
     }
 

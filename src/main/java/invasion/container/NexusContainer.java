@@ -4,9 +4,9 @@ import invasion.init.ModBlocks;
 import invasion.init.ModContainerTypes;
 import invasion.nexus.NexusMode;
 import invasion.tileentity.NexusTileEntity;
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
@@ -18,18 +18,25 @@ import net.minecraft.util.IntArray;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.SlotItemHandler;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class NexusContainer extends Container {
-    public static final int INDEX_HP = 0, INDEX_ACTIVATION_TYPE = 1, INDEX_GENERATION_PROGRESS = 2, INDEX_ACTIVATION_PROGRESS = 3, INDEX_COOKING_PROGRESS = 4, INDEX_LEVEL = 5, INDEX_RADIUS = 6, INDEX_KILLS = 7;
+    public static final int INDEX_HP = 0, INDEX_ACTIVATION_BAR_COLOR = 1, INDEX_GENERATION_PROGRESS = 2, INDEX_ACTIVATION_PROGRESS = 3, INDEX_COOKING_PROGRESS = 4, INDEX_LEVEL = 5, INDEX_RADIUS = 6, INDEX_KILLS = 7;
     public static final int SYNC_DATA_SIZE = 8;
     public final NexusTileEntity tileEntity;
     private final IWorldPosCallable canInteractWithCallable;
     private final IIntArray syncData;
 
-    public NexusContainer(final int windowId, final PlayerInventory playerInventory, final NexusTileEntity tileEntity, final IIntArray syncData) {
+    //Server constructor
+    public NexusContainer(final int windowId, final PlayerInventory playerInventory, final NexusTileEntity tileEntity,IIntArray syncData) {
         super(ModContainerTypes.NEXUS.get(), windowId);
         this.tileEntity = tileEntity;
         this.canInteractWithCallable = IWorldPosCallable.of(tileEntity.getWorld(), tileEntity.getPos());
@@ -37,9 +44,9 @@ public class NexusContainer extends Container {
         assertIntArraySize(syncData, SYNC_DATA_SIZE);
 
         //Input
-        this.addSlot(new Slot(tileEntity, 0, 32, 33));
+        this.addSlot(new SlotItemHandler(tileEntity.getInventory(), 0, 32, 33));
         //Output
-        this.addSlot(new OutputSlot(tileEntity, 1, 102, 33));
+        this.addSlot(new OutputSlotItemHandler(tileEntity.getInventory(), 1, 102, 33));
         //Player Inventory
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 9; k++) {
@@ -51,14 +58,15 @@ public class NexusContainer extends Container {
             this.addSlot(new Slot(playerInventory, j, 8 + j * 18, 142));
         }
 
-
-        this.trackIntArray(this.syncData);
+        trackIntArray(syncData);
 
     }
 
+    //Client constructor
     public NexusContainer(final int windowId, final PlayerInventory playerInventory, final PacketBuffer data) {
         this(windowId, playerInventory, getTileEntity(playerInventory, data), new IntArray(SYNC_DATA_SIZE));
     }
+
 
     private static NexusTileEntity getTileEntity(final PlayerInventory playerInventory, final PacketBuffer data) {
         Objects.requireNonNull(playerInventory, "player inventory cannot be null");
@@ -84,7 +92,7 @@ public class NexusContainer extends Container {
 
     @OnlyIn(Dist.CLIENT)
     public NexusMode getMode() {
-        return NexusMode.values()[syncData.get(INDEX_ACTIVATION_TYPE)];
+        return NexusMode.values()[syncData.get(INDEX_ACTIVATION_BAR_COLOR)];
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -123,13 +131,43 @@ public class NexusContainer extends Container {
         return (activationTimer > 0) && (activationTimer < NexusTileEntity.MAX_ACTIVATION_TIME);
     }
 
-    private static class OutputSlot extends Slot {
-        public OutputSlot(IInventory iinventory, int i, int j, int k) {
-            super(iinventory, i, j, k);
+    @Override
+    public ItemStack transferStackInSlot(final PlayerEntity player, final int index) {
+        ItemStack returnStack = ItemStack.EMPTY;
+        final Slot slot = this.inventorySlots.get(index);
+        if (slot != null && slot.getHasStack()) {
+            final ItemStack slotStack = slot.getStack();
+            returnStack = slotStack.copy();
+
+            final int containerSlots = this.inventorySlots.size() - player.inventory.mainInventory.size();
+            if (index < containerSlots) {
+                if (!mergeItemStack(slotStack, containerSlots, this.inventorySlots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (!mergeItemStack(slotStack, 0, containerSlots, false)) {
+                return ItemStack.EMPTY;
+            }
+            if (slotStack.getCount() == 0) {
+                slot.putStack(ItemStack.EMPTY);
+            } else {
+                slot.onSlotChanged();
+            }
+            if (slotStack.getCount() == returnStack.getCount()) {
+                return ItemStack.EMPTY;
+            }
+            slot.onTake(player, slotStack);
+        }
+        return returnStack;
+    }
+
+    private static class OutputSlotItemHandler extends SlotItemHandler {
+
+        public OutputSlotItemHandler(IItemHandler itemHandler, int index, int xPosition, int yPosition) {
+            super(itemHandler, index, xPosition, yPosition);
         }
 
         @Override
-        public boolean isItemValid(ItemStack itemstack) {
+        public boolean isItemValid(@Nonnull ItemStack stack) {
             return false;
         }
     }

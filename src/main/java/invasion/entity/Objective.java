@@ -1,6 +1,7 @@
 package invasion.entity;
 
-public enum Objective {
+public enum
+Objective {
     TARGET_ENTITY,
     GOTO_ENTITY,
     NONE,

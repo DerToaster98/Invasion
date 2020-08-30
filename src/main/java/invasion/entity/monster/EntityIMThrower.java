@@ -48,7 +48,7 @@ public class EntityIMThrower extends InvadingEntity {
         this.setDestructiveness(2);
         this.setSize(1.8F, 1.95F);
     }
-
+/*
     @Override
     protected void initEntityAI() {
         this.tasksIM = new EntityAITasks(this.world.profiler);
@@ -74,6 +74,8 @@ public class EntityIMThrower extends InvadingEntity {
         this.targetTasksIM.addTask(2, new EntityAISimpleTarget(this, EntityPlayer.class, this.getAggroRange(), true));
         this.targetTasksIM.addTask(3, new EntityAIHurtByTarget(this, false));
     }
+
+ */
 
     @Override
     public void updateAITick() {

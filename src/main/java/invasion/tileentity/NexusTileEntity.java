@@ -8,53 +8,50 @@ import invasion.init.ModTileEntityTypes;
 import invasion.nexus.Nexus;
 import invasion.nexus.NexusMode;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tileentity.ITickableTileEntity;
-import net.minecraft.tileentity.LockableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.IIntArray;
 import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.InvWrapper;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-//Todo which superclass to use?
-public class NexusTileEntity extends LockableTileEntity implements ITickableTileEntity {
+public class NexusTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
 
-    //TODO maybe use two separate fields
     public final static int MAX_COOK_TIME = 1200, MAX_GENERATION_TIME = 3000, MAX_ACTIVATION_TIME = 400;
 
-    private final NonNullList<ItemStack> contents = NonNullList.withSize(2, ItemStack.EMPTY);
-    private final IItemHandlerModifiable items = createHandler();
-    private final LazyOptional<IItemHandlerModifiable> itemHandler = LazyOptional.of(() -> items);
+    private final NexusItemHandler items = new NexusItemHandler(2);
     private final IIntArray syncData;
-    private int numPlayersUsing;
 
-
-    private NexusMode mode = NexusMode.MODE_0; // it seems like: { 0: inactive, 1: wave invasion ,2:continuous invasion, 3: strong wave invasion 4:? }?
+    private NexusMode mode = NexusMode.OFF; // it seems like: { 0: inactive, 1: wave invasion ,2:continuous invasion, 3: strong wave invasion 4:? }?
 
     //the following fields are stored in NBT
     private int fluxGeneration;
     private int cookTime;
-
     private int activationTimer;
 
 
@@ -68,14 +65,15 @@ public class NexusTileEntity extends LockableTileEntity implements ITickableTile
                 switch (i) {
                     case NexusContainer.INDEX_HP:
                         return Nexus.get(world).getHp();
-                    case NexusContainer.INDEX_ACTIVATION_TYPE:
-                        //TODO
-                        return NexusTileEntity.this.mode.ordinal();
+                    case NexusContainer.INDEX_ACTIVATION_BAR_COLOR:
+                        // 0 for wave, 1 for stable invasion
+                        return NexusTileEntity.this.getMode() == NexusMode.CONTINUOUS_INVASION || NexusTileEntity.this.items.getStackInSlot(0).getItem() == ModItems.STABLE_CATALYST.get() ? 0x0000ff : 0xff0000;
                     case NexusContainer.INDEX_GENERATION_PROGRESS:
                         return NexusTileEntity.this.fluxGeneration;
                     case NexusContainer.INDEX_ACTIVATION_PROGRESS:
-                        return 0; //TODO;
+                        return NexusTileEntity.this.activationTimer;
                     case NexusContainer.INDEX_COOKING_PROGRESS:
+                        return NexusTileEntity.this.cookTime;
                     case NexusContainer.INDEX_LEVEL:
                         return Nexus.get(world).getLevel();
                     case NexusContainer.INDEX_RADIUS:
@@ -103,22 +101,49 @@ public class NexusTileEntity extends LockableTileEntity implements ITickableTile
         this(ModTileEntityTypes.NEXUS.get());
     }
 
-    public static int getNumPlayersUsing(IBlockReader reader, BlockPos pos) {
-        BlockState blockstate = reader.getBlockState(pos);
-        if (blockstate.hasTileEntity()) {
-            TileEntity tileEntity = reader.getTileEntity(pos);
-            if (tileEntity instanceof NexusTileEntity) {
-                return ((NexusTileEntity) tileEntity).numPlayersUsing;
-            }
-        }
-        return 0;
+    @Nullable
+    @Override
+    public Container createMenu(final int windowId, PlayerInventory playerInv, PlayerEntity player) {
+        return new NexusContainer(windowId, playerInv, this, syncData);
     }
 
     @Override
     public void tick() {
 
-        if (world == null || world.isRemote) return;
+        boolean dirty = false;
 
+        if (world != null && !world.isRemote) {
+
+            if (mode == NexusMode.OFF) {
+                ItemStack input = items.getStackInSlot(0);
+                if (!input.isEmpty() && input.getItem().isIn(ItemTags.COALS)) {
+                    dirty = true;
+                    activationTimer++;
+                    if (activationTimer >= MAX_ACTIVATION_TIME) {
+                        activationTimer = 0;
+
+                        if (input.getItem() == ModItems.CATALYST.get()) {
+                            Nexus.get(world).startInvasion(1, this);
+                        } else if (input.getItem() == ModItems.STRONG_CATALYST.get()) {
+                            Nexus.get(world).startInvasion(10, this);
+                        } else if (input.getItem() == ModItems.STABLE_CATALYST.get()) {
+                            Nexus.get(world).debugStartContinuous(this);
+                        }
+                        setActive(true);
+                        world.notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE);
+                        items.decrStackSize(0, 1);
+                    }
+                }
+            } else {
+                //generateFlux(1);
+                dirty = true;
+            }
+
+
+
+
+
+        /*
         if (contents.get(0).isEmpty()) {
             cookTime = 0;
             activationTimer = 0;
@@ -134,7 +159,8 @@ public class NexusTileEntity extends LockableTileEntity implements ITickableTile
                 } else {
                     //TODO rift trap generation
                 }
-            } else if (isInInputSlot(ModItems.RIFT_FLUX.get()) && contents.get(0).getDamage() == 0 /*TODO find out what this means*/) { /*
+            } else if (isInInputSlot(ModItems.RIFT_FLUX.get()) && contents.get(0).getDamage() == 0 /*TODO find out what this means*/
+             /*
             if ((cookTime < 1200) && (nexusLevel >= 10)) {
                 cookTime += 5;
             }
@@ -144,180 +170,98 @@ public class NexusTileEntity extends LockableTileEntity implements ITickableTile
                     if ((nexusItemStacks[0].getCount() - 1) <= 0) nexusItemStacks[0] = null;
                     cookTime = 0;
                 */
-            }
-        }
-        if (activationTimer >= MAX_ACTIVATION_TIME) {
-            activationTimer = 0;
+            //    }
+            //}
 
-            if (isInInputSlot(ModItems.CATALYST.get())) {
-                Nexus.get(world).startInvasion(1, this);
-            } else if (isInInputSlot(ModItems.STRONG_CATALYST.get())) {
-                Nexus.get(world).startInvasion(10, this);
-            } else if (isInInputSlot(ModItems.STABLE_CATALYST.get())) {
-                Nexus.get(world).debugStartContinuous(this);
-            }
 
-            contents.get(0).shrink(1);
         }
 
 
-    }
-
-    @Override
-    protected Container createMenu(int id, PlayerInventory playerInventory) {
-        return new NexusContainer(id, playerInventory, this, syncData);
-    }
-
-    @Override
-    public boolean receiveClientEvent(int id, int type) {
-        if (id == 1) {
-            return true;
-        } else {
-            return super.receiveClientEvent(id, type);
+        if (dirty) {
+            markDirty();
         }
     }
 
+    @Nullable
     @Override
-    public int getSizeInventory() {
-        return 2;
+    public SUpdateTileEntityPacket getUpdatePacket() {
+        CompoundNBT nbt = new CompoundNBT();
+        this.write(nbt);
+        return new SUpdateTileEntityPacket(this.pos, 0, nbt);
+    }
+
+    @Override
+    public void onDataPacket(NetworkManager net, SUpdateTileEntityPacket pkt) {
+        this.read(pkt.getNbtCompound());
+    }
+
+    @Override
+    public CompoundNBT getUpdateTag() {
+        CompoundNBT nbt = new CompoundNBT();
+        this.write(nbt);
+        return nbt;
+    }
+
+    @Override
+    public void handleUpdateTag(CompoundNBT nbt) {
+        this.read(nbt);
+    }
+
+    @Override
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap) {
+        return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.orEmpty(cap, LazyOptional.of(() -> items));
+    }
+
+    public final IItemHandler getInventory() {
+        return items;
     }
 
     @Override
     public void read(@Nonnull CompoundNBT nbt) {
         super.read(nbt);
-        fluxGeneration = nbt.getInt("fluxGeneration");
-        cookTime = nbt.getInt("cookTime");
-        activationTimer = nbt.getInt("activationTimer");
-        ItemStackHelper.loadAllItems(nbt, contents);
+        fluxGeneration = nbt.getInt("flux");
+        cookTime = nbt.getInt("cook");
+        activationTimer = nbt.getInt("activation");
+        NonNullList<ItemStack> inv = NonNullList.withSize(items.getSlots(), ItemStack.EMPTY);
+        ItemStackHelper.loadAllItems(nbt, inv);
+        items.setNonNullList(inv);
     }
 
     @Override
     public CompoundNBT write(@Nonnull CompoundNBT nbt) {
         super.write(nbt);
-        nbt.putInt("fluxGeneration", fluxGeneration);
-        nbt.putInt("cookTime", cookTime);
-        nbt.putInt("activationTimer", activationTimer);
-        ItemStackHelper.saveAllItems(nbt, contents);
+        nbt.putInt("flux", fluxGeneration);
+        nbt.putInt("cook", cookTime);
+        nbt.putInt("activation", activationTimer);
+        ItemStackHelper.saveAllItems(nbt, items.toNonNullList());
         return nbt;
     }
 
-    @Override
-    public boolean isEmpty() {
-        //TODO test this function
-        return contents.stream().allMatch(ItemStack::isEmpty);
-    }
-
-    @Override
-    public ItemStack getStackInSlot(int i) {
-        return i >= 0 && i < getSizeInventory() ? contents.get(i) : ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack decrStackSize(int i1, int i2) {
-        return ItemStackHelper.getAndSplit(contents, i1, i2);
-    }
-
-    @Override
-    public ItemStack removeStackFromSlot(int i) {
-        return ItemStackHelper.getAndRemove(contents, i);
-    }
-
-    @Override
-    public void setInventorySlotContents(int i, ItemStack itemStack) {
-        if (i >= 0 && i < getSizeInventory()) {
-            contents.set(i, itemStack);
-        }
-    }
-
-    @Override
-    public boolean isUsableByPlayer(PlayerEntity player) {
-        if (world.getTileEntity(pos) != this) {
-            return false;
-        }
-        return player.getDistanceSq((double) pos.getX() + 0.5D, (double) pos.getY() + 0.5D, (double) pos.getZ() + 0.5D) <= 64.0D;
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int i, ItemStack stack) {
-        return i == 0 && true;//input only possible in input slot
-        // stack.getItem(). //TODO is Nexus catalyst
-    }
-
-    @Override
-    public boolean canOpen(PlayerEntity player) {
-        return (Nexus.get(world).getNexusTE() == null || Nexus.get(world).getNexusTE() == this);
-    }
-
-    @Override
-    protected ITextComponent getDefaultName() {
-        return new TranslationTextComponent("container.nexus");
-    }
-
-    @Override
-    public void openInventory(PlayerEntity player) {
-        if (!player.isSpectator()) {
-            if (numPlayersUsing < 0) {
-                numPlayersUsing = 0;
-            }
-            numPlayersUsing++;
-            onOpenOrClose();
-        }
-    }
-
-    @Override
-    public void closeInventory(PlayerEntity player) {
-        if (!player.isSpectator()) {
-            numPlayersUsing--;
-            onOpenOrClose();
-        }
-    }
-
-    protected void onOpenOrClose() {
-        //TODO
-    }
-
-    @Override
-    public void updateContainingBlockInfo() {
-        super.updateContainingBlockInfo();
-        //TODO
-    }
-
-    private IItemHandlerModifiable createHandler() {
-        return new InvWrapper(this);
-    }
-
-    @Override
-    public void remove() {
-        super.remove();
-        itemHandler.invalidate();
-    }
-
-    @Override
-    public void clear() {
-        contents.clear();
-    }
-
     public boolean isInInputSlot(Item item) {
-        ItemStack inputStack = contents.get(0);
+        ItemStack inputStack = items.getStackInSlot(0);
         return (!inputStack.isEmpty()) && inputStack.getItem() == item;
     }
 
     public void generateFlux(int increment) {
         fluxGeneration += increment;
         if (fluxGeneration >= MAX_GENERATION_TIME) {
-            if (this.contents.get(1).isEmpty()) {
-                contents.set(1, new ItemStack(ModItems.RIFT_FLUX.get()));
-            } else if (contents.get(1).getItem() == ModItems.RIFT_FLUX.get()) {
-                contents.get(1).grow(1);
+            /*if (items.getStackInSlot(1).getItem() == ModItems.RIFT_FLUX.get()) {
+                items.getStackInSlot(1).grow(1);
+            } else {
+                items.setStackInSlot(1, new ItemStack(ModItems.RIFT_FLUX.get()));
+
             }
+             */
+            items.insertItem(1, new ItemStack(ModItems.RIFT_FLUX.get()), false);
             fluxGeneration -= MAX_GENERATION_TIME;
+            markDirty();
         }
     }
 
     public void reset() {
         //TODO
-        mode = NexusMode.MODE_0;
-        clear();
+        mode = NexusMode.OFF;
+        items.clear();
         world.setBlockState(pos, ModBlocks.NEXUS.get().getDefaultState());
 
     }
@@ -328,15 +272,75 @@ public class NexusTileEntity extends LockableTileEntity implements ITickableTile
 
     public void setMode(NexusMode mode) {
         this.mode = mode;
-        this.setActive(mode != NexusMode.MODE_0);
+        this.setActive(mode != NexusMode.OFF);
     }
 
-    //TODO
     public void setActive(boolean flag) {
         world.setBlockState(this.pos, this.getBlockState().with(NexusBlock.ACTIVATED, flag));
     }
- //TODO: remove
-    //public boolean isActivating() {
-   //     return (activationTimer > 0) && (activationTimer < 400);
-   // }
+
+    @Override
+    public ITextComponent getDisplayName() {
+        return new TranslationTextComponent("container.nexus");
+    }
+
+    public static class NexusItemHandler extends ItemStackHandler {
+
+        public NexusItemHandler(int size, ItemStack... stacks) {
+            super(size);
+
+            for (int index = 0; index < stacks.length; index++) {
+                this.stacks.set(index, stacks[index]);
+            }
+        }
+
+        public void clear() {
+            for (int index = 0; index < this.getSlots(); index++) {
+                this.stacks.set(index, ItemStack.EMPTY);
+                this.onContentsChanged(index);
+            }
+        }
+
+        public boolean isEmpty() {
+            for (ItemStack stack : this.stacks) {
+                if (stack.isEmpty() || stack.getItem() == Items.AIR) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public ItemStack decrStackSize(int index, int count) {
+            ItemStack stack = getStackInSlot(index);
+            stack.shrink(count);
+            this.onContentsChanged(index);
+            return stack;
+        }
+
+        public void removeStackFromSlot(int index) {
+            this.stacks.set(index, ItemStack.EMPTY);
+            this.onContentsChanged(index);
+        }
+
+        public NonNullList<ItemStack> toNonNullList() {
+            NonNullList<ItemStack> items = NonNullList.create();
+            items.addAll(this.stacks);
+            return items;
+        }
+
+        public void setNonNullList(NonNullList<ItemStack> items) {
+            if (items.size() == 0)
+                return;
+            if (items.size() != this.getSlots())
+                throw new IndexOutOfBoundsException("NonNullList must be same size as ItemStackHandler!");
+            for (int index = 0; index < items.size(); index++) {
+                this.stacks.set(index, items.get(index));
+            }
+        }
+
+        @Override
+        public String toString() {
+            return this.stacks.toString();
+        }
+    }
 }

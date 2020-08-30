@@ -3,6 +3,7 @@ package invasion.entity.projectile;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.util.math.EntityRayTraceResult;
 import net.minecraft.world.World;
 
 public class BlackArrowEntity extends ArrowEntity {
@@ -17,4 +18,5 @@ public class BlackArrowEntity extends ArrowEntity {
     public BlackArrowEntity(World worldIn, LivingEntity shooter) {
         super(worldIn, shooter);
     }
+
 }

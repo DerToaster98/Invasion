@@ -10,6 +10,7 @@ import net.minecraft.state.EnumProperty;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.ILightReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
@@ -23,9 +24,26 @@ public class TrapBlock extends Block implements IBlockColor {
         super(Block.Properties.create(Material.IRON).doesNotBlockMovement().hardnessAndResistance(0.2F).sound(SoundType.LANTERN));
     }
 
+    //TODO
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+       if(world.isRemote || /* ! (entity instanceof InvadingEntity) || */state.get(CHARGE) == Charge.EMPTY) return;
 
+       switch (state.get(CHARGE)) {
+           case RIFT:
+
+           case FIRE:
+
+           case POISON:
+
+           default:
+       }
+
+    }
+
+    @Override
+    public boolean isValidPosition(BlockState state, IWorldReader worldIn, BlockPos pos) {
+        return hasSolidSideOnTop(worldIn,pos.down());
     }
 
     @Override

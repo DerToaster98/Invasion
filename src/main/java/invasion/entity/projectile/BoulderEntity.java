@@ -35,15 +35,15 @@ public class BoulderEntity extends ThrowableEntity implements IProjectile {
     private int ticksInAir;
 
     public BoulderEntity(World worldIn) {
-        super(ModEntityTypes.BOULDER, worldIn);
+        super(ModEntityTypes.BOULDER.get(), worldIn);
     }
 
     public BoulderEntity(double x, double y, double z, World worldIn) {
-        super(ModEntityTypes.BOULDER, x, y, z, worldIn);
+        super(ModEntityTypes.BOULDER.get(), x, y, z, worldIn);
     }
 
     public BoulderEntity(LivingEntity livingEntityIn, World worldIn) {
-        super(ModEntityTypes.BOULDER, livingEntityIn, worldIn);
+        super(ModEntityTypes.BOULDER.get(), livingEntityIn, worldIn);
     }
 
     // USE shoot instead

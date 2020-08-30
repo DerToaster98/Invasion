@@ -16,6 +16,7 @@ public class ComparatorEntityDistance implements Comparator<Entity> {
         this.z = z;
     }
 
+
     @Override
     public int compare(Entity entity1, Entity entity2) {
         double d1 = (this.x - entity1.getPosX()) * (this.x - entity1.getPosX()) + (this.y - entity1.getPosY()) * (this.y - entity1.getPosY()) + (this.z - entity1.getPosZ()) * (this.z - entity1.getPosZ());

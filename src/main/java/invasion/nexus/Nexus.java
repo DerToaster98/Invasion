@@ -20,6 +20,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.Region;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.WorldSavedData;
@@ -29,10 +30,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toCollection;
@@ -64,7 +63,8 @@ public class Nexus extends WorldSavedData {
     private NexusTileEntity nexusTE = null;
     private BlockPos pos = null;
     private AxisAlignedBB boundingBoxToRadius = null;
-
+    private Region sourroundingArea = null;
+    private Wave_ wave;
 
     // The following fields are stored in NBT
     private int hp;
@@ -72,7 +72,7 @@ public class Nexus extends WorldSavedData {
     private List<UUID> boundPlayers = new ArrayList<>();
     private NexusMode mode;
     private boolean happening;
-    private int currentWave;
+    private int waveNumber;
     private int spawnRadius = 52;
     private int kills; //Maybe move to nexus TE
     private int mobsLeftInWave;
@@ -82,6 +82,7 @@ public class Nexus extends WorldSavedData {
     private int lastPowerLevel;
     private int powerLevelTimer;
     // Here
+    private long waveSeed;
     private int lastMobsLeftInWave; // Here
     private int mobsToKillInWave;   // Here
     private int nextAttackTime;
@@ -138,7 +139,7 @@ public class Nexus extends WorldSavedData {
     /**
      * Called every tick and handles spawning and various checks
      *
-     * @param event The event data
+     * @param event The event dataAngle
      */
     @SubscribeEvent
     public void update(TickEvent.WorldTickEvent event) {
@@ -153,7 +154,7 @@ public class Nexus extends WorldSavedData {
         updateStatus();
         updateAI();
 
-        if ((mode == NexusMode.MODE_1) || (mode == NexusMode.MODE_2) || (mode == NexusMode.MODE_3)) {
+        if ((mode == NexusMode.WAVE_INVASION) || (mode == NexusMode.CONTINUOUS_INVASION) || (mode == NexusMode.MODE_3)) {
             if (resumedFromNBT) {
                 onResume();
                 resumedFromNBT = false;
@@ -166,9 +167,9 @@ public class Nexus extends WorldSavedData {
                     updateMobList();
                 }
 
-                if ((mode == NexusMode.MODE_1) || (mode == NexusMode.MODE_3))
+                if ((mode == NexusMode.WAVE_INVASION) || (mode == NexusMode.MODE_3))
                     doInvasion(50);
-                else if (mode == NexusMode.MODE_2)
+                else if (mode == NexusMode.CONTINUOUS_INVASION)
                     doContinuous(50);
             } catch (WaveSpawnerException e) {
                 Invasion.logger.fatal("Error while spawning: {}", e.getMessage());
@@ -192,7 +193,7 @@ public class Nexus extends WorldSavedData {
                 pos.getZ() - (spawnRadius + 10),
                 pos.getX() + (spawnRadius + 10), 127.0D,
                 pos.getZ() + (spawnRadius + 10));
-        if ((mode == NexusMode.MODE_2) && (continuousAttack)) {
+        if ((mode == NexusMode.CONTINUOUS_INVASION) && (continuousAttack)) {
             if (resumeSpawnerContinuous()) {
                 //RM mobsLeftInWave = (lastMobsLeftInWave += acquireEntities());
                 Invasion.logger.debug("mobsLeftInWave: {}", mobsLeftInWave);
@@ -218,11 +219,11 @@ public class Nexus extends WorldSavedData {
      * Prints debug messages to player chats
      */
     public void debugStatus() {
-        sendMessageToBoundPlayers(new StringTextComponent("Current Time: " + world.getGameTime()));
-        sendMessageToBoundPlayers(new StringTextComponent("Time to next: " + nextAttackTime));
-        sendMessageToBoundPlayers(new StringTextComponent("Days to attack: " + daysToAttack));
-        sendMessageToBoundPlayers(new StringTextComponent("Mobs left: " + mobsLeftInWave));
-        sendMessageToBoundPlayers(new StringTextComponent("Mode: " + mode));
+        forEachBoundPlayer(p->p.sendMessage(new StringTextComponent("Current Time: " + world.getGameTime())));
+        forEachBoundPlayer(p->p.sendMessage(new StringTextComponent("Time to next: " + nextAttackTime)));
+        forEachBoundPlayer(p->p.sendMessage(new StringTextComponent("Days to attack: " + daysToAttack)));
+        forEachBoundPlayer(p->p.sendMessage(new StringTextComponent("Mobs left: " + mobsLeftInWave)));
+        forEachBoundPlayer(p->p.sendMessage(new StringTextComponent("Mode: " + mode)));
     }
 
     /**
@@ -254,14 +255,14 @@ public class Nexus extends WorldSavedData {
         mobsLeftInWave -= 1;
         if (mobsLeftInWave <= 0) {
             if (lastMobsLeftInWave > 0) {
-                sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus.stable"));
-                sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus.energy_blast"));
+                forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.nexus.stable")));
+                forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.nexus.energy_blast")));
                 lastMobsLeftInWave = mobsLeftInWave;
             }
             return;
         }
         while (mobsLeftInWave + mobsToKillInWave * 0.1F <= lastMobsLeftInWave) {
-            sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus.stabilized_to", (100 - 100 * mobsLeftInWave / mobsToKillInWave)));
+            forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.nexus.stabilized_to", (100 - 100 * mobsLeftInWave / mobsToKillInWave))));
             lastMobsLeftInWave = ((int) (lastMobsLeftInWave - mobsToKillInWave * 0.1F));
         }
     }
@@ -321,8 +322,8 @@ public class Nexus extends WorldSavedData {
         powerLevel = i;
     }
 
-    public int getCurrentWave() {
-        return currentWave;
+    public int getWaveNumber() {
+        return waveNumber;
     }
 
     /*
@@ -451,7 +452,8 @@ public class Nexus extends WorldSavedData {
         hp = nbt.getInt("hp");
         level = nbt.getInt("level");
         powerLevel = nbt.getInt("powerLevel");
-        currentWave = nbt.getInt("currentWave");
+        waveNumber = nbt.getInt("currentWave");
+        waveSeed = nbt.getLong("waveSeed");
         spawnRadius = nbt.getInt("spawnRadius");
         //RM waveSpawner.setRadius(spawnRadius);
         boundingBoxToRadius = new AxisAlignedBB(
@@ -468,7 +470,7 @@ public class Nexus extends WorldSavedData {
         )).collect(Collectors.toList());
 
         Invasion.logger.debug("Restored invasion from NBT with with currentWave: {}, spawnRadius: {}, powerLevel: {}, boundPlayers: {} entries",
-                currentWave, currentWave, powerLevel, boundPlayers.size());
+                waveNumber, waveNumber, powerLevel, boundPlayers.size());
 
         //RM attackerAI.read(nbt);
     }
@@ -494,7 +496,8 @@ public class Nexus extends WorldSavedData {
         nbt.putInt("hp", hp);
         nbt.putInt("level", level);
         nbt.putInt("powerLevel", powerLevel);
-        nbt.putInt("currentWave", currentWave);
+        nbt.putInt("currentWave", waveNumber);
+        nbt.putLong("waveSeed", waveSeed);
         nbt.putInt("spawnRadius", spawnRadius);
 
         ListNBT uuids = new ListNBT();
@@ -524,9 +527,9 @@ public class Nexus extends WorldSavedData {
     }
     */
 
-    public void setWave(int wave) {
-        currentWave = wave;
-    }
+    //public void setWave(int wave) {
+    //    waveNumber = wave;
+    //}
 
     public void startInvasion(int startWave, NexusTileEntity tileEntity) {
 
@@ -546,21 +549,21 @@ public class Nexus extends WorldSavedData {
                 pos.getY() + (spawnRadius + 40),
                 pos.getZ() + (spawnRadius + 10));
 
-        if ((mode == NexusMode.MODE_0) || (mode == NexusMode.MODE_2)) {
+        if ((mode == NexusMode.OFF) || (mode == NexusMode.CONTINUOUS_INVASION)) {
             //RM
             if (true/* waveSpawner.isReady()*/) {
                 try {
-                    currentWave = startWave;
+                    waveNumber = startWave;
                     //RM waveSpawner.beginNextWave(currentWave);
-                    if (mode == NexusMode.MODE_0) {
-                        setMode(NexusMode.MODE_1);
+                    if (mode == NexusMode.OFF) {
+                        setMode(NexusMode.WAVE_INVASION);
                     } else {
                         setMode(NexusMode.MODE_3);
                     }
                     bindPlayers();
                     waveDelayTimer = -1L;
                     timer = System.currentTimeMillis();
-                    sendMessageToBoundPlayers(new TranslationTextComponent("message.wave.first"));
+                    forEachBoundPlayer(p -> p.sendMessage(new TranslationTextComponent("message.wave.first")));
                     //TODO play sound for everyone
                     world.playSound(null, pos, ModSounds.RUMBLE.get(), SoundCategory.AMBIENT, 1.0F, 1.0F);
                     //RM
@@ -597,18 +600,18 @@ public class Nexus extends WorldSavedData {
                 pos.getZ() + (spawnRadius + 10));
         //RM
         if ((mode == NexusMode.MODE_4) && (true /*waveSpawner.isReady()*/) && (happening)) {
-            setMode(NexusMode.MODE_2);
+            setMode(NexusMode.CONTINUOUS_INVASION);
             lastPowerLevel = powerLevel;
             lastWorldTime = world.getGameTime();
             nextAttackTime = ((int) (lastWorldTime / 24000L * 24000L) + 14000);
             if ((lastWorldTime % 24000L > 12000L)
                     && (lastWorldTime % 24000L < 16000L)) {
-                sendMessageToBoundPlayers(new TranslationTextComponent("message.invasion.dusk"));
+                forEachBoundPlayer(p -> p.sendMessage(new TranslationTextComponent("message.invasion.dusk")));
             } else {
-                sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus.activated"));
+                forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.nexus.activated")));
             }
         } else {
-            sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus.activation_failed"));
+            forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.nexus.activation_failed")));
         }
 
         happening = true;
@@ -619,9 +622,9 @@ public class Nexus extends WorldSavedData {
         //RM
         if (true/*waveSpawner.isActive()*/) {
             //RM
-            if (true/*waveSpawner.isWaveComplete()*/) {
+            if (true/*waveSpawner.isWaveComplete()*/ && wave.isOver()) {
                 if (waveDelayTimer == -1L) {
-                    sendMessageToBoundPlayers(new TranslationTextComponent("message.wave.complete", currentWave));
+                    forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.wave.complete", waveNumber)));
                     //playSoundForBoundPlayers("invmod:chime1");
                     //TODO play to everyone
                     world.playSound(null, pos, ModSounds.CHIME.get(), SoundCategory.AMBIENT, 1.0F, 1.0F);
@@ -630,20 +633,25 @@ public class Nexus extends WorldSavedData {
                 } else {
                     waveDelayTimer += elapsed;
                     if (waveDelayTimer > waveDelay) {
-                        currentWave += 1;
-                        sendMessageToBoundPlayers(new TranslationTextComponent("message.wave.begin", currentWave));
+                        waveNumber += 1;
+                        forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.wave.begin", waveNumber)));
                         //RM waveSpawner.beginNextWave(currentWave);
                         waveDelayTimer = -1L;
                         world.playSound(null, pos, ModSounds.RUMBLE.get(), SoundCategory.AMBIENT, 1.0F, 1.0F);
-                        level = Math.max(level, currentWave);
+                        level = Math.max(level, waveNumber);
+
+                        waveSeed = world.getRandom().nextLong();
+                        wave = WaveGenerator.generate(waveNumber, new Random(waveSeed));
                     }
                 }
             } else {
+                wave.doSpawns(elapsed, this);
                 //RM waveSpawner.spawn(elapsed);
             }
         }
     }
 
+    
     private void playSoundForBoundPlayers(SoundEvent sound) {
         /* TODO if (getBoundPlayers() != null) {
             for (int i = 0; i < getBoundPlayers().size(); i++) {
@@ -679,7 +687,7 @@ public class Nexus extends WorldSavedData {
         if (!continuousAttack) {
             long currentTime = world.getGameTime();
             if ((world.getDayTime() < 12000L) && (currentTime % 24000L >= 12000L) && (currentTime + 12000L > nextAttackTime)) {
-                sendMessageToBoundPlayers(new TranslationTextComponent("message.invasion.dusk"));
+                forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.invasion.dusk")));
             }
             if (lastWorldTime > currentTime) {
                 nextAttackTime = ((int) (nextAttackTime - (lastWorldTime - currentTime)));
@@ -698,13 +706,13 @@ public class Nexus extends WorldSavedData {
                     //RM waveSpawner.beginNextWave(wave);
                     continuousAttack = true;
                     int days = 2; //RM world.rand.nextInt(1
-                            //RM  + Config.MAX_DAYS_BETWEEN_ATTACKS_CONTINIOUS_MODE
+                    //RM  + Config.MAX_DAYS_BETWEEN_ATTACKS_CONTINIOUS_MODE
                     //RM - Config.MIN_DAYS_BETWEEN_ATTACKS_CONTINIOUS_MODE);
                     nextAttackTime = ((int) (currentTime / 24000L * 24000L) + 14000 + days * 24000);
                     hp = MAX_HP;
                     zapTimer = 0;
                     waveDelayTimer = -1L;
-                    sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus_destabilized"));
+                    forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.nexus_destabilized")));
                     //playSoundForBoundPlayers("invmod:rumble");
                     playSoundForBoundPlayers(ModSounds.RUMBLE.get());
                     //RM
@@ -790,21 +798,21 @@ public class Nexus extends WorldSavedData {
 
     private void stop() {
         if (mode == NexusMode.MODE_3) {
-            setMode(NexusMode.MODE_2);
+            setMode(NexusMode.CONTINUOUS_INVASION);
             int days = 2; //RM world.rand.nextInt(1
-                    //RM  + Config.MAX_DAYS_BETWEEN_ATTACKS_CONTINIOUS_MODE
-                    //RM  - Config.MIN_DAYS_BETWEEN_ATTACKS_CONTINIOUS_MODE);
+            //RM  + Config.MAX_DAYS_BETWEEN_ATTACKS_CONTINIOUS_MODE
+            //RM  - Config.MIN_DAYS_BETWEEN_ATTACKS_CONTINIOUS_MODE);
             nextAttackTime = ((int) (world.getGameTime() / 24000L * 24000L) + 14000 + days * 24000);
         } else {
-            setMode(NexusMode.MODE_0);
+            setMode(NexusMode.OFF);
         }
 
         //RM waveSpawner.stop();
-        currentWave = 0;
+        waveNumber = 0;
         errorState = 0;
         happening = false;
         nexusTE.reset();
-        sendMessageToBoundPlayers(new TranslationTextComponent("message.invasion.end"));
+        forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.invasion.end")));
         boundPlayers.clear();
 
         Invasion.logger.info("Main ended.");
@@ -819,7 +827,7 @@ public class Nexus extends WorldSavedData {
         players.forEach((player) -> {
             ITextComponent name = player.getName();
             Invasion.logger.debug("binding {} to nexus", name.toString());
-            sendMessageToBoundPlayers(new TranslationTextComponent("message.invasion.bind_player"));
+            forEachBoundPlayer(p -> p.sendMessage(new TranslationTextComponent("message.invasion.bind_player")));
             player.sendMessage(new TranslationTextComponent("message.invasion.bind_you").applyTextStyle(TextFormatting.DARK_RED));
         });
 
@@ -849,16 +857,16 @@ public class Nexus extends WorldSavedData {
 
     public void theEnd() {
         if (!world.isRemote) {
-            sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus.destroyed"));
+            forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.nexus.destroyed")));
             playSoundForBoundPlayers(SoundEvents.ENTITY_GENERIC_EXPLODE);
-            boundPlayers.stream().map(world::getPlayerByUuid).filter(Objects::nonNull).forEach(player -> player.attackEntityFrom(DamageSource.GENERIC, Float.MAX_VALUE));
+            boundPlayers.stream().map(world::getPlayerByUuid).filter(Objects::nonNull).forEach(p->p.attackEntityFrom(DamageSource.GENERIC, Float.MAX_VALUE));
             stop();
             //RM killAllMobs();
         }
     }
 
     private void continuousNexusHurt() {
-        sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus.damaged"));
+        forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.nexus.damaged")));
         //playSoundForBoundPlayers("random.explode");
         playSoundForBoundPlayers(SoundEvents.ENTITY_GENERIC_EXPLODE);
         //RM killAllMobs();
@@ -913,10 +921,10 @@ public class Nexus extends WorldSavedData {
         hp -= damage;
         if (hp <= 0) {
             hp = 0;
-            if (mode == NexusMode.MODE_1) theEnd();
+            if (mode == NexusMode.WAVE_INVASION) theEnd();
         }
         while (this.hp + 5 <= lastHp) {
-            sendMessageToBoundPlayers(new TranslationTextComponent("message.nexus_at_hp", lastHp - 5));
+            forEachBoundPlayer(p->p.sendMessage(new TranslationTextComponent("message.nexus_at_hp", lastHp - 5)));
         }
     }
 
@@ -925,7 +933,7 @@ public class Nexus extends WorldSavedData {
         //RM  float difficulty = 1.0F + (float) powerLevel / 4500;
         ////RMRM  float tierLevel = 1.0F + (float) powerLevel / 4500;
         //RM   int timeSeconds = 240;
-            //RM Wave wave = waveBuilder.generateWave(difficulty, tierLevel, timeSeconds);
+        //RM Wave wave = waveBuilder.generateWave(difficulty, tierLevel, timeSeconds);
         //RM   mobsToKillInWave = ((int) (wave.getTotalMobAmount() * 0.8F));
         //RM  Invasion.logger.info("Original mobs to kill: {}", mobsToKillInWave);
         //RM  mobsLeftInWave = (lastMobsLeftInWave = mobsToKillInWave
@@ -934,7 +942,7 @@ public class Nexus extends WorldSavedData {
         //RM }//RM catch (WaveSpawnerException e) {
         //RM    Invasion.logger.fatal("Error resuming spawner: {}", e.getMessage());
         //RM    waveSpawner.stop();
-            return false;
+        return false;
         //RM }
 
     }
@@ -948,12 +956,8 @@ public class Nexus extends WorldSavedData {
         //RM  }
     }
 
-    public void sendMessageToBoundPlayers(ITextComponent message) {
-        boundPlayers.stream().map(world::getPlayerByUuid).filter(Objects::nonNull).forEach(player -> player.sendMessage(message));
-    }
-
-    public void sendStatusMessageToBoundPlayers(ITextComponent message) {
-        boundPlayers.stream().map(world::getPlayerByUuid).filter(Objects::nonNull).forEach(player -> player.sendStatusMessage(message,true));
+    public void forEachBoundPlayer(Consumer<PlayerEntity> action) {
+        boundPlayers.stream().map(world::getPlayerByUuid).filter(Objects::nonNull).forEach(action);
     }
 
     private void updateAI() {
@@ -983,6 +987,10 @@ public class Nexus extends WorldSavedData {
 //								: meta, 3);
 //			}
 //		}
+    }
+
+    public Region getSourroundingArea() {
+        return sourroundingArea;
     }
 
     public NexusTileEntity getNexusTE() {
