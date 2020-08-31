@@ -42,4 +42,26 @@ public class WaveGenerator {
                 ZOMBIE_T2 = null;
 
     }
+
+    private static class Spawn implements Consumer<Nexus>, ISpawnCount {
+
+        private final Function<Nexus, Entity> entityGenerator;
+
+        Spawn(Function<Nexus, Entity> entityGenerator) {
+            this.entityGenerator=entityGenerator;
+
+        }
+
+        @Override
+        public void accept(Nexus nexus) {
+            Entity entity = entityGenerator.apply(nexus);
+            entity.setPosition(0,100,0);
+            nexus.getWorld().addEntity(entity);
+        }
+
+        @Override
+        public int spawnCount() {
+            return 1;
+        }
+    }
 }

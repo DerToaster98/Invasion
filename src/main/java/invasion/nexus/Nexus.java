@@ -326,6 +326,10 @@ public class Nexus extends WorldSavedData {
         return waveNumber;
     }
 
+    public int getKills() {
+        return kills;
+    }
+
     /*
     @Override
     public void readFromNBT(NBTTagCompound nbttagcompound) {

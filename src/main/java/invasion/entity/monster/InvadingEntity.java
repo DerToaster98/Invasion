@@ -1,15 +1,10 @@
 package invasion.entity.monster;
 
-import invasion.IPathfindable;
-import invasion.client.render.animation.util.IMMoveHelper;
-import invasion.entity.EntityIMLiving;
+
 import invasion.entity.IHasNexus;
-import invasion.entity.MoveState;
 import invasion.entity.Objective;
-import invasion.entity.ai.navigator.*;
 import invasion.nexus.Nexus;
 import invasion.util.Distance;
-import invasion.util.config.Config;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -37,7 +32,7 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class InvadingEntity extends MonsterEntity implements /*SparrowAPI,*/ IEntityAdditionalSpawnData, IHasNexus, IPathfindable {
+public abstract class InvadingEntity extends MonsterEntity implements /*SparrowAPI,*/ IEntityAdditionalSpawnData, IHasNexus {
 
     //TODO reasonable defaults
     protected static final IAttribute JUMP_HEIGHT = new RangedAttribute(null, "invasion.jump_height", 1.0D, 0.0D, 3.0D).setDescription("Jump Height");
@@ -45,10 +40,10 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     protected static final IAttribute SENSE_RANGE = new RangedAttribute(null, "invasion.sense_range", 6.0D, 0.0D, 20.0D).setDescription("Sensory Range");
     private static final DataParameter<Boolean> IS_ADJACENT_CLIMB_BLOCK = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BOOLEAN); //21
     private static final DataParameter<Boolean> IS_JUMPING = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BOOLEAN); //22
-    private static final DataParameter<Boolean> IS_HOLDING_ONTO_LADDER = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.BOOLEAN); //20
-    private static final DataParameter<Integer> MOVE_STATE = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.VARINT); //23
-    private static final DataParameter<Byte> TIER = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.BYTE); //30
-    private static final DataParameter<Integer> TEXTURE = EntityDataManager.createKey(EntityIMLiving.class, DataSerializers.VARINT); //31
+    private static final DataParameter<Boolean> IS_HOLDING_ONTO_LADDER = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BOOLEAN); //20
+    private static final DataParameter<Integer> MOVE_STATE = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //23
+    private static final DataParameter<Byte> TIER = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BYTE); //30
+    private static final DataParameter<Integer> TEXTURE = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //31
     private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
     protected static List<Block> unbreakableBlocks = Arrays.asList(
             Blocks.BEDROCK, Blocks.COMMAND_BLOCK, Blocks.END_PORTAL_FRAME,
@@ -90,8 +85,8 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     //private float turnRate = 30.0F;
     //private float moveSpeedBase = 0.2f;
     //private float moveSpeed = 0.2f;
-    private MoveState moveState;
-    private final IMMoveHelper moveHelperIM = new IMMoveHelper(this);
+    //private MoveState moveState;
+    //private final IMMoveHelper moveHelperIM = new IMMoveHelper(this);
     //private float rotationRoll = 0f;
 
     //DarthXenon: Not sure what these should be initialized as
@@ -125,16 +120,15 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         super(type, world);
 
         this.nexus = nexus;
-        debugMode = Config.DEBUG ? 1 : 0;
+        debugMode = 0; //RM Config.DEBUG ? 1 : 0;
         //setMaxHealthAndHealth(Invasion.getMobHealth(this));
         //RM isImmuneToFire = false;
         experienceValue = 5;
         nexusBound = nexus != null;
-        burnsInDay = nexus == null && Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY;
+        burnsInDay = nexus == null; //RM && Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY;
         //   aggroRange = nexus != null ? 12 : Config.NIGHTSPAWNS_MOB_SIGHTRANGE;
         //   senseRange = nexus != null ? 6 : Config.NIGHTSPAWNS_MOB_SENSERANGE;
         // debugTest
-        this.targetSelector
     }
 
     public static float getBlockStrength(BlockPos pos, Block block, World world) {
@@ -450,42 +444,6 @@ private boolean nexusBound;
             //(Config.NIGHTSPAWNS_MOB_SENSERANGE);
         }
     }
-/*
-    public float getPrevRotationRoll() {
-        return prevRotationRoll;
-    }
-
-    public float getRotationRoll() {
-        return rotationRoll;
-    }
-
-    public void setRotationRoll(float roll) {
-        rotationRoll = roll;
-    }
-
-    public float getPrevRotationYawHeadIM() {
-        return prevRotationYawHeadIM;
-    }
-
-    public float getRotationYawHeadIM() {
-        return rotationYawHeadIM;
-    }
-
-    public void setRotationYawHeadIM(float yaw) {
-        rotationYawHeadIM = yaw;
-    }
-
-    public float getPrevRotationPitchHead() {
-        return prevRotationPitchHead;
-    }
-
-    public float getRotationPitchHead() {
-        return rotationPitchHead;
-    }
-
-    public void setRotationPitchHead(float pitch) {
-        rotationPitchHead = pitch;
-    }*/
 
     public float getAttackRange() {
         return attackRange;
@@ -596,115 +554,6 @@ private boolean nexusBound;
 
      */
 
-/*
-    @Override
-    public boolean isHostile() {
-        return isHostile;
-    }
-
-    @Override
-    public boolean isNeutral() {
-        return creatureRetaliates;
-    }
-
-    @Override
-    public boolean isThreatTo(Entity entity) {
-        return isHostile() && entity instanceof PlayerEntity;
-    }
-
-    @Override
-    public Entity getAttackingTarget() {
-        return getAttackTarget();
-    }
-
-    @Override
-    public boolean isStupidToAttack() {
-        return false;
-    }
-
-    @Override
-    public boolean doNotVaporize() {
-        return false;
-    }
-
-    @Override
-    public boolean isPredator() {
-        return false;
-    }
-
-    @Override
-    public boolean isPeaceful() {
-        return false;
-    }
-
-    @Override
-    public boolean isPrey() {
-        return false;
-    }
-
-    @Override
-    public boolean isUnkillable() {
-        return false;
-    }
-
-    @Override
-    public boolean isFriendOf(Entity par1entity) {
-        return false;
-    }
-
-    @Override
-    public boolean isNPC() {
-        return false;
-    }
-
-    @Override
-    public int isPet() {
-        return 0;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public int getGender() {
-        return gender;
-    }
-
-    @Override
-    @Nullable
-    public Entity getPetOwner() {
-        return null;
-    }
-
-    @Override
-    public float getSize() {
-        return height * width;
-    }
-
-    @Override
-    @Nullable
-    public String customStringAndResponse(String s) {
-        return null;
-    }
-
-    @Override
-    public String getSimplyID() {
-        return "needID";
-    }
-
-    public boolean isNexusBound() {
-        return nexusBound;
-    }
-
-    @Override
-    public boolean isOnLadder() {
-        return isAdjacentClimbBlock();
-    }
-
- */
-
     public int getDestructiveness() {
         return destructiveness;
     }
@@ -753,6 +602,8 @@ private boolean nexusBound;
         prevObjective = objective;
     }
 
+    //RM
+    /* TODO
 
     @Override
     public float getBlockPathCost(PathNode prevNode, PathNode node) {
@@ -764,6 +615,8 @@ private boolean nexusBound;
     public void getPathOptionsFromNode(PathNode currentNode, PathfinderIM pathFinder) {
        //RM calcPathOptions(world, currentNode, pathFinder);
     }
+
+     */
 
     public int getDebugMode() {
         return debugMode;
@@ -811,20 +664,10 @@ private boolean nexusBound;
         //TODO
     }
 
-    /*
-    @Override
-    protected void dropFewItems(boolean flag, int amount) {
-        if (rand.nextInt(4) == 0) {
-            entityDropItem(new ItemStack(BlocksAndItems.itemSmallRemnants), 0f);
-        }
-    }
-
-     */
-
-
     @Override
     public void onDeath(DamageSource cause) {
-        nexus.registerMobDied();
+        if(nexus !=null) {nexus.registerMobDied();}
+
         super.onDeath(cause);
     }
 
@@ -833,37 +676,6 @@ private boolean nexusBound;
         super.setJumping(flag);
         if (!world.isRemote) getDataManager().set(IS_JUMPING, flag);
     }
-
-    /*
-    @Override
-    protected void updateAITasks() {
-        world.getProfiler().startSection("Invasion Entity AI");
-        ticksExisted++;
-        despawnEntity();
-        getEntitySenses().clearSensingCache();
-        targetTasksIM.onUpdateTasks();
-        updateAITick();
-        tasksIM.onUpdateTasks();
-        getNavigatorNew().onUpdateNavigation();
-        getLookHelper().onUpdateLook();
-        getMoveHelper().onUpdateMoveHelper();
-        getJumpHelper().doJump();
-        world.getProfiler().endSection();
-    }
-
-    @Override
-    protected void updateAITick() {
-        super.updateAITick();
-        if (getAttackTarget() != null) {
-            currentObjective = Objective.TARGET_ENTITY;
-        } else if (nexus != null) {
-            currentObjective = Objective.BREAK_NEXUS;
-        } else {
-            currentObjective = Objective.CHILL;
-        }
-    }
-
-     */
 
     @Override
     public boolean isNoDespawnRequired() {

@@ -1,8 +1,10 @@
 package invasion.entity;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 
 public interface ICanDig {
@@ -13,8 +15,8 @@ public interface ICanDig {
 
     boolean canClearBlock(BlockPos pos);
 
-    void onBlockRemoved(BlockPos pos, IBlockState state);
+    void onBlockRemoved(BlockPos pos, BlockState state);
 
-    IBlockAccess getTerrain();
+    World getWorld();
 
 }

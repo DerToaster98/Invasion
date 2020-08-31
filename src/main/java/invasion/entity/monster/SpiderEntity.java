@@ -3,7 +3,9 @@ package invasion.entity.monster;
 import invasion.nexus.Nexus;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.CreatureAttribute;
+import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.Pose;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
@@ -43,6 +45,11 @@ SpiderEntity extends InvadingEntity {
     @Override
     protected void playStepSound(BlockPos pos, BlockState blockIn) {
         this.playSound(SoundEvents.ENTITY_SPIDER_STEP, 0.15F, 1.0F);
+    }
+
+    @Override
+    public EntitySize getSize(Pose poseIn) {
+        return new EntitySize(
     }
 
     @Override

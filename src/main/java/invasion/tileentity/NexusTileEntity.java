@@ -57,17 +57,16 @@ public class NexusTileEntity extends TileEntity implements ITickableTileEntity, 
 
     public NexusTileEntity(TileEntityType<?> type) {
         super(type);
-        assert world != null;
 
         syncData = new IIntArray() {
             @Override
             public int get(int i) {
+                if(world == null) return 0;
                 switch (i) {
                     case NexusContainer.INDEX_HP:
                         return Nexus.get(world).getHp();
-                    case NexusContainer.INDEX_ACTIVATION_BAR_COLOR:
-                        // 0 for wave, 1 for stable invasion
-                        return NexusTileEntity.this.getMode() == NexusMode.CONTINUOUS_INVASION || NexusTileEntity.this.items.getStackInSlot(0).getItem() == ModItems.STABLE_CATALYST.get() ? 0x0000ff : 0xff0000;
+                    case NexusContainer.INDEX_MODE:
+                        return NexusTileEntity.this.getMode().ordinal();
                     case NexusContainer.INDEX_GENERATION_PROGRESS:
                         return NexusTileEntity.this.fluxGeneration;
                     case NexusContainer.INDEX_ACTIVATION_PROGRESS:
@@ -79,7 +78,10 @@ public class NexusTileEntity extends TileEntity implements ITickableTileEntity, 
                     case NexusContainer.INDEX_RADIUS:
                         return Nexus.get(world).getSpawnRadius();
                     case NexusContainer.INDEX_KILLS:
-                        // return NexusTileEntity.this.invasion.getKills();
+                        return Nexus.get(world).getKills();
+                    case NexusContainer.INDEX_ACTIVATION_MODE:
+                        // 0 for wave, 1 for stable invasion
+                        return NexusTileEntity.this.getMode() == NexusMode.CONTINUOUS_INVASION || NexusTileEntity.this.items.getStackInSlot(0).getItem() == ModItems.STABLE_CATALYST.get() ? 0x0000ff : 0xff0000;
                     default:
                         return 0;
                 }
@@ -133,6 +135,10 @@ public class NexusTileEntity extends TileEntity implements ITickableTileEntity, 
                         world.notifyBlockUpdate(getPos(), getBlockState(), getBlockState(), Constants.BlockFlags.BLOCK_UPDATE);
                         items.decrStackSize(0, 1);
                     }
+                }
+                if(activationTimer > 0 && input.isEmpty()) {
+                    activationTimer = 0;
+                    dirty = true;
                 }
             } else {
                 //generateFlux(1);

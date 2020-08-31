@@ -42,7 +42,8 @@ public class NexusScreen extends ContainerScreen<NexusContainer> {
         font.drawString(container.getKills() + " mobs killed", 96, 60, 4210752);
         font.drawString("R: " + container.getRadius(), 142, 72, 4210752);
 
-        if ((container.getMode() == NexusMode.WAVE_INVASION) || (container.getMode() == NexusMode.MODE_3)) {
+        if ((container.
+                getMode() == NexusMode.WAVE_INVASION) || (container.getMode() == NexusMode.MODE_3)) {
             font.drawString("Activated!", 13, 62, 4210752);
             font.drawString("Wave " + container.getLevel(), 55, 37, 4210752);
         } else if (container.getMode() == NexusMode.CONTINUOUS_INVASION) {

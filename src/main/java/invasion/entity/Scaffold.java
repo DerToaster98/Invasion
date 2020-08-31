@@ -1,26 +1,16 @@
 package invasion.entity;
 
-import invasion.IPathfindable;
-import invasion.entity.ai.navigator.PathAction;
-import invasion.entity.ai.navigator.PathNode;
-import invasion.entity.ai.navigator.PathfinderIM;
+
 import invasion.nexus.Nexus;
-import invasion.util.Distance;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.Direction;
-import net.minecraft.util.Direction8;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraftforge.common.util.INBTSerializable;
 
-import java.util.List;
 
-
-public class Scaffold extends Structure implements IPathfindable, INBTSerializable<CompoundNBT> {
+public class Scaffold implements  INBTSerializable<CompoundNBT> {
 
     private static final int MIN_SCAFFOLD_HEIGHT = 4;
     //private int xCoord;
@@ -30,7 +20,8 @@ public class Scaffold extends Structure implements IPathfindable, INBTSerializab
     private int targetHeight;
     private Direction orientation;
     private int[] platforms;
-    private IPathfindable pathfindBase;
+    //RM
+    //private IPathfindable pathfindBase;
     private final Nexus nexus;
     private float latestPercentCompleted;
     private float latestPercentIntact;
@@ -104,9 +95,10 @@ public class Scaffold extends Structure implements IPathfindable, INBTSerializab
         return nexus;
     }
 
-    public void setPathfindBase(IPathfindable base) {
-        pathfindBase = base;
-    }
+    //RM
+   // public void setPathfindBase(IPathfindable base) {
+  //      pathfindBase = base;
+   // }
 
     public boolean isLayerPlatform(int height) {
         if (height == targetHeight - 1) {
@@ -220,6 +212,7 @@ public class Scaffold extends Structure implements IPathfindable, INBTSerializab
         return 0.0F;
     }
 
+    /* TODO
     @Override
     public float getBlockPathCost(PathNode prevNode, PathNode node, World world) {
         float materialMultiplier = world.getBlockState(node.pos).isSolid() ? 2.2F : 1.0F;
@@ -280,9 +273,13 @@ public class Scaffold extends Structure implements IPathfindable, INBTSerializab
         }
     }
 
+
+
     private boolean avoidsBlock(Block block) {
         return (block == Blocks.FIRE) || (block == Blocks.BEDROCK) || (block == Blocks.WATER) || (block == Blocks.FLOWING_WATER) || (block == Blocks.LAVA) || (block == Blocks.FLOWING_LAVA);
     }
+
+     */
 
 
 }

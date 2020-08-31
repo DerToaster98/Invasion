@@ -29,8 +29,8 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class NexusContainer extends Container {
-    public static final int INDEX_HP = 0, INDEX_ACTIVATION_BAR_COLOR = 1, INDEX_GENERATION_PROGRESS = 2, INDEX_ACTIVATION_PROGRESS = 3, INDEX_COOKING_PROGRESS = 4, INDEX_LEVEL = 5, INDEX_RADIUS = 6, INDEX_KILLS = 7;
-    public static final int SYNC_DATA_SIZE = 8;
+    public static final int INDEX_HP = 0, INDEX_MODE = 1, INDEX_GENERATION_PROGRESS = 2, INDEX_ACTIVATION_PROGRESS = 3, INDEX_COOKING_PROGRESS = 4, INDEX_LEVEL = 5, INDEX_RADIUS = 6, INDEX_KILLS = 7, INDEX_ACTIVATION_MODE = 8;
+    public static final int SYNC_DATA_SIZE = 9;
     public final NexusTileEntity tileEntity;
     private final IWorldPosCallable canInteractWithCallable;
     private final IIntArray syncData;
@@ -92,7 +92,7 @@ public class NexusContainer extends Container {
 
     @OnlyIn(Dist.CLIENT)
     public NexusMode getMode() {
-        return NexusMode.values()[syncData.get(INDEX_ACTIVATION_BAR_COLOR)];
+        return NexusMode.values()[syncData.get(INDEX_MODE)];
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -123,6 +123,12 @@ public class NexusContainer extends Container {
     @OnlyIn(Dist.CLIENT)
     public int getLevel() {
         return syncData.get(INDEX_LEVEL);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public int getActivationBarColor() {
+        final int[] COLORS = {0x00ff00,0xff0000};
+        return COLORS[syncData.get(INDEX_ACTIVATION_MODE)];
     }
 
     @OnlyIn(Dist.CLIENT)
