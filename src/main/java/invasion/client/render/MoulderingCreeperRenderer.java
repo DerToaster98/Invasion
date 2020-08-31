@@ -13,7 +13,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 
 @OnlyIn(Dist.CLIENT)
-public class MoulderingCreeperRenderer extends MobRenderer<MoulderingCreeperEntity, CreeperModel<MoulderingCreeperEntity>> {
+public class MoulderingCreeperRenderer<T extends MoulderingCreeperEntity> extends MobRenderer<T, CreeperModel<T>> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID, "textures/entity/mouldering_creeper.png");
 
     public MoulderingCreeperRenderer(EntityRendererManager rendererManager) {

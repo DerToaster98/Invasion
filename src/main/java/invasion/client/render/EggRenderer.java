@@ -15,7 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 
 @OnlyIn(Dist.CLIENT)
-public class EggRenderer extends EntityRenderer<EggEntity> {
+public class EggRenderer<T extends EggEntity> extends EntityRenderer<T> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID + "textures/entity/spider_egg.png");
     private final EggModel model = new EggModel();
 
@@ -25,7 +25,7 @@ public class EggRenderer extends EntityRenderer<EggEntity> {
     }
 
     @Override
-    public void render(EggEntity entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
+    public void render(T entityIn, float entityYaw, float partialTicks, MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn) {
         super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
 
         IVertexBuilder vertexBuilder = bufferIn.getBuffer(model.getRenderType(getEntityTexture(entityIn)));

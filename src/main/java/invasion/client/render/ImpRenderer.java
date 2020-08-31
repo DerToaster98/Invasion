@@ -8,11 +8,11 @@ import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.util.ResourceLocation;
 
 
-public class ImpRenderer extends LivingRenderer<ImpEntity, ImpModel> {
+public class ImpRenderer<T extends ImpEntity> extends LivingRenderer<T, ImpModel<T>> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID + "textures/entity/imp.png");
 
     public ImpRenderer(EntityRendererManager rendererManager) {
-        super(rendererManager, new ImpModel(), 0.3f);
+        super(rendererManager, new ImpModel<>(), 0.3f);
     }
 
     @Override

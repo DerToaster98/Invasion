@@ -49,7 +49,7 @@ SpiderEntity extends InvadingEntity {
 
     @Override
     public EntitySize getSize(Pose poseIn) {
-        return new EntitySize(
+        return null;
     }
 
     @Override

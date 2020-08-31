@@ -7,16 +7,18 @@ import invasion.entity.monster.EntityIMThrower;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-
-public class ThrowerRenderer extends LivingRenderer<EntityIMThrower, ThrowerModel> {
+@OnlyIn(Dist.CLIENT)
+public class ThrowerRenderer<T extends EntityIMThrower> extends LivingRenderer<T, ThrowerModel<T>> {
     private static final ResourceLocation[] TEXTURES = {
             new ResourceLocation(Invasion.MOD_ID + "textures/entity/throwerT1.png"),
             new ResourceLocation(Invasion.MOD_ID + "textures/entity/throwerT2.png")
     };
 
     public ThrowerRenderer(EntityRendererManager rendererManager) {
-        super(rendererManager, new ThrowerModel(), 1.5f);
+        super(rendererManager, new ThrowerModel<>(), 1.5f);
     }
 
     @Override

@@ -5,10 +5,11 @@ import invasion.entity.monster.ImpEntity;
 import net.minecraft.client.renderer.entity.model.SegmentedModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.MathHelper;
 
 
-public class ImpModel extends SegmentedModel<ImpEntity> {
+public class ImpModel<T extends Entity> extends SegmentedModel<T> {
     ModelRenderer head;
     ModelRenderer body;
     ModelRenderer rightArm;
@@ -160,7 +161,7 @@ public class ImpModel extends SegmentedModel<ImpEntity> {
 
 
     @Override
-    public void setRotationAngles(ImpEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+    public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
         head.rotateAngleY = (netHeadYaw / 57.29578F);
         head.rotateAngleX = (headPitch / 57.29578F);
     }
@@ -170,8 +171,8 @@ public class ImpModel extends SegmentedModel<ImpEntity> {
         return ImmutableList.of();
     }
 
-    @Override
-    public void l(float f, float f1, float f2, float f3, float f4, float f5, Entity entity) {
+   // @Override
+    public void l(float f, float f1, float f2, float f3, float f4, float f5, T entity) {
 
 
         rightArm.rotateAngleX = (MathHelper.cos(f * 0.6662F + 3.141593F) * 2.0F * f1 * 0.5F);

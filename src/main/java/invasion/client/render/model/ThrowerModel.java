@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.entity.model.IHasArm;
 import net.minecraft.client.renderer.entity.model.IHasHead;
 import net.minecraft.client.renderer.entity.model.SegmentedModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
+import net.minecraft.entity.Entity;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.api.distmarker.Dist;
@@ -14,7 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 
 @OnlyIn(Dist.CLIENT)
-public class ThrowerModel extends SegmentedModel<EntityIMThrower> implements IHasArm, IHasHead {
+public class ThrowerModel<T extends Entity> extends SegmentedModel<T> implements IHasArm, IHasHead {
     private final ModelRenderer throwerHead;
     private final ModelRenderer throwerBody;
     private final ModelRenderer throwerBody2;
@@ -78,7 +79,7 @@ public class ThrowerModel extends SegmentedModel<EntityIMThrower> implements IHa
     }
 
     @Override
-    public void setRotationAngles(EntityIMThrower thrower, float t, float v1, float v2, float headPitch, float headYaw) {
+    public void setRotationAngles(T thrower, float t, float v1, float v2, float headPitch, float headYaw) {
         throwerHead.rotateAngleY = (headPitch / 57.29578F);
         throwerHead.rotateAngleX = (headYaw / 57.29578F);
         throwerRightArm.rotateAngleX = (MathHelper.cos(t * 0.6662F + 3.141593F) * 2.0F * v1 * 0.5F);
