@@ -3,6 +3,7 @@ package invasion.init;
 import invasion.Invasion;
 import invasion.entity.monster.FenSpiderEntity;
 import invasion.entity.monster.ImpEntity;
+import invasion.entity.monster.MoulderingCreeperEntity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
@@ -15,7 +16,7 @@ public class ModEntityTypes {
 
     public static final RegistryObject<EntityType<FenSpiderEntity>> FEN_SPIDER = ENTITY_TYPES.register("fen_spider", () -> EntityType.Builder.<FenSpiderEntity>create(FenSpiderEntity::new, EntityClassification.MONSTER).size(0.5f, 0.5f).build(new ResourceLocation(Invasion.MOD_ID, "fen_spider").toString()));
     public static final RegistryObject<EntityType<ImpEntity>> IMP = ENTITY_TYPES.register("imp", () -> EntityType.Builder.<ImpEntity>create(ImpEntity::new, EntityClassification.MONSTER).size(0.5f, 0.5f).build(new ResourceLocation(Invasion.MOD_ID, "imp").toString()));
-
+    public static final RegistryObject<EntityType<MoulderingCreeperEntity>> MOULDERING_CREEPER = ENTITY_TYPES.register("mouldering_creeper", () -> EntityType.Builder.<MoulderingCreeperEntity>create(MoulderingCreeperEntity::new, EntityClassification.MONSTER).size(0.6f, 1.7f).build(new ResourceLocation(Invasion.MOD_ID, "mouldering_creeper").toString()));
     // public static final RegistryObject<EntityType<DogEntity>> DOG = ENTITY_TYPES.register("dog",()->EntityType.Builder.<DogEntity>create(DogEntity::new, EntityClassification.CREATURE).size(0.6f, 0.85f).build(new ResourceLocation(Invasion.MOD_ID, "dog").toString()));
 
     // public static final RegistryObject<EntityType<BlackArrowEntity>> BLACK_ARROW = ENTITY_TYPES.register("black_arrow", () -> EntityType.Builder.<BlackArrowEntity>create(BlackArrowEntity::new, EntityClassification.MISC).size(0.5f, 0.5f).build(new ResourceLocation(Invasion.MOD_ID, "black_arrow").toString()));

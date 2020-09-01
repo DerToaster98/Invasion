@@ -4,6 +4,7 @@ import invasion.Invasion;
 import invasion.client.gui.NexusScreen;
 import invasion.client.render.FenSpiderRenderer;
 import invasion.client.render.ImpRenderer;
+import invasion.client.render.MoulderingCreeperRenderer;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraftforge.api.distmarker.Dist;
@@ -30,5 +31,6 @@ public class ClientEventBusSubscriber {
         // register entity renderers
         RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.FEN_SPIDER.get(), FenSpiderRenderer::new);
         RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.IMP.get(), ImpRenderer::new);
+        RenderingRegistry.registerEntityRenderingHandler(ModEntityTypes.MOULDERING_CREEPER.get(), MoulderingCreeperRenderer::new);
     }
 }

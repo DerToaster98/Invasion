@@ -1,15 +1,9 @@
 package invasion.entity.monster;
 
-import com.google.common.base.Predicate;
-import invasion.INotifyTask;
-import invasion.Invasion;
-import invasion.entity.ai.*;
-import invasion.entity.ai.navigator.Path;
-import invasion.entity.ai.navigator.PathNode;
+
 import invasion.init.ModEntityTypes;
 import invasion.nexus.Nexus;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -24,7 +18,6 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
@@ -53,13 +46,13 @@ public class MoulderingCreeperEntity extends InvadingEntity {
     // TODO rework constructors
 
 
-    public MoulderingCreeperEntity(EntityType type, World world) {
-        this(world, null);
+    public MoulderingCreeperEntity(EntityType<? extends MoulderingCreeperEntity> type, World world) {
+        super(type, world, null);
     }
 
     public MoulderingCreeperEntity(World world, Nexus nexus) {
-        super(ModEntityTypes.MOULDERING_CREEPER.get(),world,nexus);
-        setMaxHealthAndHealth(Invasion.getMobHealth(this));
+        super(ModEntityTypes.MOULDERING_CREEPER.get(), world, nexus);
+        //setMaxHealthAndHealth(Invasion.getMobHealth(this));
     }
 
 
@@ -67,7 +60,7 @@ public class MoulderingCreeperEntity extends InvadingEntity {
     protected void registerGoals() {
 
         goalSelector.addGoal(0, new SwimGoal(this));
-        goalSelector.addGoal(1, null );
+        //goalSelector.addGoal(1, null );
         goalSelector.addGoal(2, new AvoidEntityGoal<>(this, CatEntity.class, 0.6f, 0.25d, 0.3d));
         goalSelector.addGoal(2, new AvoidEntityGoal<>(this, OcelotEntity.class, 0.6f, 0.25d, 0.3d));
 
@@ -128,6 +121,7 @@ public class MoulderingCreeperEntity extends InvadingEntity {
         return MathHelper.lerp(f, (float) lastActiveTime, (float) timeSinceIgnited) / (float) (fuseTime - 2);
     }
 
+    /*
     @Override
     public boolean onPathBlocked(Path path, INotifyTask notifee) {
         if (!path.isFinished()) {
@@ -153,6 +147,9 @@ public class MoulderingCreeperEntity extends InvadingEntity {
         return false;
     }
 
+     */
+
+    /*
     @Override
     public void tick() {
         if (explosionDeath) {
@@ -175,6 +172,8 @@ public class MoulderingCreeperEntity extends InvadingEntity {
         super.tick();
     }
 
+     */
+
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
         return SoundEvents.ENTITY_CREEPER_HURT;
@@ -183,11 +182,6 @@ public class MoulderingCreeperEntity extends InvadingEntity {
     @Override
     protected SoundEvent getDeathSound() {
         return SoundEvents.ENTITY_CREEPER_DEATH;
-    }
-
-    @Override
-    public String getSpecies() {
-        return "Creeper";
     }
 
     /*
@@ -211,6 +205,7 @@ public class MoulderingCreeperEntity extends InvadingEntity {
         return (lastActiveTime + (timeSinceIgnited - lastActiveTime) * par1) / 28.0F;
     }
 
+    /*
     @Override
     public float getBlockPathCost(PathNode prevNode, PathNode node, IBlockAccess terrainMap) {
         Block block = terrainMap.getBlockState(new BlockPos(node.pos)).getBlock();
@@ -221,10 +216,8 @@ public class MoulderingCreeperEntity extends InvadingEntity {
         return super.getBlockPathCost(prevNode, node, terrainMap);
     }
 
-    @Override
-    public String toString() {
-        return "MoulderingCreeper-T" + getTier();
-    }
+     */
+
 
     /* TODO drop Items
     @Override
