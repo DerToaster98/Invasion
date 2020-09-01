@@ -169,7 +169,7 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     public void readSpawnData(PacketBuffer additionalData) {
         tier = additionalData.readByte();
     }
-
+/*
     @Override
     public void tick() {
         super.tick();
@@ -190,6 +190,8 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         }
         
     }
+
+ */
 
     @Override
     public void livingTick() {

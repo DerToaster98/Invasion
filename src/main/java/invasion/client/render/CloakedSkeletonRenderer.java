@@ -6,8 +6,10 @@ import net.minecraft.client.renderer.entity.BipedRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.model.SkeletonModel;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-
+@OnlyIn(Dist.CLIENT)
 public class CloakedSkeletonRenderer<T extends EntityIMSkeleton> extends BipedRenderer<T, SkeletonModel<T>> {
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID + "textures/entity/skeleton.png");

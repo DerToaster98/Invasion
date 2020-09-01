@@ -6,8 +6,10 @@ import invasion.entity.monster.ImpEntity;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-
+@OnlyIn(Dist.CLIENT)
 public class ImpRenderer<T extends ImpEntity> extends LivingRenderer<T, ImpModel<T>> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID + "textures/entity/imp.png");
 

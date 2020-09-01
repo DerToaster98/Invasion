@@ -8,9 +8,12 @@ import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.model.WolfModel;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 
 //TODO maybe extend WolfRenderer directly?
+@OnlyIn(Dist.CLIENT)
 public class DogRenderer<T extends DogEntity> extends MobRenderer<T, WolfModel<T>> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID + "textures/entity/wolf_tame_nexus.png");
 

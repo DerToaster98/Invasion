@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 public class RenderSpiderIM extends RenderLiving<EntityIMSpider> {
     private static final ResourceLocation t_eyes = new ResourceLocation("textures/entity/spider_eyes.png");
     private static final ResourceLocation t_spider = new ResourceLocation("textures/entity/spider/spider.png");
-    private static final ResourceLocation t_jumping = new ResourceLocation(Reference.MODID + ":textures/spiderT2.png");
+    private static final ResourceLocation t_jumping = new ResourceLocation(Reference.MODID + ":textures/spider-t2.png");
     private static final ResourceLocation t_mother = new ResourceLocation(Reference.MODID + ":textures/spiderT2b.png");
 
     public RenderSpiderIM(RenderManager renderManager) {

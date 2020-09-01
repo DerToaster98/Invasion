@@ -2,7 +2,6 @@ package invasion.client.render.model;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
-import invasion.entity.monster.EntityIMThrower;
 import net.minecraft.client.renderer.entity.model.IHasArm;
 import net.minecraft.client.renderer.entity.model.IHasHead;
 import net.minecraft.client.renderer.entity.model.SegmentedModel;

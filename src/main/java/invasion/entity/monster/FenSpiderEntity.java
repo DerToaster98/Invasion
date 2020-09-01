@@ -15,9 +15,13 @@ import net.minecraft.world.World;
 import javax.annotation.Nullable;
 
 public class
-SpiderEntity extends InvadingEntity {
+FenSpiderEntity extends InvadingEntity {
 
-    public SpiderEntity(EntityType<? extends SpiderEntity> type, World world, @Nullable Nexus nexus) {
+    public FenSpiderEntity(EntityType<? extends FenSpiderEntity> type, World world) {
+        super(type,world,null);
+    }
+
+    public FenSpiderEntity(EntityType<? extends FenSpiderEntity> type, World world, @Nullable Nexus nexus) {
         super(type, world, nexus);
     }
 
@@ -47,10 +51,13 @@ SpiderEntity extends InvadingEntity {
         this.playSound(SoundEvents.ENTITY_SPIDER_STEP, 0.15F, 1.0F);
     }
 
+    /*
     @Override
     public EntitySize getSize(Pose poseIn) {
         return null;
     }
+
+     */
 
     @Override
     public CreatureAttribute getCreatureAttribute() {

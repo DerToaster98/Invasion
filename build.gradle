@@ -58,7 +58,28 @@ sourceSets {
             exclude '**/invasion/world/**'
             exclude '**/invasion/village/**'
             exclude '**/invasion/structure/**'
-            exclude '**/invasion/client/render/**'
+
+            exclude '**/invasion/client/render/animation/**'
+            exclude '**/invasion/client/render/layer/**'
+            exclude '**/invasion/client/render/AnimationRegistry.java'
+            exclude '**/invasion/client/render/BoltRenderer.java'
+            exclude '**/invasion/client/render/BoulderRenderer.java'
+            exclude '**/invasion/client/render/Render*.java'
+            exclude '**/invasion/client/render/CloakedSkeletonRenderer.java'
+            exclude '**/invasion/client/render/ThrowerRenderer.java'
+            exclude '**/invasion/client/render/MoulderingCreeperRenderer.java'
+            exclude '**/invasion/client/render/ImpRenderer.java'
+            exclude '**/invasion/client/render/DogRenderer.java'
+            exclude '**/invasion/client/render/PigEngyRenderer.java'
+            exclude '**/invasion/client/render/model/Model*.java'
+            exclude '**/invasion/client/render/model/ImpModel.java'
+            exclude '**/invasion/client/render/model/ThrowerModel.java'
+            exclude '**/invasion/client/render/model/BoulderModel.java'
+
+
+
+
+
             exclude '**/invasion/TerrainDataLayer.java'
             //exclude '**/invasion/nexus/**'
             exclude '**/invasion/IPathfindable.java'

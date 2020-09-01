@@ -43,7 +43,6 @@ public class Invasion {
     public Invasion() {
         final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         modEventBus.addListener(this::setup);
-        modEventBus.addListener(this::clientSetup);
 
         ModSounds.SOUNDS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
@@ -51,7 +50,6 @@ public class Invasion {
         ModTileEntityTypes.TILE_ENTITY_TYPES.register(modEventBus);
         ModContainerTypes.CONTAINER_TYPES.register(modEventBus);
         ModEntityTypes.ENTITY_TYPES.register(modEventBus);
-
 
         instance = this;
 
@@ -274,14 +272,6 @@ public class Invasion {
     private void setup(FMLCommonSetupEvent event) {
     }
 
-    private void clientSetup(FMLClientSetupEvent event) {
-        ScreenManager.registerFactory(ModContainerTypes.NEXUS.get(), NexusScreen::new);
-        event.getMinecraftSupplier().get().getBlockColors().register((IBlockColor) ModBlocks.TRAP.get());
-    }
-
-    private void serverSetup(FMLDedicatedServerSetupEvent event) {
-
-    }
 
     //load mobhealth config
     private void loadHealthConfig() {

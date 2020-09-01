@@ -6,9 +6,11 @@ import invasion.entity.projectile.BoulderEntity;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
 
-
+@OnlyIn(Dist.CLIENT)
 public class BoulderRenderer extends EntityRenderer<BoulderEntity> {
     private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID, "textures/entity/boulder.png");
     private final BoulderModel MODEL = new BoulderModel();

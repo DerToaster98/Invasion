@@ -1,7 +1,7 @@
 package invasion.init;
 
 import invasion.Invasion;
-import invasion.entity.monster.SpiderEntity;
+import invasion.entity.monster.FenSpiderEntity;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
@@ -12,7 +12,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ModEntityTypes {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = new DeferredRegister<>(ForgeRegistries.ENTITIES, Invasion.MOD_ID);
 
-    public static final RegistryObject<EntityType<SpiderEntity>> SPIDER = ENTITY_TYPES.register("spider",()->EntityType.Builder.<SpiderEntity>create(EntityClassification.MONSTER).size(0.5f,0.5f).build(new ResourceLocation(Invasion.MOD_ID,"spider").toString()));
+    public static final RegistryObject<EntityType<FenSpiderEntity>> FEN_SPIDER = ENTITY_TYPES.register("fen_spider",()->EntityType.Builder.<FenSpiderEntity>create(FenSpiderEntity::new,EntityClassification.MONSTER).size(0.5f,0.5f).build(new ResourceLocation(Invasion.MOD_ID,"fen_spider").toString()));
     
    // public static final RegistryObject<EntityType<DogEntity>> DOG = ENTITY_TYPES.register("dog",()->EntityType.Builder.<DogEntity>create(DogEntity::new, EntityClassification.CREATURE).size(0.6f, 0.85f).build(new ResourceLocation(Invasion.MOD_ID, "dog").toString()));
     

@@ -6,8 +6,10 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.projectile.EggEntity;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-
+@OnlyIn(Dist.CLIENT)
 public class EggModel extends EntityModel<EggEntity> /*SegmentedModel<EggEntity>*/ {
     public ModelRenderer egg;
     ModelRenderer base;
