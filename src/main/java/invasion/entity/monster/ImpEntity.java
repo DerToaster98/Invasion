@@ -1,28 +1,35 @@
 package invasion.entity.monster;
 
-import invasion.entity.ai.*;
+import invasion.init.ModEntityTypes;
 import invasion.nexus.Nexus;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.entity.ai.goal.SwimGoal;
 import net.minecraft.world.World;
 
 
 public class ImpEntity extends InvadingEntity {
 
-    private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
+    //private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
 
-    public ImpEntity(World world, Nexus nexus) {
-        super(  ,world, nexus);
+    public ImpEntity(World world, Nexus nexus, int i) {
+        super(ModEntityTypes.IMP.get(), world, nexus);
         setCanClimb(true);
     }
 
-    public ImpEntity(World world) {
-        this(world, null);
+    public ImpEntity(EntityType<? extends ImpEntity> type, World world) {
+        super(type, world, null);
     }
 
+
+    @Override
+    protected void registerGoals() {
+        goalSelector.addGoal(0, new SwimGoal(this));
+
+    }
+
+    /*
     @Override
     protected void registerGoals() {
         tasksIM = new EntityAITasks(world.profiler);
@@ -47,6 +54,8 @@ public class ImpEntity extends InvadingEntity {
 
     }
 
+     */
+
     @Override
     protected void registerAttributes() {
         super.registerAttributes();
@@ -60,8 +69,4 @@ public class ImpEntity extends InvadingEntity {
         return super.attackEntityAsMob(entity);
     }
 
-    @Override
-    public String toString() {
-        return "IMImp-T" + getTier();
-    }
 }

@@ -28,26 +28,17 @@ public class ImpModel<T extends Entity> extends SegmentedModel<T> {
     ModelRenderer tail;
     ModelRenderer tail2;
 
-    public ImpModel() {
-        this(0.0F);
-    }
-
-
-    public ImpModel(float f) {
-        this(f, 0.0F);
-    }
-
-    public ImpModel(float f, float f1) {
-        head = new ModelRenderer(this, 44, 0);
-        head.addBox(-2.733333F, -3.0F, -2.0F, 5, 3, 4);
-        head.setRotationPoint(-0.4F, 9.8F, -3.3F);
-        head.rotateAngleX = 0.15807F;
-        head.rotateAngleY = 0.0F;
-        head.rotateAngleZ = 0.0F;
-        head.mirror = false;
-        body = new ModelRenderer(this, 23, 1);
-        body.addBox(-4.0F, 0.0F, -4.0F, 7, 4, 3);
-        body.setRotationPoint(0.0F, 9.1F, -0.8666667F);
+   public ImpModel() {
+       head = new ModelRenderer(this, 44, 0);
+       head.addBox(-2.733333F, -3.0F, -2.0F, 5, 3, 4);
+       head.setRotationPoint(-0.4F, 9.8F, -3.3F);
+       head.rotateAngleX = 0.15807F;
+       head.rotateAngleY = 0.0F;
+       head.rotateAngleZ = 0.0F;
+       head.mirror = false;
+       body = new ModelRenderer(this, 23, 1);
+       body.addBox(-4.0F, 0.0F, -4.0F, 7, 4, 3);
+       body.setRotationPoint(0.0F, 9.1F, -0.8666667F);
         body.rotateAngleX = 0.64346F;
         body.rotateAngleY = 0.0F;
         body.rotateAngleZ = 0.0F;
@@ -168,10 +159,10 @@ public class ImpModel<T extends Entity> extends SegmentedModel<T> {
 
     @Override
     public Iterable<ModelRenderer> getParts() {
-        return ImmutableList.of();
+        return ImmutableList.of(head, body, rightArm, leftArm, rightLeg, leftLeg, rshin, rightFoot, lshin, leftFoot, rightHorn, leftHorn, bodymid, neck, bodyChest, tail, tail2);
     }
 
-   // @Override
+    // @Override
     public void l(float f, float f1, float f2, float f3, float f4, float f5, T entity) {
 
 

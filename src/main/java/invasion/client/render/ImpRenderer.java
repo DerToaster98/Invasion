@@ -11,7 +11,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ImpRenderer<T extends ImpEntity> extends LivingRenderer<T, ImpModel<T>> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID + "textures/entity/imp.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID, "textures/entity/imp.png");
 
     public ImpRenderer(EntityRendererManager rendererManager) {
         super(rendererManager, new ImpModel<>(), 0.3f);
