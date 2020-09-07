@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "minecraft:lapis_lazuli"
+    },
+    {
+      "item": "invasion:rift_flux"
+    },
+    {
+      "item": "minecraft:lapis_lazuli"
+    }
+  ],
+
+  "result": {
+    "item": "invasion:damping_agent",
+    "count": 1
+  }
+}
+
+
