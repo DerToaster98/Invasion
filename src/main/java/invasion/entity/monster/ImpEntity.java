@@ -25,6 +25,7 @@ public class ImpEntity extends InvadingEntity {
 
     @Override
     protected void registerGoals() {
+        super.registerGoals();
         goalSelector.addGoal(0, new SwimGoal(this));
 
     }

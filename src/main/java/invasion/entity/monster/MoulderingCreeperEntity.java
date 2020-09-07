@@ -58,6 +58,7 @@ public class MoulderingCreeperEntity extends InvadingEntity {
 
     @Override
     protected void registerGoals() {
+        super.registerGoals();
 
         goalSelector.addGoal(0, new SwimGoal(this));
         //goalSelector.addGoal(1, null );

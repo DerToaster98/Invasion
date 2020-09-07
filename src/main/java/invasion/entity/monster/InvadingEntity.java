@@ -41,14 +41,12 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     protected static Collection<Block> unbreakableBlocks = Arrays.asList(
             Blocks.BEDROCK, Blocks.COMMAND_BLOCK, Blocks.END_PORTAL_FRAME,
             Blocks.LADDER, Blocks.CHEST);
-
+    private final boolean canDig = true;
     @Nullable
     protected Nexus nexus; /// The nexus the entity is bound to. If null, the entity is independent
-
     protected Objective currentObjective = Objective.NONE;
     protected Objective prevObjective = Objective.NONE;
     protected int flammability = 2;      //TODO how flammable the entity is
-
     protected float attackRange = 0f;
     protected int selfDamage = 2;
     protected int maxSelfDamage = 6;
@@ -56,14 +54,11 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     protected float blockRemoveSpeed = 1f;
     protected boolean floatsInWater = true;
     protected int destructiveness = 0;   //TODO maybe safe delete this
-    private byte tier; /// The tier of the entity. if not needed, it should be left alone
     protected boolean burnsInDay;
-
+    private byte tier; /// The tier of the entity. if not needed, it should be left alone
     private boolean canClimb = false;
-    private final boolean canDig = true;
     private boolean nexusBound;
     private boolean alwaysIndependent = false;
-
     private int stunTimer;
 
     public InvadingEntity(EntityType<? extends InvadingEntity> type, World world, @Nullable Nexus nexus) {
@@ -253,30 +248,9 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         if (!world.isRemote) getDataManager().set(IS_ADJACENT_CLIMB_BLOCK, flag);
     }
 
-    /*
-    public boolean checkForAdjacentClimbBlock() {
-        BlockPos pos = new BlockPos(posX, getEntityBoundingBox().minY, posZ);
-        IBlockState blockState = world.getBlockState(pos);
-        if (blockState == null) return false;
-        return (blockState.getBlock().isLadder(blockState, world, pos, this));
-    }
-
-     */
-
     public boolean canSwimHorizontal() {
         return true;
     }
-
-    // TODO: Fix this
-    // @Override
-    // protected void attackEntity(Entity entity, float f) {
-    // if ((attackTime <= 0) && (f < 2.0F)
-    // && (entity.getEntityBoundingBox().maxY > getEntityBoundingBox().minY)
-    // && (entity.getEntityBoundingBox().minY < getEntityBoundingBox().maxY)) {
-    // attackTime = 38;
-    // attackEntityAsMob(entity);
-    // }
-    // }
 
     public boolean canSwimVertical() {
         return true;
