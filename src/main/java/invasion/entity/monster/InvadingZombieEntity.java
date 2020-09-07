@@ -1,24 +1,23 @@
 package invasion.entity.monster;
 
-import invasion.IBlockAccessExtended;
-import invasion.INotifyTask;
-import invasion.Invasion;
 import invasion.entity.ICanDig;
-import invasion.entity.ITerrainDig;
-import invasion.entity.TerrainDigger;
-import invasion.entity.TerrainModifier;
-import invasion.entity.ai.*;
-import invasion.entity.ai.navigator.Path;
-import invasion.entity.ai.navigator.PathAction;
-import invasion.entity.ai.navigator.PathNode;
+import invasion.init.ModEntityTypes;
+import invasion.init.ModSounds;
 import invasion.nexus.Nexus;
-import invasion.util.config.Config;
 import mcp.MethodsReturnNonnullByDefault;
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.CreatureAttribute;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.item.Item;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.entity.ai.goal.LookRandomlyGoal;
+import net.minecraft.entity.ai.goal.SwimGoal;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
@@ -28,72 +27,149 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
 
-    private static final DataParameter<Boolean> META_CHANGED = EntityDataManager.createKey(InvadingZombieEntity.class, DataSerializers.BOOLEAN); //29
     private static final DataParameter<Integer> FLAVOUR = EntityDataManager.createKey(InvadingZombieEntity.class, DataSerializers.VARINT); //28
-    private static final DataParameter<Boolean> IS_SWINGING = EntityDataManager.createKey(InvadingZombieEntity.class, DataSerializers.BOOLEAN); //27
-    private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
+    private static final DataParameter<Boolean> COVERED_IN_TAR = EntityDataManager.createKey(InvadingZombieEntity.class, DataSerializers.BOOLEAN);
 
+    /*
     private final TerrainModifier terrainModifier;
     private final TerrainDigger terrainDigger;
     private boolean metaChanged;
-    //private int tier;
-    private int flavour;
-    //private ItemStack defaultHeldItem;
-    private Item itemDrop;
-    private float dropChance;
+
+     */
+
+    private int textureIndex;
     private int swingTimer;
 
-    public InvadingZombieEntity(EntityType<? extends InvadingZombieEntity> type, World world, Nexus nexus) {
-        super(type, world, nexus);
-        terrainModifier = new TerrainModifier(this, 2.0F);
-        terrainDigger = new TerrainDigger(this, terrainModifier, 1.0F);
-        dropChance = 0.0F;
+    public InvadingZombieEntity(EntityType<? extends InvadingZombieEntity> type, World world) {
+        super(type, world, null);
+    }
 
-        setAttributes(getTier(), flavour);
-        floatsInWater = true;
+    public InvadingZombieEntity(World world, Nexus nexus, byte tier) {
+        super(ModEntityTypes.INVADING_ZOMBIE.get(), world, nexus, tier);
+        if (tier < 1 || tier > 3) throw new IllegalArgumentException("Tier must be between 1 and 3");
+        getDataManager().set(FLAVOUR, 0);
     }
 
     @Override
     protected void registerData() {
         super.registerData();
-        getDataManager().register(META_CHANGED, metaChanged = world == null || world.isRemote);
-        getDataManager().register(FLAVOUR, flavour = 0);
-        getDataManager().register(IS_SWINGING, false);
+        getDataManager().register(FLAVOUR, 0);
+        getDataManager().register(COVERED_IN_TAR, false);
     }
 
     @Override
-    public void onUpdate() {
-        super.onUpdate();
-        if (metaChanged != getDataManager().get(META_CHANGED)) {
-            metaChanged = getDataManager().get(META_CHANGED);
-            //setTexture(getDataManager().get(TEXTURE));
-            //if(tier != getDataManager().get(TIER)) setTier(getDataManager().get(TIER));
-            if (flavour != getDataManager().get(FLAVOUR)) setFlavour(getDataManager().get(FLAVOUR));
+    protected void registerAttributes() {
+        super.registerAttributes();
+        int flavour = getDataManager().get(FLAVOUR);
+        switch (getTier()) {
+            case 1:
+                getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.19f);
+                selfDamage = 6;
+                maxSelfDamage = 6;
+                flammability = 3;
+                if (flavour == 0) {
+                    getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(4);
+                    setDestructiveness(2);
+                    maxDestructiveness = 2;
+                } else {
+                    getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(6);
+                    setDestructiveness(0);
+                    maxDestructiveness = 0;
+                    setItemStackToSlot(EquipmentSlotType.MAINHAND, new ItemStack(Items.WOODEN_SWORD));
+                }
+            case 2:
+                if (flavour == 0) {
+                    setName("Zombie");
+                    setBaseMoveSpeedStat(0.19F);
+                    attackStrength = 7;
+                    selfDamage = 4;
+                    maxSelfDamage = 12;
+                    maxDestructiveness = 2;
+                    flammability = 4;
+                    itemDrop = Items.IRON_CHESTPLATE;
+                    setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+                    dropChance = 0.25F;
+                    setDestructiveness(2);
+                } else if (flavour == 1) {
+                    setName("Zombie Marauder");
+                    setBaseMoveSpeedStat(0.19F);
+                    attackStrength = 10;
+                    selfDamage = 3;
+                    maxSelfDamage = 9;
+                    maxDestructiveness = 0;
+                    //itemDrop = Items.IRON_SWORD;
+                    dropChance = 0.25F;
+                    //defaultHeldItem = new ItemStack(Items.IRON_SWORD, 1);
+                    setHeldItem(EnumHand.MAIN_HAND, new ItemStack(rand.nextBoolean() ? Items.IRON_SWORD : Items.IRON_AXE));
+                    setHeldItem(EnumHand.OFF_HAND, new ItemStack(rand.nextBoolean() ? Items.IRON_SWORD : Items.IRON_AXE));
+                    itemDrop = getHeldItem(rand.nextBoolean() ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND).getItem();
+                    setDestructiveness(0);
+                } else if (flavour == 2) {
+                    setName("Tar Zombie");
+                    setBaseMoveSpeedStat(0.19F);
+                    attackStrength = 5;
+                    selfDamage = 3;
+                    maxSelfDamage = 9;
+                    maxDestructiveness = 2;
+                    flammability = 30;
+                    floatsInWater = false;
+                    setDestructiveness(2);
+                } else if (flavour == 3) {
+                    setName("Zombie Pigman");
+                    setBaseMoveSpeedStat(0.25F);
+                    attackStrength = 8;
+                    maxDestructiveness = 2;
+                    isImmuneToFire = true;
+                    //defaultHeldItem = new ItemStack(Items.GOLDEN_SWORD, 1);
+                    setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
+                    setDestructiveness(2);
+                }
+            case 3:
+                getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.17f);
+                getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(18);
+                selfDamage = 4;
+                maxSelfDamage = 20;
+                maxDestructiveness = 2;
+                flammability = 4;
+                setDestructiveness(2);
+
         }
+    }
+
+    @Override
+    protected void registerGoals() {
+        super.registerGoals();
+
+        goalSelector.addGoal(0, new SwimGoal(this));
+        // goalSelector.addGoal(1, new MeleeAttackGoal(PlayerEntity.class,  );
+        goalSelector.addGoal(7, new LookAtGoal(this, PlayerEntity.class, 15));
+        goalSelector.addGoal(8, new LookAtGoal(this, MoulderingCreeperEntity.class, 15));
+        goalSelector.addGoal(8, new LookRandomlyGoal(this));
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
         if ((!world.isRemote) && (flammability >= 20) && (isBurning())) doFireball();
     }
 
-    @Override
-    public void onLivingUpdate() {
-        super.onLivingUpdate();
-        updateAnimation();
-        updateSound();
-    }
-
+    /*
     @Override
     public void onPathSet() {
         terrainModifier.cancelTask();
     }
 
+     */
+/*
     @Override
     protected void initEntityAI() {
         //added entityaiswimming and increased all other tasksordernumers with 1
@@ -128,28 +204,11 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
         }
     }
 
-    @Override
-    public String toString() {
-        return "IMZombie-T" + getTier();
-    }
+ */
 
     @Override
-    public IBlockAccess getTerrain() {
-        return world;
-    }
-
-    //TODO: Removed Override annotation
-	/*public ItemStack getHeldItem() {
-		return defaultHeldItem;
-		
-	}*/
-
-    @Override
-    public boolean avoidsBlock(Block block) {
-        if ((isImmuneToFire) && ((block == Blocks.FIRE) || (block == Blocks.FLOWING_LAVA) || (block == Blocks.LAVA))) {
-            return false;
-        }
-        return super.avoidsBlock(block);
+    public int getTextureIndex() {
+        return textureIndex;
     }
 
     @Override
@@ -159,10 +218,10 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
 
     @Override
     public boolean canClearBlock(BlockPos pos) {
-        IBlockState state = world.getBlockState(pos);
-        return (state.getBlock() == Blocks.AIR) || (isBlockDestructible(world, pos, state));
+        BlockState blockState = world.getBlockState(pos);
+        return (blockState.getBlock() == Blocks.AIR) || (isBlockDestructible(world, pos, blockState));
     }
-
+/*
     @Override
     public boolean onPathBlocked(Path path, INotifyTask notifee) {
         if ((!path.isFinished()) && ((isNexusBound()) || (getAttackTarget() != null))) {
@@ -177,9 +236,7 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
         return false;
     }
 
-    public boolean isBigRenderTempHack() {
-        return getTier() == 3;
-    }
+ */
 
     @Override
     public boolean attackEntityAsMob(Entity entity) {
@@ -190,6 +247,7 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
     public boolean canBePushed() {
         return getTier() != 3;
     }
+/* todo did this change anything?
 
     @Override
     public void knockBack(Entity par1Entity, float par2, double par3, double par5) {
@@ -207,6 +265,9 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
         if (motionY > 0.4000000059604645D) motionY = 0.4000000059604645D;
     }
 
+ */
+
+    /*
     @Override
     public float getBlockPathCost(PathNode prevNode, PathNode node, IBlockAccess terrainMap) {
         if ((getTier() == 2) && (flavour == 2) && (node.action == PathAction.SWIM)) {
@@ -226,13 +287,15 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
         return super.getBlockPathCost(prevNode, node, terrainMap);
     }
 
+     */
+
     @Override
     public boolean canBreatheUnderwater() {
         return (getTier() == 2) && (flavour == 2);
     }
 
-    @Override
-    public boolean isBlockDestructible(IBlockAccess terrainMap, BlockPos pos, IBlockState state) {
+    // @Override
+    public boolean isBlockDestructible(IBlockReader world, BlockPos pos, BlockState state) {
         if (getDestructiveness() == 0) return false;
 
         BlockPos position = getCurrentTargetPos();
@@ -246,7 +309,7 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
             isTooSteep = dY / dXZ > 2.144D;
         }
 
-        return (!isTooSteep) && (super.isBlockDestructible(terrainMap, pos, state));
+        return (!isTooSteep) && (super.isBlockDestructible(world, pos, state));
     }
 
     @Override
@@ -267,16 +330,6 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
     }
 
     @Override
-    public String getSpecies() {
-        return "Zombie";
-    }
-
-	/*@Override
-	public int getTier() {
-		return tier < 3 ? 2 : 3;
-	}*/
-
-    @Override
     public void writeAdditional(CompoundNBT nbt) {
         super.writeAdditional(nbt);
         nbt.putInt("flavour", flavour);
@@ -285,14 +338,7 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
     @Override
     public void readAdditional(CompoundNBT nbt) {
         super.readAdditional(nbt);
-
-        setTexture(nbt.getInt("textureId"));
-        flavour = nbttagcompound.getInteger("flavour");
-        //tier = nbttagcompound.getInteger("tier");
-        if (getTier() == 0) setTier(1);
-        setFlavour(flavour);
-        //setTier(tier);
-        //super.readEntityFromNBT(nbttagcompound);
+        setFlavour(nbt.getByte("flavour"));
     }
 
     @Override
@@ -316,51 +362,16 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
         }
     }
 
-    public void setFlavour(int flavour) {
-        getDataManager().set(FLAVOUR, flavour);
-        this.flavour = flavour;
-        setAttributes(getTier(), flavour);
-    }
 
     @Override
     protected void sunlightDamageTick() {
         if ((getTier() == 2) && (flavour == 2)) {
-            damageEntity(DamageSource.GENERIC, 3.0F);
+            damageEntity(DamageSource.ON_FIRE, 3.0F);
         } else {
             super.sunlightDamageTick();
         }
     }
-
-    protected void updateAnimation() {
-        updateAnimation(false);
-    }
-
-    public void updateAnimation(boolean override) {
-        if ((!world.isRemote) && ((terrainModifier.isBusy()) || override)) setSwinging(true);
-
-        int swingSpeed = getSwingSpeed();
-        if (isSwinging()) {
-            swingTimer += 1;
-            if (swingTimer >= swingSpeed) {
-                swingTimer = 0;
-                setSwinging(false);
-            }
-        } else {
-            swingTimer = 0;
-        }
-        swingProgress = (float) swingTimer / (float) swingSpeed;
-    }
-
-    protected boolean isSwinging() {
-        return getDataManager().get(IS_SWINGING);
-    }
-
-    protected void setSwinging(boolean flag) {
-        //isSwingInProgress=flag;
-        //getDataWatcher().updateObject(27, Byte.valueOf((byte) (flag == true ? 1 : 0)));
-        getDataManager().set(IS_SWINGING, flag);
-    }
-
+    /*
     protected void updateSound() {
         if (terrainModifier.isBusy()) {
             if (--throttled2 <= 0) {
@@ -371,13 +382,15 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
         }
     }
 
+     */
+
     protected int getSwingSpeed() {
         return 10;
     }
 
     protected boolean chargeAttack(Entity entity) {
         int knockback = 4;
-        entity.attackEntityFrom(DamageSource.causeMobDamage(this), attackStrength + 3);
+        entity.attackEntityFrom(DamageSource.causeMobDamage(this), (int) getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue() + 3);
         entity.addVelocity(-MathHelper.sin(rotationYaw * 3.141593F / 180.0F) * knockback * 0.5F, 0.4D, MathHelper.cos(rotationYaw * 3.141593F / 180.0F) * knockback * 0.5F);
         setSprinting(false);
         playSound(SoundEvents.ENTITY_GENERIC_BIG_FALL, 1f, 1f);
@@ -385,32 +398,11 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
     }
 
     @Override
-    protected void updateAITasks() {
-        super.updateAITasks();
-        terrainModifier.onUpdate();
-    }
-
-    protected ITerrainDig getTerrainDig() {
-        return terrainDigger;
-    }
-
-    //TODO: Removed Override annotation
-	/*protected String getLivingSound() {
-		if (getTier() == 3) {
-			return rand.nextInt(3) == 0 ? "invmod:bigzombie1" : null;
-		}
-	
-		return "mob.zombie.say";
-	}*/
-
-    @Override
     protected SoundEvent getAmbientSound() {
-        if (getTier() == 3) return rand.nextInt(3) == 0 ? SoundHandler.bigzombie1 : null;
+        if (getTier() == 3) return rand.nextInt(3) == 0 ? ModSounds.ENTITY_BIG_ZOMBIE_AMBIENT.get() : null;
         return SoundEvents.ENTITY_ZOMBIE_AMBIENT;
     }
 
-    //@Override
-    //protected SoundEvent getHurtSound()
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
         return SoundEvents.ENTITY_ZOMBIE_HURT;
@@ -421,127 +413,22 @@ public class InvadingZombieEntity extends InvadingEntity implements ICanDig {
         return SoundEvents.ENTITY_ZOMBIE_DEATH;
     }
 
-    /*
     @Override
-    protected Item getDropItem() {
-        return Items.ROTTEN_FLESH;
-    }
-
-    @Override
-    protected void dropFewItems(boolean flag, int bonus) {
-        super.dropFewItems(flag, bonus);
-        if (rand.nextFloat() < 0.35F) {
-            dropItem(Items.ROTTEN_FLESH, 1);
-        }
-
-        if ((itemDrop != null) && (rand.nextFloat() < dropChance)) {
-            entityDropItem(new ItemStack(itemDrop, 1, 0), 0.0F);
-        }
-    }
-
-     */
-
-    private void setAttributes(int tier, int flavour) {
-        setMaxHealthAndHealth(Invasion.getMobHealth(this));
-        setGender(1);
-        if (tier == 1) {
-            //tier = 1;
-            setName("Zombie");
-            setBaseMoveSpeedStat(0.19F);
-            selfDamage = 3;
-            maxSelfDamage = 6;
-            flammability = 3;
-            if (flavour == 0) {
-                attackStrength = 4;
-                maxDestructiveness = 2;
-                setDestructiveness(2);
-            } else if (flavour == 1) {
-                attackStrength = 6;
-                maxDestructiveness = 0;
-                //defaultHeldItem = new ItemStack(Items.WOODEN_SWORD, 1);
-                setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.WOODEN_SWORD));
-                itemDrop = Items.WOODEN_SWORD;
-                dropChance = 0.2F;
-                setDestructiveness(0);
-            }
-        } else if (tier == 2) {
-            //tier = 2;
-            if (flavour == 0) {
-                setName("Zombie");
-                setBaseMoveSpeedStat(0.19F);
-                attackStrength = 7;
-                selfDamage = 4;
-                maxSelfDamage = 12;
-                maxDestructiveness = 2;
-                flammability = 4;
-                itemDrop = Items.IRON_CHESTPLATE;
-                setItemStackToSlot(EntityEquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
-                dropChance = 0.25F;
-                setDestructiveness(2);
-            } else if (flavour == 1) {
-                setName("Zombie Marauder");
-                setBaseMoveSpeedStat(0.19F);
-                attackStrength = 10;
-                selfDamage = 3;
-                maxSelfDamage = 9;
-                maxDestructiveness = 0;
-                //itemDrop = Items.IRON_SWORD;
-                dropChance = 0.25F;
-                //defaultHeldItem = new ItemStack(Items.IRON_SWORD, 1);
-                setHeldItem(EnumHand.MAIN_HAND, new ItemStack(rand.nextBoolean() ? Items.IRON_SWORD : Items.IRON_AXE));
-                setHeldItem(EnumHand.OFF_HAND, new ItemStack(rand.nextBoolean() ? Items.IRON_SWORD : Items.IRON_AXE));
-                itemDrop = getHeldItem(rand.nextBoolean() ? EnumHand.MAIN_HAND : EnumHand.OFF_HAND).getItem();
-                setDestructiveness(0);
-            } else if (flavour == 2) {
-                setName("Tar Zombie");
-                setBaseMoveSpeedStat(0.19F);
-                attackStrength = 5;
-                selfDamage = 3;
-                maxSelfDamage = 9;
-                maxDestructiveness = 2;
-                flammability = 30;
-                floatsInWater = false;
-                setDestructiveness(2);
-            } else if (flavour == 3) {
-                setName("Zombie Pigman");
-                setBaseMoveSpeedStat(0.25F);
-                attackStrength = 8;
-                maxDestructiveness = 2;
-                isImmuneToFire = true;
-                //defaultHeldItem = new ItemStack(Items.GOLDEN_SWORD, 1);
-                setHeldItem(EnumHand.MAIN_HAND, new ItemStack(Items.GOLDEN_SWORD));
-                setDestructiveness(2);
-            }
-        } else if (tier == 3) {
-            //tier = 3;
-            if (flavour == 0) {
-                setName("Zombie Brute");
-                setBaseMoveSpeedStat(0.17F);
-                attackStrength = 18;
-                selfDamage = 4;
-                maxSelfDamage = 20;
-                maxDestructiveness = 2;
-                flammability = 4;
-                dropChance = 0.0F;
-                setDestructiveness(2);
-            }
-        }
+    public CreatureAttribute getCreatureAttribute() {
+        return CreatureAttribute.UNDEAD;
     }
 
     private void doFireball() {
-        BlockPos pos = new BlockPos(getPositionVector());
         for (int xOffset = -1; xOffset < 2; xOffset++)
             for (int yOffset = -1; yOffset < 2; yOffset++)
                 for (int zOffset = -1; zOffset < 2; zOffset++) {
-                    if ((world.isAirBlock(pos.add(xOffset, yOffset, zOffset)) || (world.getBlockState(pos.add(xOffset, yOffset, zOffset)).getMaterial().getCanBurn()))) {
+                    BlockPos pos = getPosition().add(xOffset, yOffset, zOffset);
+                    if ((world.isAirBlock(pos) && world.isTopSolid(pos, this))) { //TODO another way to check if top is solid
                         world.setBlockState(pos.add(xOffset, yOffset, zOffset), Blocks.FIRE.getDefaultState());
                     }
                 }
 
-        List<Entity> entities = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(1.5D, 1.5D, 1.5D));
-        for (int el = entities.size() - 1; el >= 0; el--) {
-            entities.get(el).setFire(8);
-        }
+        world.getEntitiesWithinAABBExcludingEntity(this, getBoundingBox().expand(1.5d, 1.5d, 1.5d)).forEach(entity -> entity.setFire(8));
         attackEntityFrom(DamageSource.IN_FIRE, 500.0F);
     }
 }

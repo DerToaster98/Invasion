@@ -2,30 +2,26 @@ package invasion.entity.monster;
 
 import invasion.BlocksAndItems;
 import invasion.INotifyTask;
-import invasion.Invasion;
-import invasion.entity.ai.*;
-import invasion.entity.ai.navigator.Path;
-import invasion.entity.ai.navigator.PathNode;
 import invasion.entity.projectile.BoulderEntity;
 import invasion.entity.projectile.EntityIMPrimedTNT;
+import invasion.init.ModEntityTypes;
 import invasion.nexus.Nexus;
 import invasion.util.config.Config;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemStack;
+import net.minecraft.entity.IRangedAttackMob;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 
-public class EntityIMThrower extends InvadingEntity {
+public class EntityIMThrower extends InvadingEntity implements IRangedAttackMob {
 
     private int throwTime;
     private int punchTimer;
@@ -33,22 +29,38 @@ public class EntityIMThrower extends InvadingEntity {
     private BlockPos pointToClear;
     private INotifyTask clearPointNotifee;
 
+//TODO size (1.8f, 1.95f)
 
-    public EntityIMThrower(EntityType<? extends EntityIMThrower> type, World world
-            , Nexus nexus) {
-        super(type,world, nexus);
-        this.setBaseMoveSpeedStat(0.13F);
-        this.attackStrength = 10;
-        this.selfDamage = 0;
-        this.maxSelfDamage = 0;
-        this.experienceValue = 20;
-        this.clearingPoint = false;
-        this.setMaxHealthAndHealth(Invasion.getMobHealth(this));
-        this.setName("Thrower");
-        this.setDestructiveness(2);
-        this.setSize(1.8F, 1.95F);
+    public EntityIMThrower(EntityType<? extends EntityIMThrower> type, World world) {
+        super(type, world, null);
     }
-/*
+
+    public EntityIMThrower(World world, Nexus nexus, byte tier) {
+        super(ModEntityTypes.THROWER.get(), world, nexus);
+        if (tier < 1 || tier > 2) throw new IllegalArgumentException("Tier must be between 1 and 2");
+        setTier(tier);
+    }
+
+    @Override
+    protected void registerAttributes() {
+        super.registerAttributes();
+        //TODO getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue();
+        switch (tier) {
+            case 1:
+                getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.13);
+                getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(10);
+                experienceValue = 20;
+                this.setDestructiveness(2);
+            case 2:
+                getAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.23);
+                getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).setBaseValue(13);
+                experienceValue = 25;
+                setDestructiveness(4);
+
+        }
+    }
+
+    /*
     @Override
     protected void initEntityAI() {
         this.tasksIM = new EntityAITasks(this.world.profiler);
@@ -78,15 +90,21 @@ public class EntityIMThrower extends InvadingEntity {
  */
 
     @Override
-    public void updateAITick() {
-        super.updateAITick();
-        this.throwTime -= 1;
+    public void tick() {
+        super.tick();
+        throwTime--;
+        //TODO find out whatever this does
         if (this.clearingPoint) {
             if (this.clearPoint()) {
                 this.clearingPoint = false;
                 if (this.clearPointNotifee != null) this.clearPointNotifee.notifyTask(0);
             }
         }
+    }
+
+    @Override
+    public int getTextureIndex() {
+        return getTier() - 1;
     }
 
     @Override
@@ -100,6 +118,7 @@ public class EntityIMThrower extends InvadingEntity {
         this.motionZ /= 2.0D;
         this.motionX -= par3 / f * f1;
         this.motionY += f1;
+
         this.motionZ -= par5 / f * f1;
 
         if (this.motionY > 0.4000000059604645D) this.motionY = 0.4000000059604645D;
@@ -109,6 +128,7 @@ public class EntityIMThrower extends InvadingEntity {
         return this.throwTime <= 0;
     }
 
+    /*
     @Override
     public boolean onPathBlocked(Path path, INotifyTask notifee) {
         if (!path.isFinished()) {
@@ -121,6 +141,9 @@ public class EntityIMThrower extends InvadingEntity {
         return false;
     }
 
+     */
+
+    /*
     @Override
     public void setTier(int tier) {
         super.setTier(tier);
@@ -150,6 +173,8 @@ public class EntityIMThrower extends InvadingEntity {
         }
     }
 
+     */
+
 	/*@Override
 	public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
 		nbttagcompound.setInteger("tier", this.tier);
@@ -164,20 +189,6 @@ public class EntityIMThrower extends InvadingEntity {
 		setTier(this.tier);
 	}*/
 
-    @Override
-    public String getSpecies() {
-        return "Zombie";
-    }
-
-    @Override
-    public int getGender() {
-        return 1;
-    }
-
-    //TODO: Removed Override annotation
-	/*protected String getLivingSound() {
-		return "mob.zombie.say";
-	}*/
 
     @Override
     protected SoundEvent getAmbientSound() {
@@ -195,13 +206,12 @@ public class EntityIMThrower extends InvadingEntity {
     }
 
     protected boolean clearPoint() {
+        /* TODO what did this do?
         if (--this.punchTimer <= 0) {
             //this is a cheat, I should fix it where it get's the point to clear
             int x = this.pointToClear.getX() + 1;
             int y = this.pointToClear.getY();
             int z = this.pointToClear.getZ();
-            int mobX = MathHelper.floor(this.posX);
-            int mobZ = MathHelper.floor(this.posZ);
             int xOffsetR = 0;
             int zOffsetR = 0;
             int axisX = 0;
@@ -258,6 +268,8 @@ public class EntityIMThrower extends InvadingEntity {
                 return true;
             }
         }
+
+         */
         return false;
     }
 
@@ -287,21 +299,16 @@ public class EntityIMThrower extends InvadingEntity {
         }
     }
 
-
     @Override
-    public boolean attackEntityAsMob(Entity entity, int f) {
-        if ((this.throwTime <= 0) && (f > 4.0F)) {
-            this.throwTime = 120;
-            //f is the throwdistance
-            if (f < 50.0F) {
-                this.throwBoulder(entity.posX, entity.posY + entity.getEyeHeight() - 0.7D, entity.posZ, false);
-            }
-            return true;
-        } else {
-            return super.attackEntityAsMob(entity, f);
+    public boolean attackEntityAsMob(Entity target) {
+        double distanceSq = getDistanceSq(target);
+        if (distanceSq < 4.0) {
+            super.attackEntityAsMob(target);
+        } else if (canThrow() && distanceSq < 1000.0) {
+            attackEntityWithRangedAttack(distanceSq);
         }
-
     }
+
 
     protected void throwBoulder(double entityX, double entityY, double entityZ, boolean forced) {
         float launchSpeed = 1.0F;
@@ -354,17 +361,6 @@ public class EntityIMThrower extends InvadingEntity {
         dY += dXY * Math.tan(angle);
         entityTNT.setBoulderHeading(dX, dY, dZ, launchSpeed, 0.05F);
         this.world.spawnEntity(entityTNT);
-    }
-
-    @Override
-    protected void dropFewItems(boolean flag, int bonus) {
-        super.dropFewItems(flag, bonus);
-        this.entityDropItem(new ItemStack(BlocksAndItems.itemSmallRemnants, 1), 0.0F);
-    }
-
-    @Override
-    public String toString() {
-        return "IMThrower-T" + this.getTier();
     }
 
 }

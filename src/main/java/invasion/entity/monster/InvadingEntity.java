@@ -9,7 +9,6 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.RangedAttribute;
 import net.minecraft.entity.monster.MonsterEntity;
@@ -20,7 +19,6 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
@@ -28,7 +26,7 @@ import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -40,68 +38,27 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
     protected static final IAttribute SENSE_RANGE = new RangedAttribute(null, "invasion.sense_range", 6.0D, 0.0D, 20.0D).setDescription("Sensory Range");
     private static final DataParameter<Boolean> IS_ADJACENT_CLIMB_BLOCK = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BOOLEAN); //21
     private static final DataParameter<Boolean> IS_JUMPING = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BOOLEAN); //22
-    private static final DataParameter<Boolean> IS_HOLDING_ONTO_LADDER = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BOOLEAN); //20
-    private static final DataParameter<Integer> MOVE_STATE = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //23
-    private static final DataParameter<Byte> TIER = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.BYTE); //30
-    private static final DataParameter<Integer> TEXTURE = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //31
-    private static final DataParameter<Integer> ROLL = EntityDataManager.createKey(InvadingEntity.class, DataSerializers.VARINT); //24
-    protected static List<Block> unbreakableBlocks = Arrays.asList(
+    protected static Collection<Block> unbreakableBlocks = Arrays.asList(
             Blocks.BEDROCK, Blocks.COMMAND_BLOCK, Blocks.END_PORTAL_FRAME,
             Blocks.LADDER, Blocks.CHEST);
 
-
     @Nullable
-    protected final Nexus nexus;
-
-    //RM
-
-    /*
-    private final PathCreator pathSource = new PathCreator(700, 50);
-    private final NavigatorIM imNavigator = new NavigatorIM(this, this.pathSource);
-    private final PathNavigateAdapter oldNavAdapter = new PathNavigateAdapter(this.imNavigator);
-
-     */
+    protected Nexus nexus; /// The nexus the entity is bound to. If null, the entity is independent
 
     protected Objective currentObjective = Objective.NONE;
     protected Objective prevObjective = Objective.NONE;
-    //protected EntityAITasks tasksIM;
-    //protected EntityAITasks targetTasksIM;
-    protected byte tier;
+    protected int flammability = 2;      //TODO how flammable the entity is
+
     protected float attackRange = 0f;
     protected int selfDamage = 2;
     protected int maxSelfDamage = 6;
     protected int maxDestructiveness = 0;
     protected float blockRemoveSpeed = 1f;
     protected boolean floatsInWater = true;
-    protected int throttled = 0;
-    protected int throttled2 = 0;
-    protected int flammability = 2;
-    protected int destructiveness = 0;
+    protected int destructiveness = 0;   //TODO maybe safe delete this
+    private byte tier; /// The tier of the entity. if not needed, it should be left alone
     protected boolean burnsInDay;
-    //protected boolean isImmuneToFire;
-    private BlockPos collideSize;
-    private final BlockPos currentTargetPos = BlockPos.ZERO;
-    private int rallyCooldown;
-    //private float turnRate = 30.0F;
-    //private float moveSpeedBase = 0.2f;
-    //private float moveSpeed = 0.2f;
-    //private MoveState moveState;
-    //private final IMMoveHelper moveHelperIM = new IMMoveHelper(this);
-    //private float rotationRoll = 0f;
 
-    //DarthXenon: Not sure what these should be initialized as
-    //private float rotationYawHeadIM = 0f;
-    //private float rotationPitchHead = 0f;
-    //private float prevRotationRoll = 0f;
-    //private float prevRotationYawHeadIM = 0f;
-    //private float prevRotationPitchHead = 0f;
-    private int debugMode;
-    private final float airResistance = 0.9995F;
-    private float groundFriction = 0.546F;
-    private float gravityAcel = 0.08F;
-    private final float pitchRate = 2f;
-    private BlockPos lastBreathExtendPos = BlockPos.ZERO;
-    private float maxHealth;
     private boolean canClimb = false;
     private final boolean canDig = true;
     private boolean nexusBound;
@@ -109,28 +66,21 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
 
     private int stunTimer;
 
-   /*
-    private int jumpHeight = 1;
-    private int aggroRange;
-    private int senseRange;
-
-     */
-
     public InvadingEntity(EntityType<? extends InvadingEntity> type, World world, @Nullable Nexus nexus) {
+        this(type, world, nexus, (byte) 0);
+    }
+
+    public InvadingEntity(EntityType<? extends InvadingEntity> type, World world, @Nullable Nexus nexus, byte tier) {
         super(type, world);
 
         this.nexus = nexus;
-        debugMode = 0; //RM Config.DEBUG ? 1 : 0;
-        //setMaxHealthAndHealth(Invasion.getMobHealth(this));
-        //RM isImmuneToFire = false;
+        setTier(tier);
         experienceValue = 5;
         nexusBound = nexus != null;
         burnsInDay = nexus == null; //RM && Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY;
-        //   aggroRange = nexus != null ? 12 : Config.NIGHTSPAWNS_MOB_SIGHTRANGE;
-        //   senseRange = nexus != null ? 6 : Config.NIGHTSPAWNS_MOB_SENSERANGE;
-        // debugTest
     }
 
+    @SuppressWarnings("deprecation")
     public static float getBlockStrength(BlockPos pos, Block block, World world) {
 
         int bonus = 0;
@@ -162,44 +112,48 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
 
     @Override
     public void writeSpawnData(PacketBuffer buffer) {
-        buffer.writeByte(tier);
+        buffer.writeByte(getTier());
     }
 
     @Override
     public void readSpawnData(PacketBuffer additionalData) {
-        tier = additionalData.readByte();
+        setTier(additionalData.readByte());
     }
-/*
+
     @Override
-    public void tick() {
-        super.tick();
-
-        if (world.isRemote) {
-            isJumping = getDataManager().get(IS_JUMPING);
-        } else {
-          //RM  setAdjacentClimbBlock(checkForAdjacentClimbBlock());
+    public void writeAdditional(CompoundNBT nbt) {
+        super.writeAdditional(nbt);
+        nbt.putBoolean("alwaysIndependent", alwaysIndependent);
+        nbt.putShort("tier", tier);
+        if (nexus != null) {
+            CompoundNBT nexusTag = new CompoundNBT();
+            nexusTag.putInt("x", nexus.getPos().getX());
+            nexusTag.putInt("y", nexus.getPos().getY());
+            nexusTag.putInt("z", nexus.getPos().getZ());
+            nbt.put("nexus", nexusTag);
         }
-
-        if (getAir() == 190) {
-            lastBreathExtendPos = getPosition();
-        } else if (getAir() == 0) {
-            if (Distance.distanceBetween(lastBreathExtendPos, getPosition()) > 4.0D) {
-                lastBreathExtendPos = getPosition();
-                setAir(180);
-            }
-        }
-        
     }
 
- */
+    @Override
+    public void readAdditional(CompoundNBT nbt) {
+        super.readAdditional(nbt);
+        if (nbt.contains("tier")) {
+            tier = nbt.getByte("tier");
+        }
+        if (nbt.contains("alwaysIndependent")) {
+            alwaysIndependent = nbt.getBoolean("alwaysIndependent");
+        }
+
+        if (nbt.contains("nexus")) {
+            //CompoundNBT nexusTag = nbt.getCompound("nexus");
+            nexus = Nexus.get(world);// ((NexusTileEntity) world.getTileEntity(new BlockPos(nexusTag.getInt("x"),nexusTag.getInt("y"),nexusTag.getInt("z"))))
+        }
+    }
 
     @Override
     public void livingTick() {
         if (!nexusBound) {
             float brightness = getBrightness();
-            if ((brightness > 0.5F) || (getPosY() < 55.0D)) {
-                ticksExisted += 2;
-            }
             if ((burnsInDay) && (world.isDaytime()) && (!world.isRemote)) {
                 if ((brightness > 0.5F) && (world.canBlockSeeSky(getPosition()))
                         && (rand.nextFloat() * 30.0F < (brightness - 0.4F) * 2.0F)) {
@@ -235,192 +189,6 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         return super.createNavigator(worldIn);
     }
 
-
-    //TODO maybe switch back to a custom implementation of attackEntityAsMob
-/*
-    @Override
-    public boolean attackEntityAsMob(Entity entity) {
-        return entity.attackEntityFrom(DamageSource.causeMobDamage(this),(float) getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getValue());
-    }
-
-    public boolean attackEntityAsMob(Entity entity, int damageOverride) {
-        return entity.attackEntityFrom(DamageSource.causeMobDamage(this), damageOverride);
-    }
-    */
-
-    //RM
-    /*
-    @Override
-    public void moveRelative(float p_213309_1_, Vec3d relative) {
-        super.moveRelative(p_213309_1_, relative);
-    }
-
-
-    @Override
-    public void moveRelative(float strafe, float up, float forward, float friction) {
-	/*	// TODO Auto-generated method stub
-		super.moveRelative(strafe, up, forward, friction);
-	}
-
-	@Override
-	public void moveEntityWithHeading(float strafe, float forward)
-	{
-        //super.moveEntityWithHeading(strafe, forward);
-        super.moveRelative(strafe, up, forward, friction);
-        if (isInWater()) {
-            double y = getPosY();
-            moveFlying(strafe, forward, 0.04F);
-            setVelocity(motionX, motionY, motionZ);
-            motionX *= 0.8D;
-            motionY *= 0.8D;
-            motionZ *= 0.8D;
-            motionY -= 0.02D;
-            if ((collidedHorizontally)
-                    && (isOffsetPositionInLiquid(motionX, motionY + 0.6D - posY + y, motionZ)))
-                motionY = 0.3D;
-        } else if (isInLava()) {
-            double y = posY;
-            moveFlying(strafe, forward, 0.04F);
-            setVelocity(motionX, motionY, motionZ);
-            motionX *= 0.5D;
-            motionY *= 0.5D;
-            motionZ *= 0.5D;
-            motionY -= 0.02D;//"get paid pupper"
-
-
-            if ((collidedHorizontally)
-                    && (isOffsetPositionInLiquid(motionX, motionY + 0.6D - posY + y, motionZ)))
-                motionY = 0.3D;
-        } else {
-            float groundFriction = 0.91F;
-            float landMoveSpeed;
-            if (onGround) {
-                groundFriction = getGroundFriction();
-                Block block = world.getBlockState(new BlockPos(posX, getEntityBoundingBox().minY - 1d, posZ)).getBlock();
-                if (block != Blocks.AIR) groundFriction = block.slipperiness * 0.91F;
-                landMoveSpeed = getAIMoveSpeed();
-
-                landMoveSpeed *= 0.162771F / (groundFriction * groundFriction * groundFriction);
-            } else {
-                landMoveSpeed = jumpMovementFactor;
-            }
-
-            moveFlying(strafe, forward, landMoveSpeed);
-//"get paid pupper"
-
-
-            if (isOnLadder()) {
-                float maxLadderXZSpeed = 0.15F;
-                if (motionX < -maxLadderXZSpeed) motionX = (-maxLadderXZSpeed);
-                if (motionX > maxLadderXZSpeed) motionX = maxLadderXZSpeed;
-                if (motionZ < -maxLadderXZSpeed) motionZ = (-maxLadderXZSpeed);
-                if (motionZ > maxLadderXZSpeed) motionZ = maxLadderXZSpeed;
-
-                fallDistance = 0.0F;
-                if (motionY < -0.15D) motionY = -0.15D;
-
-                if ((isHoldingOntoLadder()) || ((isSneaking()) && (motionY < 0.0D))) {
-                    motionY = 0.0D;
-                } else if ((world.isRemote) && (isJumping)) {
-                    motionY += 0.04D;
-                }
-            }
-            setVelocity(motionX, motionY, motionZ);
-
-            if ((collidedHorizontally) && (isOnLadder())) motionY = 0.2D;
-            motionY -= getGravity();
-            motionY *= airResistance;
-            motionX *= groundFriction * airResistance;
-            motionZ *= groundFriction * airResistance;
-        }
-private boolean nexusBound;
-        prevLimbSwingAmount = limbSwingAmount;
-        double dX = posX - prevPosX;
-        double dZ = posZ - prevPosZ;
-        float limbEnergy = MathHelper.sqrt(dX * dX + dZ * dZ) * 4.0F;
-
-        if (limbEnergy > 1.0F) {
-            limbEnergy = 1.0F;
-        }
-
-        limbSwingAmount += (limbEnergy - limbSwingAmount) * 0.4F;
-        limbSwing += limbSwingAmount;
-    }
-    */
-
-	/*
-	// not sure why, but this needed to be removed in order to let the mobs swim
-	// public boolean handleWaterMovement() {
-	// if (floatsInWater) {
-	// return
-	// world.handleMaterialAcceleration(getEntityBoundingBox().expand(0.0D,
-	// -0.4D, 0.0D).contract(0.001D, 0.001D, 0.001D), Material.water, this);
-	// }
-	//
-	// double vX = motionX;
-	// double vY = motionY;
-	// double vZ = motionZ;
-	// boolean isInWater =
-	// world.handleMaterialAcceleration(getEntityBoundingBox().expand(0.0D,
-	// -0.4D, 0.0D).contract(0.001D, 0.001D, 0.001D), Material.water, this);
-	// motionX = vX;
-	// motionY = vY;
-	// motionZ = vZ;
-	// return isInWater;
-	// }
-	*/
-
-    /*
-    //TODO: Removed Override annotation
-    public void moveFlying(float strafeAmount, float forwardAmount, float movementFactor) {
-        float unit = MathHelper.sqrt(strafeAmount * strafeAmount + forwardAmount * forwardAmount);
-
-        if (unit < 0.01F) return;
-        if (unit < 20.0F) unit = 1.0F;
-
-        unit = movementFactor / unit;
-        strafeAmount *= unit;
-        forwardAmount *= unit;
-
-        float com1 = MathHelper.sin(rotationYaw * 3.141593F / 180.0F);
-        float com2 = MathHelper.cos(rotationYaw * 3.141593F / 180.0F);
-        motionX += strafeAmount * com2 - forwardAmount * com1;
-        motionZ += forwardAmount * com2 + strafeAmount * com1;
-    }
-
-     */
-
-    public void onBlockRemoved(int x, int y, int z, int id) {
-        if (getHealth() > maxHealth - maxSelfDamage) {
-            attackEntityFrom(DamageSource.GENERIC, selfDamage);
-        }
-
-        if ((throttled == 0) && ((id == 3) || (id == 2) || (id == 12) || (id == 13))) {
-            playSound(SoundEvents.BLOCK_GRAVEL_STEP, 1.4f, 1f / (rand.nextFloat() * 0.6f + 1f));
-        } else {
-            playSound(SoundEvents.BLOCK_STONE_STEP, 1.4f, 1f / (rand.nextFloat() * 0.6f + 1f));
-        }
-        throttled = 5;
-    }
-
-	/*
-	// TODO: Fix This
-	// @Override
-	// public Entity findPlayerToAttack() {
-	// EntityPlayer entityPlayer = world.getClosestPlayerToEntity(
-	// this, getSenseRange());
-	// if (entityPlayer != null) {
-	// return entityPlayer;
-	// }
-	// entityPlayer = world.getClosestPlayerToEntity(this,
-	// getAggroRange());
-	// if ((entityPlayer != null) && (canEntityBeSeen(entityPlayer))) {
-	// return entityPlayer;
-	// }
-	// return null;
-	// }
-	*/
-
     public double findDistanceToNexus() {
         if (nexus == null) return Double.MAX_VALUE;
         double x = nexus.getPos().getX() + 0.5D - getPosX();
@@ -429,86 +197,9 @@ private boolean nexusBound;
         return Math.sqrt(x * x + y * y + z * z);
     }
 
-    @Override
-    public void writeAdditional(CompoundNBT nbt) {
-        super.writeAdditional(nbt);
-        nbt.putBoolean("alwaysIndependent", alwaysIndependent);
-        nbt.putShort("tier", tier);
-    }
-
-    @Override
-    public void readAdditional(CompoundNBT nbt) {
-        super.readAdditional(nbt);
-
-        if (nbt.contains("tier")) {
-            //getDataManager().set(TIER, nbt.getByte("tier"));
-            tier =nbt.getByte("tier");
-        }
-        if (nbt.contains("alwaysIndependent")) {
-            alwaysIndependent = nbt.getBoolean("alwaysIndependent");
-        }
-        if (alwaysIndependent) {
-            //setBurnsInDay(Config.NIGHTSPAWNS_MOB_BURN_DURING_DAY);
-            //(Config.NIGHTSPAWNS_MOB_SIGHTRANGE);
-            //(Config.NIGHTSPAWNS_MOB_SENSERANGE);
-        }
-    }
-
     public float getAttackRange() {
         return attackRange;
     }
-
-    public void setAttackRange(float range) {
-        attackRange = range;
-    }
-
-    public void setMaxHealthAndHealth(float health) {
-        maxHealth = health;
-        getAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(health);
-        setHealth(health);
-    }
-
-    //DarthXenon: Boolean flags are kept separate for debug breakpoint purposes
-    /*
-    @Override
-    public boolean getCanSpawnHere() {
-        boolean lightFlag = ((nexusBound) || (getLightLevelBelow8()));
-        BlockPos pos = new BlockPos(posX, getEntityBoundingBox().minY + 0.5D, posZ);
-        //boolean onGround = WorldEntitySpawner.canCreatureTypeSpawnAtLocation(EntityLiving.SpawnPlacementType.ON_GROUND, world, pos);
-        boolean onGround = world.isTopSolid(pos.down(), EnumFacing.UP, false);
-        boolean inWall = isEntityInOpaqueBlockBeforeSpawn();
-        return (super.getCanSpawnHere()) && (lightFlag) && (onGround && !inWall);
-    }
-
-     */
-
-    /*
-    public boolean isEntityInOpaqueBlockBeforeSpawn() {
-        AxisAlignedBB box = getEntityBoundingBox();
-        BlockPos min = new BlockPos(box.minX, box.minY, box.minZ);
-        BlockPos max = new BlockPos(MathHelper.ceil(box.maxX), MathHelper.ceil(box.maxY), MathHelper.ceil(box.maxZ));
-        for (int x = min.getX(); x < max.getX(); x++) {
-            for (int y = min.getY(); y < max.getY(); y++) {
-                for (int z = min.getZ(); z < max.getZ(); z++) {
-                    if (world.isBlockNormalCube(new BlockPos(x, y, z), false)) return true;
-                }
-            }
-        }
-        return false;
-    }
-
-
-     */
-    /*
-    public int getJumpHeight() {
-        return jumpHeight;
-    }
-
-    protected void setJumpHeight(int height) {
-        jumpHeight = height;
-    }
-
-     */
 
     public float getBlockStrength(BlockPos pos) {
         return getBlockStrength(pos, world.getBlockState(pos).getBlock());
@@ -529,39 +220,6 @@ private boolean nexusBound;
     public boolean getCanDigDown() {
         return canDig;
     }
-/*
-    public int getAggroRange() {
-        return aggroRange;
-    }
-
-    public void setAggroRange(int range) {
-        aggroRange = range;
-    }
-
-    public int getSenseRange() {
-        return senseRange;
-    }
-
-    public void setSenseRange(int range) {
-        senseRange = range;
-    }
-
- */
-
-    //TODO Prevents the entity from spawning with egg; conflict with EntityAISwimming
-	/*@Override
-	public PathNavigate getNavigator() {
-		return oldNavAdapter;
-	}*/
-
-    // TODO: Used to have override annotation
-    /*
-    public float getBlockPathWeight(int i, int j, int k) {
-        if (nexusBound) return 0.0F;
-        return 0.5F - world.getLightBrightness(new BlockPos(i, j, k));
-    }
-
-     */
 
     public int getDestructiveness() {
         return destructiveness;
@@ -569,30 +227,6 @@ private boolean nexusBound;
 
     protected void setDestructiveness(int x) {
         destructiveness = x;
-    }
-
-    public float getPitchRate() {
-        return pitchRate;
-    }
-
-    public float getGravity() {
-        return gravityAcel;
-    }
-
-    protected void setGravity(float acceleration) {
-        gravityAcel = acceleration;
-    }
-
-    public float getAirResistance() {
-        return airResistance;
-    }
-
-    public float getGroundFriction() {
-        return groundFriction;
-    }
-
-    public void setGroundFriction(float frictionCoefficient) {
-        groundFriction = frictionCoefficient;
     }
 
     public Objective getAIGoal() {
@@ -609,26 +243,6 @@ private boolean nexusBound;
 
     protected void setPrevAIGoal(Objective objective) {
         prevObjective = objective;
-    }
-
-    //RM
-    /* TODO
-
-    @Override
-    public float getBlockPathCost(PathNode prevNode, PathNode node) {
-    //RM    return calcBlockPathCost(prevNode, node, world);
-        return 420.69f;
-    }
-
-    @Override
-    public void getPathOptionsFromNode(PathNode currentNode, PathfinderIM pathFinder) {
-       //RM calcPathOptions(world, currentNode, pathFinder);
-    }
-
-     */
-
-    public int getDebugMode() {
-        return debugMode;
     }
 
     public boolean isAdjacentClimbBlock() {
@@ -675,7 +289,9 @@ private boolean nexusBound;
 
     @Override
     public void onDeath(DamageSource cause) {
-        if(nexus !=null) {nexus.registerMobDied();}
+        if (nexus != null) {
+            nexus.registerMobDied();
+        }
 
         super.onDeath(cause);
     }
@@ -690,7 +306,6 @@ private boolean nexusBound;
     public boolean isNoDespawnRequired() {
         return nexusBound;
     }
-
 
     protected void sunlightDamageTick() {
         if (isImmuneToFire()) {
@@ -892,39 +507,29 @@ private boolean nexusBound;
         return tier;
     }
 
-
-
-    /*
-    protected boolean getLightLevelBelow8() {
-        BlockPos blockPos = new BlockPos(getPosX(), getBoundingBox().minY, getPosZ());
-
-        if (world.getLightFor(EnumSkyBlock.SKY, blockPos) > rand.nextInt(32)) return false;
-        int l = world.getBlockLightOpacity(blockPos);
-
-        if (world.isThundering()) {
-            int i1 = world.getSkylightSubtracted();
-            world.setSkylightSubtracted(10);
-            l = world.getBlockLightOpacity(blockPos);
-            world.setSkylightSubtracted(i1);
-        }
-        return l <= rand.nextInt(8);
+    private void setTier(byte t) {
+        tier = t;
     }
-
-     */
-
 
     public void transitionAIGoal(Objective newObjective) {
         prevObjective = currentObjective;
         currentObjective = newObjective;
+    }
 
+    /**
+     * @return the texture index (0-based)
+     */
+    public int getTextureIndex() {
+        return 0;
     }
 
     @Override
+    @Nullable
     public Nexus getNexus() {
         return nexus;
     }
 
     public boolean isNexusBound() {
-        return nexusBound;
+        return nexus != null;
     }
 }

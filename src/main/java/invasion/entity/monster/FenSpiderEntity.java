@@ -1,11 +1,10 @@
 package invasion.entity.monster;
 
+import invasion.init.ModEntityTypes;
 import invasion.nexus.Nexus;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.CreatureAttribute;
-import net.minecraft.entity.EntitySize;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.Pose;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.SoundEvents;
@@ -14,15 +13,14 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
 
-public class
-FenSpiderEntity extends InvadingEntity {
+public class FenSpiderEntity extends InvadingEntity {
 
     public FenSpiderEntity(EntityType<? extends FenSpiderEntity> type, World world) {
-        super(type,world,null);
+        super(type, world, null);
     }
 
-    public FenSpiderEntity(EntityType<? extends FenSpiderEntity> type, World world, @Nullable Nexus nexus) {
-        super(type, world, nexus);
+    public FenSpiderEntity(World world, @Nullable Nexus nexus) {
+        super(ModEntityTypes.FEN_SPIDER.get(), world, nexus);
     }
 
     @Override
@@ -50,14 +48,6 @@ FenSpiderEntity extends InvadingEntity {
     protected void playStepSound(BlockPos pos, BlockState blockIn) {
         this.playSound(SoundEvents.ENTITY_SPIDER_STEP, 0.15F, 1.0F);
     }
-
-    /*
-    @Override
-    public EntitySize getSize(Pose poseIn) {
-        return null;
-    }
-
-     */
 
     @Override
     public CreatureAttribute getCreatureAttribute() {

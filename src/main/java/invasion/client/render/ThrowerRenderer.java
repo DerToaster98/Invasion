@@ -13,8 +13,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class ThrowerRenderer<T extends EntityIMThrower> extends LivingRenderer<T, ThrowerModel<T>> {
     private static final ResourceLocation[] TEXTURES = {
-            new ResourceLocation(Invasion.MOD_ID + "textures/entity/throwerT1.png"),
-            new ResourceLocation(Invasion.MOD_ID + "textures/entity/throwerT2.png")
+            new ResourceLocation(Invasion.MOD_ID, "textures/entity/throwerT1.png"),
+            new ResourceLocation(Invasion.MOD_ID, "textures/entity/throwerT2.png")
     };
 
     public ThrowerRenderer(EntityRendererManager rendererManager) {
@@ -23,6 +23,6 @@ public class ThrowerRenderer<T extends EntityIMThrower> extends LivingRenderer<T
 
     @Override
     public ResourceLocation getEntityTexture(EntityIMThrower entity) {
-        return TEXTURES[entity.getTier()];
+        return TEXTURES[entity.getTextureIndex()];
     }
 }

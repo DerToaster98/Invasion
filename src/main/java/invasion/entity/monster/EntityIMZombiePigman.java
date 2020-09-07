@@ -365,16 +365,6 @@ public class EntityIMZombiePigman extends InvadingEntity implements ICanDig {
         this.getDataManager().set(IS_SWINGING, flag);
     }
 
-    protected void updateSound() {
-        if (this.terrainModifier.isBusy()) {
-            if (--this.throttled2 <= 0) {
-                //this.world.playSoundAtEntity(this, "invmod:scrape", 0.85F, 1.0F / (this.rand.nextFloat() * 0.5F + 1.0F));
-                this.playSound(SoundHandler.scrape1, 0.85F, 1.0F / (this.rand.nextFloat() * 0.5F + 1.0F));
-                this.throttled2 = (45 + this.rand.nextInt(20));
-            }
-        }
-    }
-
     protected int getSwingSpeed() {
         return 10;
     }
