@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:smelting",
+  "ingredient": {
+    "item": "invasion:catalyst_mixture"
+  },
+  "result": "invasion:catalyst",
+  "experience": 2.0,
+}

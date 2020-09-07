@@ -2,18 +2,18 @@
   "type": "minecraft:crafting_shapeless",
   "ingredients": [
     {
-      "item": "minecraft:lapis_lazuli"
-    },
-    {
       "item": "invasion:rift_flux"
     },
     {
-      "item": "minecraft:lapis_lazuli"
+      "item": "minecraft:bone"
+    },
+    {
+      "item": "invasion:rift_flux"
     }
   ],
 
   "result": {
-    "item": "invasion:damping_agent",
+    "item": "invasion:strange_bone",
     "count": 1
   }
 }

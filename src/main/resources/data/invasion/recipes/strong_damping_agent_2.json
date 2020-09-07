@@ -2,17 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "pattern": [
     "   ",
-    "BBB",
+    "###",
     "   "
   ],
   "key": {
-    "B": {
-      "item": "minecraft:bowl"
+    "#": {
+      "item": "invasion:damping_agent"
     }
 
   },
   "result": {
-    "item": "invasion:damping_agent",
+    "item": "invasion:strong_damping_agent",
     "count": 1
   }
 }
