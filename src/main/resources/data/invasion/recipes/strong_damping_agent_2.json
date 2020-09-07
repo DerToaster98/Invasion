@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    "BBB",
+    "   "
+  ],
+  "key": {
+    "B": {
+      "item": "minecraft:bowl"
+    }
+
+  },
+  "result": {
+    "item": "invasion:damping_agent",
+    "count": 1
+  }
+}
+
