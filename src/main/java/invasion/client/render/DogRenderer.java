@@ -15,9 +15,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 //TODO maybe extend WolfRenderer directly?
 @OnlyIn(Dist.CLIENT)
 public class DogRenderer<T extends DogEntity> extends MobRenderer<T, WolfModel<T>> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID + "textures/entity/wolf_tame_nexus.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(Invasion.MOD_ID, "textures/entity/wolf_tame_nexus.png");
 
-    DogRenderer(EntityRendererManager rendererManager) {
+    public DogRenderer(EntityRendererManager rendererManager) {
         super(rendererManager, new WolfModel<>(), 0.8f);
     }
 

@@ -1,13 +1,16 @@
 package invasion.item;
 
 
+import invasion.entity.ally.DogEntity;
+import invasion.init.ModEntityTypes;
+import invasion.nexus.Nexus;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.WolfEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Hand;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.world.World;
 
 public class StrangeBoneItem extends Item {
     public StrangeBoneItem(Properties properties) {
@@ -19,9 +22,14 @@ public class StrangeBoneItem extends Item {
 
     @Override
     public boolean itemInteractionForEntity(ItemStack stack, PlayerEntity playerIn, LivingEntity target, Hand hand) {
-        if (target instanceof WolfEntity) {
-            if (playerIn.world.isRemote) return true;
-            playerIn.sendMessage(new StringTextComponent("Woof"));
+        World world = playerIn.world;
+        if (target instanceof WolfEntity && !(target instanceof DogEntity)) {
+            if (world.isRemote) return true;
+            DogEntity dog = new DogEntity(ModEntityTypes.DOG.get(), world);
+            dog.from((WolfEntity) target);
+            dog.acquiredByNexus(Nexus.get(world));
+            world.addEntity(dog);
+            target.remove();
             stack.shrink(1);
             return true;
         }

@@ -4,7 +4,6 @@ package invasion.entity.monster;
 import invasion.entity.IHasNexus;
 import invasion.entity.Objective;
 import invasion.nexus.Nexus;
-import invasion.util.Distance;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
@@ -19,6 +18,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.pathfinding.PathNavigator;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -228,6 +228,13 @@ public abstract class InvadingEntity extends MonsterEntity implements /*SparrowA
         if (stunTimer < ticks) stunTimer = ticks;
         setMotion(0.0, getMotion().y, 0.0);
     }
+
+    @Override
+    protected PathNavigator createNavigator(World worldIn) {
+        //TODO
+        return super.createNavigator(worldIn);
+    }
+
 
     //TODO maybe switch back to a custom implementation of attackEntityAsMob
 /*
