@@ -19,6 +19,7 @@ public class RandomBoulderGoal extends Goal {
     @Override
     public boolean shouldExecute() {
         if ((thrower.isNexusBound()) && (randomAmmo > 0) && (thrower.canThrow())) {
+
             return --this.timer <= 0;
         }
         return false;

@@ -10,6 +10,7 @@ import invasion.nexus.NexusMode;
 import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
@@ -40,11 +41,13 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class NexusTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider {
+public class NexusTileEntity extends TileEntity implements ITickableTileEntity, INamedContainerProvider, IInventory {
 
     public final static int MAX_COOK_TIME = 1200, MAX_GENERATION_TIME = 3000, MAX_ACTIVATION_TIME = 400;
 
-    private final NexusItemHandler items = new NexusItemHandler(2);
+    private final static int INVENTORY_SIZE = 2;
+
+    private final NexusItemHandler items = new NexusItemHandler(INVENTORY_SIZE);
     private final IIntArray syncData;
 
     private NexusMode mode = NexusMode.OFF; // it seems like: { 0: inactive, 1: wave invasion ,2:continuous invasion, 3: strong wave invasion 4:? }?
@@ -289,6 +292,52 @@ public class NexusTileEntity extends TileEntity implements ITickableTileEntity, 
     public ITextComponent getDisplayName() {
         return new TranslationTextComponent("container.nexus");
     }
+
+    /*
+    The following methods are for IInventory
+     */
+    @Override
+    public int getSizeInventory() {
+        return INVENTORY_SIZE;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
+
+    @Override
+    public ItemStack getStackInSlot(int index) {
+        return items.getStackInSlot(index);
+    }
+
+    @Override
+    public ItemStack decrStackSize(int index, int count) {
+        return items.decrStackSize(index, count);
+    }
+
+    @Override
+    public ItemStack removeStackFromSlot(int index) {
+        ItemStack stack = items.getStackInSlot(index);
+        items.removeStackFromSlot(index);
+        return stack;
+    }
+
+    @Override
+    public void setInventorySlotContents(int index, ItemStack stack) {
+        items.setStackInSlot(index, stack);
+    }
+
+    @Override
+    public boolean isUsableByPlayer(PlayerEntity player) {
+        return player.abilities.allowEdit; //TODO distance?
+    }
+
+    @Override
+    public void clear() {
+        items.clear();
+    }
+
 
     public static class NexusItemHandler extends ItemStackHandler {
 
